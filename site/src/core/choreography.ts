@@ -193,6 +193,9 @@ export const RIG_POSITION: [number, number, number] = [0, 0, -24];
 export interface CamKey {
   pos: [number, number, number];
   look: [number, number, number];
+  // varianti per schermi verticali (telefono): soggetto centrato, testo sotto
+  mpos?: [number, number, number];
+  mlook?: [number, number, number];
 }
 
 export const CAMERA: CamKey[] = [
@@ -200,10 +203,10 @@ export const CAMERA: CamKey[] = [
   /* 1 rumore    */ { pos: [2.6, 0.7, 8.6], look: [0, 0, 0] },
   /* 2 split     */ { pos: [0, 0.2, 15.5], look: [0, 0, 0] },
   /* 3 nel vuoto */ { pos: [0, 0.1, 2.5], look: [0, 0.4, -20] },
-  /* 4 accensione*/ { pos: [7.5, 3.4, -12.5], look: [0.8, 1.6, -30] },
-  /* 5 analisi   */ { pos: [6.8, 5.6, -16.5], look: [0.8, 0.6, -34] },
-  /* 6 pilota    */ { pos: [5.2, 7.0, -18.5], look: [0.2, 2.4, -25.5] },
+  /* 4 accensione*/ { pos: [7.5, 3.4, -12.5], look: [0.8, 1.6, -30], mpos: [6.5, 4.5, -8.5], mlook: [0.4, 2.0, -30] },
+  /* 5 analisi   */ { pos: [6.8, 5.6, -16.5], look: [0.8, 0.6, -34], mpos: [6.5, 7.5, -12], mlook: [0.6, 1.0, -34] },
+  /* 6 pilota    */ { pos: [5.2, 7.0, -18.5], look: [0.2, 2.4, -25.5], mpos: [6.0, 9.0, -15], mlook: [0.2, 2.0, -26] },
   /* 7 produzione*/ { pos: [2.6, 6.6, -46], look: [-0.2, 9.5, -84] },
-  /* 8 simbolo   */ { pos: [-5.6, 0.3, -1.5], look: [-5.6, 0.1, -24] },
-  /* 9 finale    */ { pos: [-1.6, 0.1, -7], look: [-1.6, 0, -24] },
+  /* 8 simbolo   */ { pos: [-5.6, 0.3, -1.5], look: [-5.6, 0.1, -24], mpos: [0, -4.2, -2], mlook: [0, -4.2, -24] },
+  /* 9 finale    */ { pos: [-1.6, 0.1, -7], look: [-1.6, 0, -24], mpos: [0, -1, -7], mlook: [0, -1, -24] },
 ];

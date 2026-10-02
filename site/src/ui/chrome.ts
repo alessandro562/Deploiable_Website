@@ -51,6 +51,8 @@ export class Chrome {
   }
 
   moveCursor(x: number, y: number) {
-    if (this.cursor) this.cursor.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+    if (!this.cursor) return;
+    this.cursor.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+    this.cursor.classList.add('is-on');
   }
 }

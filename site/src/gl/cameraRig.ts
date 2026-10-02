@@ -3,9 +3,17 @@ import { CAMERA, type SceneState } from '../core/choreography';
 
 // Camera su due curve (posizione e punto di vista) che passano per i keyframe della regia.
 // camK è un indice di keyframe continuo; sopra si sommano parallasse del mouse e un leggero respiro.
+const curve = (pts: [number, number, number][]) =>
+  new CatmullRomCurve3(pts.map((p) => new Vector3(...p)), false, 'centripetal');
+const DESIGN_ASPECT = 1.45;
+const toRad = Math.PI / 180;
+
 export class CameraRig {
-  private readonly posCurve = new CatmullRomCurve3(CAMERA.map((k) => new Vector3(...k.pos)), false, 'centripetal');
-  private readonly lookCurve = new CatmullRomCurve3(CAMERA.map((k) => new Vector3(...k.look)), false, 'centripetal');
+  private readonly desktop = { pos: curve(CAMERA.map((k) => k.pos)), look: curve(CAMERA.map((k) => k.look)) };
+  private readonly portrait = {
+    pos: curve(CAMERA.map((k) => k.mpos ?? k.pos)),
+    look: curve(CAMERA.map((k) => k.mlook ?? k.look)),
+  };
   private readonly look = new Vector3();
   private readonly par = new Vector2();
   private readonly tmp = new Vector3();
@@ -14,8 +22,10 @@ export class CameraRig {
 
   update(s: SceneState, pointer: Vector2, time: number) {
     const u = Math.min(1, Math.max(0, s.camK / (CAMERA.length - 1)));
-    this.posCurve.getPoint(u, this.camera.position);
-    this.lookCurve.getPoint(u, this.look);
+    const aspect = this.camera.aspect;
+    const set = aspect < 1 ? this.portrait : this.desktop;
+    set.pos.getPoint(u, this.camera.position);
+    set.look.getPoint(u, this.look);
 
     this.par.lerp(pointer, 0.06);
     const breath = Math.sin(time * 0.5) * 0.06;
@@ -24,8 +34,14 @@ export class CameraRig {
     this.camera.lookAt(this.look);
     this.camera.rotateZ(s.roll);
 
-    if (Math.abs(this.camera.fov - s.fov) > 1e-3) {
-      this.camera.fov = s.fov;
+    // Su schermi più stretti del formato di progetto si conserva il campo orizzontale.
+    let fov = s.fov;
+    if (aspect < DESIGN_ASPECT) {
+      const h = Math.atan((Math.tan((fov / 2) * toRad) * DESIGN_ASPECT) / aspect) * 2;
+      fov = Math.min(92, h / toRad);
+    }
+    if (Math.abs(this.camera.fov - fov) > 1e-3) {
+      this.camera.fov = fov;
       this.camera.updateProjectionMatrix();
     }
     this.camera.updateMatrixWorld();

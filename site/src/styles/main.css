@@ -378,6 +378,7 @@ html[data-theme='lime'] .grain {
 .is-webgl .track {
   display: block;
   height: calc(var(--total-vh) * 1vh);
+  height: calc(var(--total-vh) * 1svh);
 }
 .is-webgl .film {
   position: fixed;
@@ -593,7 +594,9 @@ html[data-theme='lime'] .grain {
   pointer-events: none;
   border: 1px solid var(--lime);
   border-radius: 50%;
+  opacity: 0;
   transition:
+    opacity 0.3s,
     width 0.25s,
     height 0.25s,
     margin 0.25s,
@@ -629,6 +632,29 @@ html[data-theme='lime'] .cursor::after {
   }
   .is-webgl .blk--right {
     top: auto;
-    bottom: 26vh;
+    bottom: 30vh;
   }
+  .is-webgl .blk--ml {
+    top: auto;
+    bottom: calc(var(--m) + 3vh);
+    translate: none;
+  }
+  .is-webgl .blk--manifesto {
+    left: var(--m);
+    right: auto;
+    top: auto;
+    bottom: calc(var(--m) + 3vh);
+    translate: none;
+  }
+}
+
+.is-static .topbar__meta,
+.is-static .blk--hint,
+html:not(.is-webgl) .topbar__meta,
+html:not(.is-webgl) .blk--hint {
+  display: none;
+}
+
+.cursor.is-on {
+  opacity: 1;
 }

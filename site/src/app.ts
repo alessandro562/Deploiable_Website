@@ -185,6 +185,9 @@ export async function start(caps: Capabilities) {
   };
   hooks.freezeTime = (tt) => {
     frozen = tt;
+    // Con il tempo bloccato il ciclo si ferma: ogni seek() disegna esattamente un fotogramma.
+    if (tt === null) gsap.ticker.wake();
+    else gsap.ticker.sleep();
   };
   hooks.skipIntro = () => introTl.progress(1);
   hooks.state = () => ({ ...state, labels: LABELS, particles: particles.count, dpr: engine.dpr });
