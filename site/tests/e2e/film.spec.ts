@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { PNG } from 'pngjs';
 import { brightPixels, brightness, canvasHash, maxChannels, openFilm, peakColumn, sample, seek } from './helpers';
 
 const LIME = [200, 242, 90];
@@ -46,7 +47,7 @@ test('colori del brand esatti nell’inquadratura finale', async ({ page }) => {
   await openFilm(page);
   await seek(page, 12.9);
   // tutte le facce luminose del simbolo sono Lime esatto (nessun lampo, nessuna sfumatura rimasta)
-  const lit = await brightPixels(page, 0.3, 0.1, 0.7, 0.7);
+  const lit = await brightPixels(page, 0.02, 0.05, 0.98, 0.75);
   expect(lit.length).toBeGreaterThan(200);
   for (const px of lit) near(px, LIME, 2);
   near(await sample(page, 0.05, 0.5, 8), FOREST, 2); // fondo: Forest, al valore
@@ -139,7 +140,7 @@ for (const tier of ['high', 'mid', 'mobile']) {
       expect(Math.max(...px.map(brightness)), `t=${t}`).toBeGreaterThan(dark);
     }
     await seek(page, 12.9);
-    const lit = await brightPixels(page, 0.3, 0.1, 0.7, 0.7);
+    const lit = await brightPixels(page, 0.02, 0.05, 0.98, 0.75);
     expect(lit.length).toBeGreaterThan(200);
     // con l'antialiasing i bordi sono sfumature più scure del Lime: quasi tutto è Lime esatto, e niente è più chiaro
     const exact = lit.filter((px) => px.every((v, i) => Math.abs(v - LIME[i]) <= 3));
@@ -149,3 +150,72 @@ for (const tier of ['high', 'mid', 'mobile']) {
     expect(errors).toEqual([]);
   });
 }
+
+test('il naming compare alla fine, lettera dopo lettera da sinistra a destra', async ({ page }) => {
+  await openFilm(page);
+  const letters = () => page.evaluate(() => window.__DEPLOIABLE__!.state!().letters);
+  for (const t of [0.8, 6, 10.5, 11.0]) {
+    await seek(page, t);
+    expect((await letters()).every((v) => v === 0), `t=${t}`).toBe(true);
+  }
+  await seek(page, 11.5);
+  const mid = await letters();
+  expect(mid.length).toBe(11);
+  expect(mid[0]).toBeGreaterThan(0.9); // la prima è già aperta
+  expect(mid[10]).toBeLessThan(0.5); // l'ultima sta ancora iniziando
+  // si aprono da sinistra a destra: le lettere già partite formano un blocco iniziale, senza buchi
+  const started = mid.map((v) => v > 0);
+  const firstIdle = started.indexOf(false);
+  expect(firstIdle, 'almeno una lettera non ancora partita').toBeGreaterThan(0);
+  expect(started.slice(firstIdle).every((v) => !v), 'nessuna lettera parte prima di quella alla sua sinistra').toBe(true);
+  await seek(page, 12.9);
+  expect((await letters()).every((v) => v === 1)).toBe(true);
+});
+
+test('allineamento: logo 3D e frase partono dallo stesso bordo sinistro (misura sui pixel)', async ({ page }) => {
+  await openFilm(page, '', 'high');
+  await seek(page, 12.9);
+  const rects = await page.evaluate(() => {
+    const r = (el: Element) => { const b = el.getBoundingClientRect(); return { x: b.left, y: b.top, w: b.width, h: b.height }; };
+    return { slot: r(document.querySelector('.logo-slot')!), lines: Array.from(document.querySelectorAll('.claim .line')).map(r) };
+  });
+  const png = PNG.sync.read(await page.screenshot());
+  const inkLeft = (x0: number, y0: number, x1: number, y1: number) => {
+    let L = 1e9, R = -1;
+    for (let y = Math.max(0, Math.floor(y0)); y < Math.min(png.height, Math.ceil(y1)); y++)
+      for (let x = Math.floor(x0); x < Math.ceil(x1); x++) {
+        const i = (y * png.width + x) * 4;
+        if (Math.abs(png.data[i] - 16) + Math.abs(png.data[i + 1] - 38) + Math.abs(png.data[i + 2] - 27) > 60) { L = Math.min(L, x); R = Math.max(R, x + 1); }
+      }
+    return { L, R };
+  };
+  const { slot, lines } = rects;
+  const logo = inkLeft(slot.x - 4, slot.y - 4, slot.x + slot.w + 4, slot.y + slot.h + 4);
+  expect(Math.abs(logo.L - slot.x), 'bordo sinistro del logo 3D contro il segnaposto').toBeLessThanOrEqual(2);
+  expect(Math.abs(logo.R - (slot.x + slot.w)), 'bordo destro del logo 3D contro il segnaposto').toBeLessThanOrEqual(2);
+  for (const [i, l] of lines.entries()) {
+    const ink = inkLeft(l.x - 4, l.y, l.x + l.w + 4, l.y + l.h);
+    expect(Math.abs(ink.L - logo.L), `riga ${i + 1} contro il bordo del logo`).toBeLessThanOrEqual(2);
+  }
+});
+
+test('sul telefono le barre non escono mai dallo schermo', async ({ page }) => {
+  await openFilm(page);
+  const vp = page.viewportSize()!;
+  test.skip(vp.width > vp.height, 'solo schermi verticali');
+  for (const t of [3.4, 5.6, 7.0, 7.6, 8.0, 8.4, 8.9, 9.3, 9.6]) {
+    await seek(page, t);
+    const edge = await page.evaluate(() => {
+      const src = document.querySelector<HTMLCanvasElement>('canvas.gl')!;
+      const c = document.createElement('canvas');
+      c.width = src.width;
+      c.height = src.height;
+      const ctx = c.getContext('2d')!;
+      ctx.drawImage(src, 0, 0);
+      const bright = (d: Uint8ClampedArray) => { for (let i = 0; i < d.length; i += 4) if (d[i] + d[i + 1] + d[i + 2] > 300) return true; return false; };
+      const w = c.width, h = c.height;
+      return bright(ctx.getImageData(0, 0, 1, h).data) || bright(ctx.getImageData(w - 1, 0, 1, h).data);
+    });
+    expect(edge, `t=${t}: una barra tocca il bordo`).toBe(false);
+  }
+});

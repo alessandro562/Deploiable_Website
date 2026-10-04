@@ -3,9 +3,10 @@ import type { SceneState } from './choreography';
 import { BarGeometry } from './symbol/barGeometry';
 import { createBarMaterial } from './symbol/barMaterial';
 import { SYMBOL_H, SYMBOL_W } from './symbol/symbolSpec';
+import { LOGO_CENTER, LOGO_W, buildWordmark, type Letter } from './wordmark';
 
 // Quanto del viewport occupa il simbolo assemblato: metà altezza, oppure il 62% della larghezza
-// (su telefono in verticale). Lo stesso calcolo è replicato in CSS (--sym-w), così testo e 3D combaciano.
+// (su telefono in verticale).
 export const FIT_HEIGHT = 0.5;
 export const FIT_WIDTH = 0.62;
 
@@ -16,9 +17,19 @@ export function fitDistance(fovDeg: number, aspect: number) {
   return Math.max(byHeight, byWidth);
 }
 
+/** Dove sta il logo nella pagina, in pixel CSS: il segnaposto che la pagina riserva sopra la frase. */
+export interface LogoSlot {
+  cx: number;
+  cy: number;
+  w: number;
+}
+
 export class Stage {
   readonly group = new Group();
   private readonly bars: { geo: BarGeometry; mesh: Mesh; mat: ShaderMaterial }[] = [];
+  private readonly letters: Letter[];
+  private readonly letterMat: ShaderMaterial;
+  private slot: LogoSlot = { cx: 0, cy: 0, w: 1 };
 
   constructor(scene: Scene) {
     for (let i = 0; i < 3; i++) {
@@ -30,28 +41,46 @@ export class Stage {
       this.group.add(mesh);
       this.bars.push({ geo, mesh, mat });
     }
+    const word = buildWordmark();
+    this.letters = word.letters;
+    this.letterMat = word.material;
+    for (const l of this.letters) this.group.add(l.mesh);
     scene.add(this.group);
+  }
+
+  /** Il segnaposto del logo cambia con le dimensioni della finestra: la camera finale si adatta. */
+  setSlot(slot: LogoSlot) {
+    this.slot = slot;
   }
 
   /** Rende visibili tutti gli oggetti: serve al disegno di riscaldamento, per compilare ogni shader in anticipo. */
   forceVisible() {
     for (const b of this.bars) b.mesh.visible = true;
+    for (const l of this.letters) l.mesh.visible = true;
   }
 
   apply(s: SceneState, camera: PerspectiveCamera, width: number, height: number) {
     // la camera si aggiorna per prima: le barre usano la sua posizione del fotogramma corrente
-    // camera: orbita attorno al centro del simbolo; la distanza segue il campo visivo
     const aspect = width / height;
+    const tan = Math.tan((s.fov * Math.PI) / 360);
     // in verticale la scena larga (dispersione delle barre) esce dai lati: l'allontanamento si amplifica
-    const k = aspect < 1 ? 1 + (s.dist - 1) * 2.2 : s.dist;
-    const d = fitDistance(s.fov, aspect) * k;
+    // e quando le barre sono sparse (le più larghe sono ±9,8 unità) la camera si ritira ancora un po'
+    const k = aspect < 1 ? (1 + (s.dist - 1) * 2.2) * (1 + 0.3 * s.spread) : s.dist;
+    const dSymbol = fitDistance(s.fov, aspect) * k;
+    // Distanza che fa occupare al logo completo esattamente il segnaposto della pagina.
+    const dLogo = (LOGO_W * height) / (2 * tan * Math.max(this.slot.w, 1));
+    const e = s.pull;
+    const d = dSymbol + (dLogo - dSymbol) * e;
+    const px = LOGO_CENTER[0] * e;
+    const py = LOGO_CENTER[1] * e;
     const cosEl = Math.cos(s.el);
-    camera.position.set(Math.sin(s.az) * cosEl * d, Math.sin(s.el) * d, Math.cos(s.az) * cosEl * d);
-    camera.lookAt(0, 0, 0);
+    camera.position.set(px + Math.sin(s.az) * cosEl * d, py + Math.sin(s.el) * d, Math.cos(s.az) * cosEl * d);
+    camera.lookAt(px, py, 0);
     camera.fov = s.fov;
     camera.aspect = aspect;
-    // lo spostamento verticale non cambia la prospettiva: sposta solo l'immagine, lasciando spazio al testo
-    camera.setViewOffset(width, height, 0, MathUtils.clamp(s.shiftY, 0, 1) * height, width, height);
+    // lo spostamento verticale non cambia la prospettiva: porta il centro del logo dove la pagina lo vuole
+    const shift = (height / 2 - this.slot.cy) * e;
+    camera.setViewOffset(width, height, 0, MathUtils.clamp(shift, -height, height), width, height);
     camera.updateMatrixWorld();
 
     for (let i = 0; i < 3; i++) {
@@ -64,8 +93,15 @@ export class Stage {
       geo.update({ lift: p.lift, extend: 0, front: 1 });
       mat.uniforms.uCam.value.copy(camera.position);
     }
+    // Le lettere del naming: ognuna si apre da una linea, sul suo asse orizzontale.
+    this.letters.forEach((l, i) => {
+      const o = s.letters[i];
+      l.mesh.visible = o > 0.002;
+      l.mesh.scale.set(1, Math.max(o, 1e-4), 1);
+      l.mesh.position.set(l.center[0], l.center[1], 0);
+    });
+    this.letterMat.uniforms.uCam.value.copy(camera.position);
     this.group.scale.z = Math.max(s.flatten, 0.001);
     this.group.updateMatrixWorld();
-
   }
 }

@@ -4,13 +4,9 @@
   --mist: #f1f3ea;
   --sans: 'Satoshi', 'Helvetica Neue', Arial, sans-serif;
 
-  /* Composizione: stessa matematica della camera 3D (src/gl/stage.ts), così testo e simbolo combaciano.
-     Il simbolo occupa metà altezza (o il 62% della larghezza in verticale), centrato al 40% dell'altezza. */
-  --sym-w: min(62vw, 40.6svh);
-  --sym-h: calc(var(--sym-w) * 1.2306);
-  --sym-left: calc((100vw - var(--sym-w)) / 2);
-  --sym-top: calc(40svh - var(--sym-h) / 2);
-  --copy-top: calc(var(--sym-top) + var(--sym-h) + 5svh);
+  /* Composizione del finale: il logo orizzontale in alto, la frase sotto, tutto allineato al bordo sinistro del logo.
+     La larghezza del logo è l'unica misura: la camera 3D inquadra il segnaposto .logo-slot (src/gl/stage.ts). */
+  --logo-w: min(88vw, max(52vw, 360px), 150svh);
   color-scheme: dark;
 }
 
@@ -43,28 +39,48 @@ p {
   margin: 0;
 }
 
-/* ---------- Testo: titoli a sinistra, due pesi (Satoshi 300 + 900) ---------- */
+/* ---------- La pila: logo, frase, CTA ---------- */
 
-.copy {
+.stack {
   position: fixed;
   z-index: 10;
-  left: var(--sym-left);
-  top: var(--copy-top);
-  width: var(--sym-w);
+  top: 0;
+  bottom: 0;
+  left: calc((100vw - var(--logo-w)) / 2);
+  width: var(--logo-w);
   display: flex;
   flex-direction: column;
-  gap: calc(var(--sym-w) / 18);
+  justify-content: center;
+  gap: calc(var(--logo-w) / 14);
+  /* il centro ottico sta un po' sopra il centro geometrico */
+  padding-bottom: 8svh;
 }
 
-.claim,
-.cta {
-  white-space: nowrap;
+.logo-slot {
+  width: 100%;
+  aspect-ratio: 514.158 / 97.3;
+  color: var(--lime);
 }
+.logo-slot svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+/* Nella versione 3D il logo lo disegna il canvas: il segnaposto resta solo per misurare e per l'accessibilità. */
+.is-webgl .logo-slot svg {
+  opacity: 0;
+}
+
+/* Titoli a sinistra, due pesi di Satoshi (300 + 900): la parte leggera introduce, quella pesante dice la cosa. */
 .claim {
-  font-size: calc(var(--sym-w) / 5.4);
-  line-height: 0.98;
+  display: flex;
+  flex-direction: column;
+  gap: 0.05em;
+  font-size: calc(var(--logo-w) / 9);
+  line-height: 1;
   letter-spacing: -0.045em;
   font-weight: 300;
+  white-space: nowrap;
 }
 .line--light {
   font-weight: 300;
@@ -72,18 +88,6 @@ p {
 }
 .line--black {
   font-weight: 900;
-  color: var(--lime);
-}
-
-.cta {
-  font-size: calc(var(--sym-w) / 10.8);
-  line-height: 1.1;
-  letter-spacing: -0.02em;
-  font-weight: 500;
-  color: var(--mist);
-}
-.cta strong {
-  font-weight: 500;
   color: var(--lime);
 }
 
@@ -97,6 +101,23 @@ p {
 .line {
   display: block;
   will-change: transform;
+}
+
+/* Allineamento ottico: il bordo vuoto a sinistra di ogni lettera (la W, la M) si compensa sulla maschera,
+   così l'inchiostro della prima lettera parte esattamente dal bordo sinistro del logo (misurato in scripts/align.mjs). */
+.claim .mask:nth-child(1) {
+  margin-left: -0.02em;
+}
+.claim .mask:nth-child(2) {
+  margin-left: -0.08em;
+}
+
+/* Su schermi verticali (telefono) il logo occupa quasi tutta la larghezza e sotto c'è molto spazio:
+   la frase è più grande, in proporzione. */
+@media (max-aspect-ratio: 1/1) {
+  .claim {
+    font-size: calc(var(--logo-w) / 7);
+  }
 }
 
 /* ---------- Canvas e simbolo statico ---------- */
@@ -119,23 +140,12 @@ p {
   z-index: 2;
   left: -10vw;
   width: 120vw;
-  top: calc(40svh - 1px);
+  top: calc(50svh - 1px);
   height: 2px;
   background: var(--lime);
   transform: rotate(-8deg);
   clip-path: inset(0 100% 0 0);
   pointer-events: none;
-}
-
-.static-symbol {
-  display: none;
-  position: fixed;
-  z-index: 1;
-  left: var(--sym-left);
-  top: var(--sym-top);
-  width: var(--sym-w);
-  height: var(--sym-h);
-  color: var(--lime);
 }
 
 .is-webgl .gl {
@@ -147,30 +157,27 @@ p {
   z-index: 0;
 }
 
-/* Senza WebGL (o con riduzione del movimento): il simbolo piatto ufficiale e la frase. */
-.is-static .static-symbol {
-  display: block;
-}
+/* Senza WebGL (o con riduzione del movimento): il logo ufficiale e la frase. */
 .is-static .line {
   transform: none;
 }
 
-/* Motion ufficiale del logo: barre dall'alto, 120 ms di sfasamento, 400 ms ease-out. */
-.is-static .static-symbol .bar {
+/* Motion ufficiale del logo: le barre entrano dall'alto (120 ms di sfasamento, 400 ms ease-out), il lettering per ultimo, senza movimento. */
+.is-static .logo-slot .bar {
   animation: bar-in 0.4s cubic-bezier(0.2, 0.7, 0.3, 1) both;
 }
-.is-static .static-symbol .bar-2 {
+.is-static .logo-slot .bar-2 {
   animation-delay: 0.12s;
 }
-.is-static .static-symbol .bar-3 {
+.is-static .logo-slot .bar-3 {
   animation-delay: 0.24s;
+}
+.is-static .logo-slot .logo-lettering {
+  animation: letters-in 0.01s 0.8s both;
 }
 .is-static .line {
   animation: rise 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both;
   animation-delay: 0.9s;
-}
-.is-static .cta .line {
-  animation-delay: 1.15s;
 }
 @keyframes bar-in {
   from { transform: translateY(-40%); opacity: 0; }
@@ -178,8 +185,12 @@ p {
 @keyframes rise {
   from { transform: translateY(110%); }
 }
+@keyframes letters-in {
+  from { opacity: 0; }
+}
 @media (prefers-reduced-motion: reduce) {
-  .is-static .static-symbol .bar,
+  .is-static .logo-slot .bar,
+  .is-static .logo-slot .logo-lettering,
   .is-static .line {
     animation: none;
   }

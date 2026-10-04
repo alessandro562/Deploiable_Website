@@ -7,7 +7,7 @@ import type { Quality } from '../config/quality';
 export class Engine {
   readonly renderer: WebGLRenderer;
   readonly scene = new Scene();
-  readonly camera = new PerspectiveCamera(36, 1, 0.05, 300);
+  readonly camera = new PerspectiveCamera(36, 1, 1, 2000);
   readonly res = new Vector2(1, 1);
   dpr = 1;
   /** Dimensione (in pixel CSS) con cui è stato impostato il canvas: la camera deve usare la stessa. */

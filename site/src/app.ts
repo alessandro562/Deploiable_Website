@@ -25,13 +25,18 @@ export async function start(caps: Capabilities) {
   const stage = new Stage(engine.scene);
 
   const claim = Array.from(document.querySelectorAll<HTMLElement>('.claim .line'));
-  const cta = document.querySelector<HTMLElement>('.cta .line')!;
   const sweep = document.querySelector<HTMLElement>('.sweep')!;
+  const slotEl = document.querySelector<HTMLElement>('.logo-slot')!;
   const state = createState();
 
   let time = 0;
   let playing = true;
   let paused = false;
+
+  const measureSlot = () => {
+    const r = slotEl.getBoundingClientRect();
+    stage.setSlot({ cx: r.left + r.width / 2, cy: r.top + r.height / 2, w: r.width });
+  };
 
   const draw = () => {
     stateAt(time, state);
@@ -40,16 +45,15 @@ export async function start(caps: Capabilities) {
       const p = Math.min(1, Math.max(0, state.claim * 1.25 - i * 0.25));
       el.style.transform = `translate3d(0, ${((1 - p) * 110).toFixed(2)}%, 0)`;
     });
-    cta.style.transform = `translate3d(0, ${((1 - state.cta) * 110).toFixed(2)}%, 0)`;
     // la linea: testa e coda sono percentuali della sua lunghezza
     sweep.style.clipPath = `inset(0 ${((1 - state.sweepHead) * 100).toFixed(2)}% 0 ${(state.sweepTail * 100).toFixed(2)}%)`;
     engine.render();
   };
 
+  measureSlot();
   // Stato iniziale: testo nascosto prima del primo disegno, poi si attende font e shader.
   stateAt(0, state);
   claim.forEach((el) => (el.style.transform = 'translate3d(0, 110%, 0)'));
-  cta.style.transform = 'translate3d(0, 110%, 0)';
   await document.fonts.ready;
   // Riscaldamento: shader e geometrie vengono compilati e caricati sulla GPU ora, con la pagina ancora
   // nel Forest iniziale, così nessun scatto arriva all'incastro (9,2 s) o al lampo (10,2 s).
@@ -67,6 +71,7 @@ export async function start(caps: Capabilities) {
   });
   window.addEventListener('resize', () => {
     engine.resize();
+    measureSlot();
     draw();
   });
   document.addEventListener('visibilitychange', () => {
@@ -84,6 +89,6 @@ export async function start(caps: Capabilities) {
   hooks.play = () => {
     playing = true;
   };
-  hooks.state = () => ({ t: state.t, bump: [...state.bump], sweep: [state.sweepHead, state.sweepTail] });
+  hooks.state = () => ({ t: state.t, bump: [...state.bump], sweep: [state.sweepHead, state.sweepTail], letters: [...state.letters] });
   hooks.ready = true;
 }

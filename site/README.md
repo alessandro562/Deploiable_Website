@@ -2,7 +2,7 @@
 
 Landing pre-lancio: una sola schermata, nessuno scroll, nessuna interazione. Le tre barre del simbolo
 giocano da sole in 3D finché non scattano al loro posto; poi compare la frase.
-Titolo: **We deploy AI. Measurably.** (in inglese) · CTA: **deploiable sta arrivando.**
+Titolo: **We deploy AI. Measurably.** (in inglese)
 
 ## L'animazione (circa 13 secondi, poi resta ferma e "viva")
 
@@ -13,7 +13,7 @@ Titolo: **We deploy AI. Measurably.** (in inglese) · CTA: **deploiable sta arri
 | 5,1–8,4 s | Il tentativo | Si impilano storte, oscillano, cadono con un rimbalzo, si disperdono. |
 | 8,4–10,4 s | Il gradino | Si incastrano dal basso; ognuna alza il suo blocco di mezzo spessore e scatta con un clic secco. Nessuna luce, nessun effetto. |
 | 10,4–10,9 s | Silenzio | Tutto fermo, mezzo secondo. |
-| 10,9–12,9 s | Rivelazione | Una linea Lime a 8° attraversa lo schermo (come quella con cui si apre), il simbolo si appiattisce nel simbolo ufficiale, compare la frase. |
+| 10,9–12,9 s | Il logo | Una linea Lime a 8° attraversa lo schermo (come quella con cui si apre). Mentre passa la camera si ritira sul logo completo e le undici lettere del naming, in 3D, si aprono una dopo l'altra da sinistra a destra, accanto al simbolo che si appiattisce. Poi compare la frase. |
 | dopo | Vivo | Ogni ~6 s le tre barre si danno una piccola spinta in sequenza. |
 
 Tutta la regia è in `src/gl/choreography.ts`: ogni movimento è una funzione del tempo, quindi con
@@ -46,14 +46,16 @@ Parametri URL: `?tier=high|mid|mobile|minimal` (cambia solo nitidezza: densità 
 - `src/gl/symbol/symbolSpec.ts` · il simbolo, dal generatore del brand book (`geo()`): identico all'SVG ufficiale.
 - `src/gl/symbol/barGeometry.ts` · barre estruse centrate sul loro perno, con il gradino regolabile (`lift`).
 - `src/gl/choreography.ts` · la regia: tracce a keyframe sul tempo.
-- `src/gl/stage.ts` · camera e barre; calcola quanto spazio occupa il simbolo.
+- `src/gl/wordmark.ts` · il naming in 3D: il lettering ufficiale del logo (già in curve) estruso con la profondità delle barre e posizionato come nel logo orizzontale.
+- `src/gl/stage.ts` · camera, barre e lettere. Nel finale inquadra il segnaposto `.logo-slot` della pagina, così il logo 3D coincide con il layout (misurato: entro 1 px).
 - `src/gl/engine.ts` · renderer semplice: niente post-produzione, niente tone mapping.
 - `src/main.ts`, `src/core/capabilities.ts` · scelta tra animazione 3D e versione statica.
+- `scripts/align.mjs` · misura sui pixel l'allineamento del finale (bordi del logo e della frase, spazi) a nove formati di schermo.
 
 ## Versione statica
 
 Con riduzione del movimento attiva, senza WebGL2 o con risparmio dati, la pagina mostra direttamente il
-simbolo piatto ufficiale con la sua motion (barre dall'alto, 120 ms, 400 ms) e la frase. Il codice 3D non viene scaricato.
+logo completo ufficiale con la sua motion (barre dall'alto, 120 ms, 400 ms; lettering per ultimo, senza movimento) e la frase. Il codice 3D non viene scaricato.
 
 ## Regole del brand rispettate
 

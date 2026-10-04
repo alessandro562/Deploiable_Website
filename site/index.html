@@ -17,23 +17,20 @@
     <noscript>
       <style>
         .line { transform: none !important; }
-        .static-symbol { display: block !important; }
       </style>
     </noscript>
   </head>
   <body>
     <canvas class="gl" aria-hidden="true"></canvas>
     <i class="sweep" aria-hidden="true"></i>
-    <!-- symbol:static-symbol -->
-
-    <main class="copy">
+    <main class="stack">
+      <!-- Il segnaposto del logo: nella versione 3D la camera finale lo inquadra esattamente qui;
+           nella versione statica è il logo ufficiale. -->
+      <div class="logo-slot"><!-- logo:static-logo --></div>
       <h1 class="claim">
         <span class="mask"><span class="line line--light" lang="en">We deploy AI.</span></span>
         <span class="mask"><span class="line line--black" lang="en">Measurably.</span></span>
       </h1>
-      <p class="cta">
-        <span class="mask"><span class="line">deploiable <strong>sta arrivando.</strong></span></span>
-      </p>
     </main>
 
     <script type="module" src="/src/main.ts"></script>

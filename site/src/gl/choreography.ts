@@ -1,5 +1,6 @@
 import { Track } from '../core/tracks';
 import { PIVOT } from './symbol/symbolSpec';
+import { WORDMARK_COUNT } from './wordmark';
 
 // La regia dell'animazione. Ogni canale è una traccia a keyframe sul tempo (secondi): con lo stesso
 // tempo si ottiene sempre lo stesso fotogramma, in avanti, all'indietro o fermi per i test.
@@ -9,7 +10,8 @@ import { PIVOT } from './symbol/symbolSpec';
 //   5.1 –  8.4  Il tentativo  si impilano storte, oscillano, cadono, si disperdono
 //   8.4 – 10.4  Il gradino    si incastrano una dopo l'altra, ognuna con un clic secco (niente luce)
 //  10.4 – 10.9  Silenzio      tutto fermo
-//  10.9 – 12.9  Rivelazione   una linea Lime a 8° attraversa lo schermo, il simbolo si appiattisce, compare la frase
+//  10.9 – 12.9  Rivelazione   una linea Lime a 8° attraversa lo schermo, la camera si ritira sul logo completo,
+//                             le lettere del naming si aprono una dopo l'altra, compare la frase
 
 export const DURATION = 12.9;
 
@@ -32,12 +34,13 @@ export interface SceneState {
   el: number;
   dist: number; // moltiplicatore della distanza che inquadra il simbolo
   fov: number;
-  shiftY: number;
+  spread: number; // 0..1 quanto le barre sono sparse: su schermi stretti la camera si allontana per tenerle dentro
+  pull: number; // 0 camera sul simbolo, 1 camera sul logo completo
+  letters: number[]; // 0..1 quanto è aperta ogni lettera del naming (da sinistra a destra)
   flatten: number;
   sweepHead: number; // la linea del finale: 0..1 quanto si è tracciata
   sweepTail: number; // 0..1 quanto si è già cancellata
   claim: number;
-  cta: number;
 }
 
 /** Costruisce le tracce di una barra "andando da un punto al successivo", senza sovrapposizioni. */
@@ -189,14 +192,23 @@ const tracks = {
     [8.4, 1.2, 'sine.inOut'], [SILENZIO_DA, 1.1, 'sine.inOut'], [SILENZIO_A, 1.1], [11.7, 1.0, 'power3.inOut'],
   ]),
   fov: T([[0, 36], [SILENZIO_A, 36], [11.7, 22, 'power3.inOut']]),
-  shiftY: T([[0, 0], [SILENZIO_A, 0], [11.7, 0.1, 'power3.inOut']]),
+  // Le barre sparse (dalla caduta fino a prima dell'incastro): fra 6,3 e 9,95 s occupano molta più larghezza.
+  spread: T([[0, 0], [6.3, 0], [6.9, 1, 'sine.inOut'], [9.4, 1], [9.95, 0, 'sine.inOut']]),
+  // La camera si ritira e si sposta sul logo completo: il simbolo scivola a sinistra, il naming gli sta accanto.
+  pull: T([[0, 0], [SILENZIO_A, 0], [11.75, 1, 'power3.inOut']]),
   flatten: T([[0, 1], [SILENZIO_A, 1], [11.6, 0.002, 'power3.inOut']]),
   // La linea del finale: la testa corre da sinistra a destra, la coda la cancella subito dopo.
   sweepHead: T([[0, 0], [SILENZIO_A, 0], [11.35, 1, 'power2.inOut']]),
   sweepTail: T([[0, 0], [SILENZIO_A + 0.15, 0], [11.55, 1, 'power2.inOut']]),
-  claim: T([[0, 0], [11.6, 0], [12.3, 1, 'power3.out']]),
-  cta: T([[0, 0], [12.2, 0], [12.85, 1, 'power2.out']]),
+  claim: T([[0, 0], [11.95, 0], [12.55, 1, 'power3.out']]),
 };
+
+// Il naming: ogni lettera si apre da una linea, come le barre all'inizio, una dopo l'altra, da sinistra a destra,
+// mentre la linea del finale attraversa lo schermo. Nessun altro movimento.
+const letterTracks = Array.from({ length: WORDMARK_COUNT }, (_, i) => {
+  const t0 = 11.2 + 0.04 * i;
+  return new Track([[0, 0], [t0, 0], [t0 + 0.38, 1, 'back.out(1.5)']]);
+});
 
 const bump = (t: number, i: number) => {
   // dopo la rivelazione: ogni ~6 s le tre barre si danno una piccola spinta in sequenza (120 ms)
@@ -208,8 +220,8 @@ const bump = (t: number, i: number) => {
 export function createState(): SceneState {
   const pose = (): BarPose => ({ x: 0, y: 0, z: 0, rx: 0, ry: 0, rz: 0, sx: 1, sy: 1, lift: 0 });
   return {
-    t: 0, bars: [pose(), pose(), pose()], bump: [0, 0, 0], az: 0, el: 0, dist: 1.5, fov: 36, shiftY: 0,
-    flatten: 1, sweepHead: 0, sweepTail: 0, claim: 0, cta: 0,
+    t: 0, bars: [pose(), pose(), pose()], bump: [0, 0, 0], az: 0, el: 0, dist: 1.5, fov: 36, spread: 0, pull: 0,
+    letters: Array(WORDMARK_COUNT).fill(0), flatten: 1, sweepHead: 0, sweepTail: 0, claim: 0,
   };
 }
 
@@ -225,11 +237,12 @@ export function stateAt(t: number, s: SceneState): SceneState {
   s.el = tracks.el.at(t);
   s.dist = tracks.dist.at(t);
   s.fov = tracks.fov.at(t);
-  s.shiftY = tracks.shiftY.at(t);
+  s.spread = tracks.spread.at(t);
+  s.pull = tracks.pull.at(t);
+  for (let i = 0; i < WORDMARK_COUNT; i++) s.letters[i] = letterTracks[i].at(t);
   s.flatten = tracks.flatten.at(t);
   s.sweepHead = tracks.sweepHead.at(t);
   s.sweepTail = tracks.sweepTail.at(t);
   s.claim = tracks.claim.at(t);
-  s.cta = tracks.cta.at(t);
   return s;
 }
