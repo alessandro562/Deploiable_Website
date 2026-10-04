@@ -1,12 +1,12 @@
 import type { Page } from '@playwright/test';
 
-export async function openFilm(page: Page, extra = '') {
+export async function openFilm(page: Page, extra = '', tier = 'minimal') {
   const errors: string[] = [];
   page.on('pageerror', (e) => errors.push(e.message));
   page.on('console', (m) => {
     if (m.type() === 'error') errors.push(m.text());
   });
-  await page.goto(`/?__test=1&tier=minimal${extra}`);
+  await page.goto(`/?__test=1&tier=${tier}${extra}`);
   await page.waitForFunction(() => window.__DEPLOIABLE__?.ready === true, null, { timeout: 90_000 });
   return errors;
 }

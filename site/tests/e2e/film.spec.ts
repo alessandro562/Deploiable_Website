@@ -80,3 +80,29 @@ test('dopo la rivelazione le tre barre respirano in sequenza', async ({ page }) 
   expect(a).toBeGreaterThan(b);
   expect(b).toBeGreaterThan(c);
 });
+
+// Regressione: con il post-processing completo (livello "high": bloom, vignettatura, aberrazione cromatica,
+// antialiasing) il canvas restava vuoto quando l'aberrazione era spenta. I test al livello minimo non lo vedevano.
+for (const tier of ['high', 'mid', 'mobile']) {
+  test(`con il post-processing (livello ${tier}) l'animazione è sempre visibile`, async ({ page }) => {
+    test.setTimeout(240_000);
+    const errors = await openFilm(page, '', tier);
+    const dark = FOREST[0] + FOREST[1] + FOREST[2] + 12;
+    await seek(page, 0.8);
+    expect(await peakColumn(page, 0.5, 0.45, 0.55), 'linea iniziale').toBeGreaterThan(300);
+    for (const t of [3.4, 6.3, 9.0]) {
+      await seek(page, t);
+      const px = await Promise.all([[0.5, 0.5], [0.45, 0.4], [0.55, 0.6], [0.5, 0.3]].map(([x, y]) => sample(page, x, y, 90)));
+      expect(Math.max(...px.map(brightness)), `t=${t}`).toBeGreaterThan(dark);
+    }
+    await seek(page, 12.9);
+    const lit = await brightPixels(page, 0.3, 0.1, 0.7, 0.7);
+    expect(lit.length).toBeGreaterThan(200);
+    // con l'antialiasing i bordi sono sfumature più scure del Lime: quasi tutto è Lime esatto, e niente è più chiaro
+    const exact = lit.filter((px) => px.every((v, i) => Math.abs(v - LIME[i]) <= 3));
+    expect(exact.length / lit.length, 'quota di Lime esatto').toBeGreaterThan(0.9);
+    for (const px of lit) LIME.forEach((v, i) => expect(px[i]).toBeLessThanOrEqual(v + 3));
+    near(await sample(page, 0.05, 0.5, 8), FOREST, 3);
+    expect(errors).toEqual([]);
+  });
+}

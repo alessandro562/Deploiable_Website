@@ -2,6 +2,7 @@ import { HalfFloatType, NoToneMapping, PerspectiveCamera, Scene, SRGBColorSpace,
 import {
   BloomEffect,
   ChromaticAberrationEffect,
+  type Effect,
   EffectComposer,
   EffectPass,
   RenderPass,
@@ -20,7 +21,6 @@ export class Engine {
   private bloom: BloomEffect | null = null;
   private vignette: VignetteEffect | null = null;
   private ca: ChromaticAberrationEffect | null = null;
-  private caPass: EffectPass | null = null;
   private width = 0;
   private height = 0;
 
@@ -63,12 +63,15 @@ export class Engine {
     });
     const vignette = new VignetteEffect({ offset: 0.38, darkness: 0.55 });
     this.vignette = vignette;
-    composer.addPass(new EffectPass(this.camera, this.bloom, vignette));
+    // Un solo passaggio per bloom, vignettatura e aberrazione cromatica. L'aberrazione non si disattiva mai:
+    // in questa libreria solo l'ultimo passaggio scrive sullo schermo, e uno spento lascerebbe il canvas vuoto.
+    // Si regola solo l'intensità (a zero non cambia nulla).
+    const effects: Effect[] = [this.bloom, vignette];
     if (q.ca) {
       this.ca = new ChromaticAberrationEffect({ offset: new Vector2(0, 0), radialModulation: true, modulationOffset: 0.25 });
-      this.caPass = new EffectPass(this.camera, this.ca);
-      composer.addPass(this.caPass);
+      effects.push(this.ca);
     }
+    composer.addPass(new EffectPass(this.camera, ...effects));
     this.composer = composer;
   }
 
@@ -76,11 +79,6 @@ export class Engine {
     this.dpr = dpr;
     this.renderer.setPixelRatio(dpr);
     this.resize(true);
-  }
-
-  disableCA() {
-    if (this.caPass) this.caPass.enabled = false;
-    this.ca = null;
   }
 
   resize(force = false) {
@@ -104,12 +102,16 @@ export class Engine {
       if (this.ca) {
         const o = 0.0022 * ca;
         this.ca.offset.set(o, o * 0.6);
-        if (this.caPass) this.caPass.enabled = ca > 0.01;
       }
       this.composer.render(dt);
     } else {
       this.renderer.render(this.scene, this.camera);
     }
+  }
+
+  /** Attende che la GPU abbia finito di disegnare: serve ai test e al render del video, mai nel ciclo normale. */
+  sync() {
+    this.renderer.getContext().finish();
   }
 
   async warmup() {

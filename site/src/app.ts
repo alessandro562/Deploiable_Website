@@ -78,6 +78,7 @@ export async function start(caps: Capabilities) {
     playing = false;
     time = seconds;
     draw(0);
+    engine.sync(); // con la GPU software un fotogramma costoso può non essere ancora pronto per lo screenshot
   };
   hooks.play = () => {
     playing = true;

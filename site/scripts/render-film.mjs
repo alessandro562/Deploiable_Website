@@ -29,6 +29,8 @@ const total = Math.round((duration + hold) * FPS);
 const t0 = Date.now();
 for (let f = 0; f < Math.min(total, limit); f++) {
   await page.evaluate((t) => window.__DEPLOIABLE__.seek(t), f / FPS);
+  // un fotogramma di pagina deve essere presentato prima dello screenshot
+  await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
   await page.screenshot({ path: `${dir}/${String(f).padStart(5, '0')}.png` });
   if (f % 60 === 0) console.log(`frame ${f}/${total}  ${((Date.now() - t0) / 1000).toFixed(0)}s`);
 }
