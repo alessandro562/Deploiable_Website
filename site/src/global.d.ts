@@ -4,11 +4,13 @@ interface DeploiableHooks {
   tier: string;
   reason?: string;
   errors: string[];
-  seek?: (p: number | string) => void;
-  freezeTime?: (t: number | null) => void;
-  skipIntro?: () => void;
-  state?: () => Record<string, unknown>;
   duration?: number;
+  /** Porta l'animazione al secondo indicato e la ferma: ogni chiamata disegna un solo fotogramma. */
+  seek?: (seconds: number) => void;
+  /** Riprende la riproduzione normale. */
+  play?: () => void;
+  /** Stato corrente dell'animazione (solo per i test). */
+  state?: () => { t: number; bump: number[]; sparks: number[] };
 }
 
 interface Window {

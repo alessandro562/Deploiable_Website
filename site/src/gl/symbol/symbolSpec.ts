@@ -154,3 +154,15 @@ export function toSvgD(bar: number): string {
 export const UNIT = 10;
 export const CENTER: Vec2 = [ORIGIN[0] + SIZE[0] / 2, ORIGIN[1] + SIZE[1] / 2];
 export const toLocal = (p: Vec2): Vec2 => [(p[0] - CENTER[0]) / UNIT, -(p[1] - CENTER[1]) / UNIT];
+
+/** Centro (spazio locale 3D) di ogni barra a riposo: è il perno attorno a cui la barra si muove e ruota. */
+export const PIVOT: Vec2[] = OUTLINES.map((o, i) => {
+  const pts = o.map((v) => toLocal(vertexAt(i, v, REST, [0, 0])));
+  const xs = pts.map((p) => p[0]);
+  const ys = pts.map((p) => p[1]);
+  return [(Math.min(...xs) + Math.max(...xs)) / 2, (Math.min(...ys) + Math.max(...ys)) / 2] as Vec2;
+});
+
+/** Ingombro del simbolo assemblato, in unità mondo. */
+export const SYMBOL_W = SIZE[0] / UNIT;
+export const SYMBOL_H = SIZE[1] / UNIT;

@@ -2,7 +2,8 @@ import { Color, ShaderMaterial, Vector3 } from 'three';
 import { COLORS } from '../../config/brand';
 
 // Faccia frontale in Lime esatto (nessuna luce, nessun tone mapping): il colore del brand esce identico.
-// Pareti da Lime Deep a Pine con una luce chiave e un bordo Lime; nebbia Forest per "l'infinito".
+// Pareti da Lime Deep a Pine con una luce chiave e un bordo Lime. uFlash gonfia il Lime oltre 1 solo
+// nell'istante dell'incastro, così il bloom lo trasforma in un lampo; a riposo vale 0.
 export function createBarMaterial() {
   return new ShaderMaterial({
     uniforms: {
@@ -10,23 +11,17 @@ export function createBarMaterial() {
       uLimeDeep: { value: new Color(COLORS.limeDeep) },
       uPine: { value: new Color(COLORS.pine) },
       uMoss: { value: new Color(COLORS.moss) },
-      uForest: { value: new Color(COLORS.forest) },
       uCam: { value: new Vector3() },
-      uHeadX: { value: 0 },
-      uHead: { value: 0 },
-      uFogNear: { value: 18 },
-      uFogFar: { value: 70 },
+      uFlash: { value: 0 },
     },
     vertexShader: /* glsl */ `
       attribute float aKind;
       varying vec3 vN;
       varying vec3 vLocalN;
       varying vec3 vWorld;
-      varying vec3 vLocal;
       varying float vKind;
       void main() {
         vKind = aKind;
-        vLocal = position;
         vLocalN = normal;
         vec4 w = modelMatrix * vec4(position, 1.0);
         vWorld = w.xyz;
@@ -35,12 +30,11 @@ export function createBarMaterial() {
       }
     `,
     fragmentShader: /* glsl */ `
-      uniform vec3 uLime, uLimeDeep, uPine, uMoss, uForest, uCam;
-      uniform float uHeadX, uHead, uFogNear, uFogFar;
+      uniform vec3 uLime, uLimeDeep, uPine, uMoss, uCam;
+      uniform float uFlash;
       varying vec3 vN;
       varying vec3 vLocalN;
       varying vec3 vWorld;
-      varying vec3 vLocal;
       varying float vKind;
       void main() {
         vec3 n = normalize(vN);
@@ -58,10 +52,7 @@ export function createBarMaterial() {
           float rim = pow(1.0 - abs(dot(n, V)), 3.0);
           col += uLime * rim * 0.4;
         }
-        float head = exp(-pow((vLocal.x - uHeadX) * 2.2, 2.0)) * uHead;
-        col += uLime * head * 1.8;
-        float f = smoothstep(uFogNear, uFogFar, length(uCam - vWorld));
-        col = mix(col, uForest, f);
+        col *= 1.0 + uFlash * 1.7;
         gl_FragColor = vec4(col, 1.0);
         #include <colorspace_fragment>
       }

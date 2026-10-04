@@ -1,11 +1,9 @@
 import { HalfFloatType, NoToneMapping, PerspectiveCamera, Scene, SRGBColorSpace, Color, Vector2, WebGLRenderer } from 'three';
 import {
-  BlendFunction,
   BloomEffect,
   ChromaticAberrationEffect,
   EffectComposer,
   EffectPass,
-  NoiseEffect,
   RenderPass,
   VignetteEffect,
 } from 'postprocessing';
@@ -20,6 +18,7 @@ export class Engine {
   dpr = 1;
   private composer: EffectComposer | null = null;
   private bloom: BloomEffect | null = null;
+  private vignette: VignetteEffect | null = null;
   private ca: ChromaticAberrationEffect | null = null;
   private caPass: EffectPass | null = null;
   private width = 0;
@@ -62,10 +61,9 @@ export class Engine {
       radius: 0.72,
       levels: q.bloomLevels,
     });
-    const vignette = new VignetteEffect({ offset: 0.32, darkness: 0.62 });
-    const noise = new NoiseEffect({ blendFunction: BlendFunction.OVERLAY, premultiply: false });
-    noise.blendMode.opacity.value = 0.18;
-    composer.addPass(new EffectPass(this.camera, this.bloom, vignette, noise));
+    const vignette = new VignetteEffect({ offset: 0.38, darkness: 0.55 });
+    this.vignette = vignette;
+    composer.addPass(new EffectPass(this.camera, this.bloom, vignette));
     if (q.ca) {
       this.ca = new ChromaticAberrationEffect({ offset: new Vector2(0, 0), radialModulation: true, modulationOffset: 0.25 });
       this.caPass = new EffectPass(this.camera, this.ca);
@@ -95,14 +93,14 @@ export class Engine {
     this.renderer.setSize(w, h, true);
     this.composer?.setSize(w, h);
     this.camera.aspect = w / h;
-    this.camera.updateProjectionMatrix();
     this.res.set(w * this.dpr, h * this.dpr);
     return true;
   }
 
-  render(bloom: number, ca: number, dt: number) {
+  render(bloom: number, ca: number, vignette: number, dt: number) {
     if (this.composer) {
       if (this.bloom) this.bloom.intensity = bloom;
+      if (this.vignette) this.vignette.darkness = 0.55 * vignette;
       if (this.ca) {
         const o = 0.0022 * ca;
         this.ca.offset.set(o, o * 0.6);

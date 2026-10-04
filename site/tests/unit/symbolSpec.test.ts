@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { BARS, OUTLINES, REST, SIZE, toSvgD, vertexAt, ORIGIN } from '../../src/gl/symbol/symbolSpec';
+import { BARS, OUTLINES, PIVOT, REST, SIZE, toSvgD, vertexAt, ORIGIN } from '../../src/gl/symbol/symbolSpec';
 
 const svg = readFileSync(new URL('../../../deploiable-symbol-lime.svg', import.meta.url), 'utf8');
 const d = /<path[^>]* d="([^"]+)"/.exec(svg)![1];
@@ -43,5 +43,13 @@ describe('simbolo', () => {
       }
     }
     expect(ORIGIN[0]).toBeGreaterThan(0);
+  });
+
+  it('i perni sono simmetrici attorno al centro del simbolo', () => {
+    expect(PIVOT[1][0]).toBeCloseTo(0, 6);
+    expect(PIVOT[1][1]).toBeCloseTo(0, 6);
+    expect(PIVOT[0][0]).toBeCloseTo(-PIVOT[2][0], 6);
+    expect(PIVOT[0][1]).toBeCloseTo(-PIVOT[2][1], 6);
+    expect(PIVOT[0][1]).toBeGreaterThan(PIVOT[1][1]); // barra 1 (Analisi) in alto
   });
 });
