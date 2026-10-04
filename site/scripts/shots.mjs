@@ -20,7 +20,7 @@ await page.goto(`${base}?__test=1&tier=${tier}${process.env.EXTRA ?? ''}`);
 page.setDefaultTimeout(120000);
 await page.waitForFunction(() => window.__DEPLOIABLE__?.ready === true, null, { timeout: 60000 });
 
-const points = (process.env.POINTS ?? '0.8,1.5,2.6,3.4,4.5,5.7,6.9,7.6,8.9,9.5,10.25,10.6,11.4,12.9').split(',');
+const points = (process.env.POINTS ?? '0.4,1.0,1.6,2.1,2.6,2.9,3.2,3.5,3.8,4.15,4.8,5.1,5.4,6.6').split(',');
 for (const [i, p] of points.entries()) {
   await page.evaluate((p) => window.__DEPLOIABLE__.seek(+p), p);
   await page.waitForTimeout(120);

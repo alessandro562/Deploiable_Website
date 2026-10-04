@@ -4,19 +4,18 @@ Landing pre-lancio: una sola schermata, nessuno scroll, nessuna interazione. Le 
 giocano da sole in 3D finché non scattano al loro posto; poi compare la frase.
 Titolo: **We deploy AI. Measurably.** (in inglese)
 
-## L'animazione (circa 13 secondi, poi resta ferma e "viva")
+## L'animazione (circa 6,6 secondi, poi resta ferma e "viva")
 
 | Tempo | Atto | Cosa succede |
 |---|---|---|
-| 0–2,1 s | Buio | Una linea Lime inclinata di 8° si apre in tre barre (motion ufficiale: 120 ms di sfasamento). |
-| 2,1–5 s | Le tre carte | Le barre si scambiano di posto in 3D, sempre più veloci. |
-| 5,1–8,4 s | Il tentativo | Si impilano storte, oscillano, cadono con un rimbalzo, si disperdono. |
-| 8,4–10,4 s | Il gradino | Si incastrano dal basso; ognuna alza il suo blocco di mezzo spessore e scatta con un clic secco. Al clic dell'ultima barra lo schermo passa di colpo dal Forest al Lime e le barre diventano Forest. Nessuna luce, nessun effetto. |
-| 10,4–10,9 s | Silenzio | Tutto fermo, mezzo secondo. |
-| 10,9–12,9 s | Il logo | Una linea Forest a 8° attraversa lo schermo (come quella con cui si apre). Mentre passa la camera si ritira sul logo completo e le undici lettere del naming, in 3D, si aprono una dopo l'altra da sinistra a destra, accanto al simbolo che si appiattisce. Poi compare la frase. |
+| 0–1,3 s | La linea | Su Forest una linea Lime si allarga e diventa una barra. Sembra una sola: sono tre, allineate in profondità. |
+| 1,2–2,7 s | Il segreto | La camera gira di lato e sale: la barra si sfoglia in tre lastre parallele. |
+| 2,65–4,1 s | Il deploy | Ognuna vola al suo posto nel simbolo con un avvitamento completo (120–150 ms di sfasamento), la camera torna frontale. Si incastrano dal basso con un clic secco; all'ultimo lo schermo passa al Lime e le barre diventano Forest. |
+| 4,1–4,6 s | Silenzio | Tutto fermo. |
+| 4,6–6,6 s | Il logo | Una linea Forest a 8° attraversa lo schermo; la camera si ritira sul logo completo e le undici lettere del naming, in 3D, si aprono una dopo l'altra. Poi la frase, poi "Coming soon" e il modulo. |
 | dopo | Vivo | Ogni ~6 s le tre barre si danno una piccola spinta in sequenza. |
 
-Tutta la regia è in `src/gl/choreography.ts`: ogni movimento è una funzione del tempo, quindi con
+I tempi sono in `src/gl/timeline.ts` (li usano anche test e script). Tutta la regia è in `src/gl/choreography.ts`: ogni movimento è una funzione del tempo, quindi con
 lo stesso tempo si ottiene sempre lo stesso fotogramma (è ciò che permette test e render del video).
 
 ## Comandi

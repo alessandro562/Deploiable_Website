@@ -15,7 +15,7 @@ for (const [w, h] of SIZES) {
   page.setDefaultTimeout(120000);
   await page.goto(`${base}?__test=1&tier=high`);
   await page.waitForFunction(() => window.__DEPLOIABLE__?.ready === true);
-  await page.evaluate(() => window.__DEPLOIABLE__.seek(12.9));
+  await page.evaluate(() => window.__DEPLOIABLE__.seek(window.__DEPLOIABLE__.duration));
   await page.waitForTimeout(150);
   const rects = await page.evaluate(() => {
     const r = (el) => { const b = el.getBoundingClientRect(); return { x: b.left, y: b.top, w: b.width, h: b.height }; };

@@ -75,7 +75,7 @@ export class Stage {
     const tan = Math.tan((s.fov * Math.PI) / 360);
     // in verticale la scena larga (dispersione delle barre) esce dai lati: l'allontanamento si amplifica
     // e quando le barre sono sparse (le più larghe sono ±9,8 unità) la camera si ritira ancora un po'
-    const k = aspect < 1 ? (1 + (s.dist - 1) * 2.2) * (1 + 0.3 * s.spread) : s.dist;
+    const k = aspect < 1 ? (1 + (s.dist - 1) * 2.2) * (1 + 0.65 * s.spread) : s.dist;
     const dSymbol = fitDistance(s.fov, aspect) * k;
     // Distanza che fa occupare al logo completo esattamente il segnaposto della pagina.
     const dLogo = (LOGO_W * height) / (2 * tan * Math.max(this.slot.w, 1));

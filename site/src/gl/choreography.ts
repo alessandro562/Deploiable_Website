@@ -5,15 +5,17 @@ import { WORDMARK_COUNT } from './wordmark';
 // La regia dell'animazione. Ogni canale è una traccia a keyframe sul tempo (secondi): con lo stesso
 // tempo si ottiene sempre lo stesso fotogramma, in avanti, all'indietro o fermi per i test.
 //
-//   0.0 –  2.1  Buio          una linea Lime si apre in tre barre (motion ufficiale: 120 ms, ease-out)
-//   2.1 –  5.0  Le tre carte  le barre si scambiano di posto in 3D, sempre più veloci
-//   5.1 –  8.4  Il tentativo  si impilano storte, oscillano, cadono, si disperdono
-//   8.4 – 10.4  Il gradino    si incastrano una dopo l'altra, ognuna con un clic secco (niente luce)
-//  10.4 – 10.9  Silenzio      tutto fermo
-//  10.9 – 12.9  Rivelazione   una linea Lime a 8° attraversa lo schermo, la camera si ritira sul logo completo,
-//                             le lettere del naming si aprono una dopo l'altra, compare la frase
+//   0.0 – 1.3  La linea     una linea Lime si allarga e diventa una barra: sembra una sola
+//   1.2 – 2.7  Il segreto   la camera gira di lato: sono tre barre, una dietro l'altra in profondità
+//   2.65 – 4.1 Il deploy    ognuna vola al suo posto nel simbolo avvitandosi, la camera torna frontale;
+//                           si incastrano dal basso con un clic secco, all'ultimo lo schermo passa al Lime
+//   4.1 – 4.6  Silenzio     tutto fermo
+//   4.6 – 6.6  Il logo      una linea a 8° attraversa lo schermo, la camera si ritira sul logo completo,
+//                           le lettere del naming si aprono una dopo l'altra, compare la frase, poi il modulo
 
-export const DURATION = 12.9;
+import { DURATION, LOCK, SILENZIO_A } from './timeline';
+
+export { DURATION, LOCK, TIMES } from './timeline';
 
 type Ch = 'x' | 'y' | 'z' | 'rx' | 'ry' | 'rz' | 'sx' | 'sy' | 'lift';
 type Key = [time: number, value: number, ease?: string];
@@ -75,108 +77,39 @@ class BarTimeline {
   }
 }
 
-const ROW = [4.4, 0, -4.4]; // le tre righe: alta, centrale, bassa
 const HAIR = 0.012; // spessore della linea iniziale
 const A = PIVOT; // posizione di incastro: il simbolo assemblato
+// In profondità: davanti la barra alta, in mezzo la centrale, dietro la bassa. Da davanti coincidono.
+const DEPTH = [6, 0, -6];
 
-// Primo tentativo, sbagliato: barre quasi impilate ma storte.
-const WRONG = [
-  { x: 2.3, y: 3.5, z: 0.4, rz: 0.15 },
-  { x: -0.7, y: 0.5, z: 0.0, rz: -0.07 },
-  { x: -2.1, y: -2.7, z: 0.2, rz: -0.11 },
-];
-// Dove restano sparse dopo la caduta.
-const SCATTER = [
-  { x: 6.6, y: -3.4, z: 3.0, rx: 0.45, ry: -0.8, rz: 0.35 },
-  { x: -6.2, y: 2.5, z: -4.0, rx: -0.3, ry: 0.9, rz: -0.5 },
-  { x: 0.9, y: -5.4, z: 5.0, rx: 0.2, ry: 0.35, rz: 0.7 },
-];
-// Scambi di posto: [inizio, durata, riga A, riga B].
-const SWAPS: [number, number, number, number][] = [
-  [2.25, 0.75, 0, 1],
-  [3.05, 0.6, 1, 2],
-  [3.7, 0.5, 0, 2],
-  [4.25, 0.4, 0, 1],
-  [4.7, 0.3, 1, 2],
-];
-// Istante in cui ogni barra (alta, centrale, bassa) scatta al suo posto: prima la bassa.
-export const LOCK: [number, number, number] = [10.2, 9.7, 9.2];
-/** Il silenzio: nessun movimento di camera tra l'ultimo clic (meno 0,3 s) e la linea del finale. */
+const FLIGHT = 1.15; // durata del volo di ogni barra verso il suo posto
+/** Il silenzio: nessun movimento di camera dall'ultimo clic (meno 0,3 s) fino alla linea del finale. */
 const SILENZIO_DA = LOCK[0] - 0.3;
-const SILENZIO_A = 10.9;
 
 function buildBars(): Record<Ch, Track>[] {
-  const slot = [0, 1, 2]; // slot[b] = riga occupata dalla barra b
   const tls = [0, 1, 2].map(
-    (b) =>
-      new BarTimeline({
-        x: 0, y: b === 1 ? 0 : 14, z: 0, rx: 0, ry: 0, rz: 0,
-        sx: b === 1 ? 0 : 1, sy: b === 1 ? HAIR : 0, lift: 0,
-      }),
+    (b) => new BarTimeline({ x: 0, y: 0, z: DEPTH[b], rx: 0, ry: 0, rz: 0, sx: 0, sy: HAIR, lift: 0 }),
   );
 
   for (let b = 0; b < 3; b++) {
     const tl = tls[b];
-    // ---- Buio: una linea al centro, due che cadono dall'alto (sfasamento ufficiale 120 ms), poi si aprono
-    if (b === 1) tl.go(0.25, 1.0, 'expo.out', { sx: 1 });
-    else {
-      const d = b === 0 ? 0 : 0.12; // la barra resta invisibile finché non inizia a cadere
-      tl.go(1.049 + d, 1.05 + d, 'none', { sy: HAIR });
-      tl.go(1.05 + d, 1.45 + d, 'power2.out', { y: ROW[b] });
-    }
-    tl.go(1.65 + 0.12 * b, 2.1 + 0.12 * b, 'back.out(1.7)', { sy: 1 });
-  }
+    // ---- La linea: si allarga dal centro e diventa una barra piena (le tre insieme: da davanti è una sola)
+    tl.go(0.2, 0.95, 'expo.out', { sx: 1 });
+    tl.go(0.85, 1.3, 'back.out(1.6)', { sy: 1 });
+    // ---- Il segreto: mentre la camera gira, le lastre si aprono un po' di più e si sfalsano appena
+    tl.go(1.2, 2.6, 'power2.inOut', { z: DEPTH[b] * 1.25, y: (1 - b) * 0.9, x: (b - 1) * 1.2 });
 
-  // ---- Le tre carte: la barra che scende passa davanti, quella che sale passa dietro
-  for (const [t0, dur, ra, rb] of SWAPS) {
-    const t1 = t0 + dur;
-    const tm = t0 + dur / 2;
-    for (let b = 0; b < 3; b++) {
-      if (slot[b] !== ra && slot[b] !== rb) continue;
-      const to = slot[b] === ra ? rb : ra;
-      const sign = to > slot[b] ? 1 : -1;
-      tls[b]
-        .go(t0, t1, 'power2.inOut', { y: ROW[to] })
-        .go(t0, tm, 'sine.out', { z: sign * 3.4, rx: -sign * 0.4 })
-        .go(tm, t1, 'sine.in', { z: 0, rx: 0 });
-      slot[b] = to;
-    }
-  }
-
-  // ---- Il tentativo sbagliato
-  for (let b = 0; b < 3; b++) {
-    const w = WRONG[b];
-    const tl = tls[b];
-    tl.go(5.1, 5.8, 'back.out(1.4)', { x: w.x, y: w.y, z: w.z, rz: w.rz, lift: 0.35 });
-    tl.go(5.8, 5.95, 'sine.inOut', { rz: w.rz + 0.06 })
-      .go(5.95, 6.1, 'sine.inOut', { rz: w.rz - 0.05 })
-      .go(6.1, 6.25, 'sine.inOut', { rz: w.rz + 0.03 })
-      .go(6.25, 6.4, 'sine.inOut', { rz: w.rz });
-  }
-  // una alla volta scivolano via e cadono con un rimbalzo, poi restano sparse
-  const s = SCATTER;
-  tls[0]
-    .go(6.5, 7.0, 'power2.in', { x: 6.9, rz: 0.35 })
-    .go(7.0, 7.6, 'bounce.out', { y: -7.8, z: 1.5, rz: 1.1 })
-    .go(7.7, 8.3, 'power2.inOut', { x: s[0].x, y: s[0].y, z: s[0].z, rx: s[0].rx, ry: s[0].ry, rz: s[0].rz, lift: 0 });
-  tls[1]
-    .go(6.7, 7.2, 'power2.in', { x: -1.6, rz: -0.6 })
-    .go(7.2, 7.8, 'bounce.out', { y: -5.2 })
-    .go(7.85, 8.3, 'power2.inOut', { x: s[1].x, y: s[1].y, z: s[1].z, rx: s[1].rx, ry: s[1].ry, rz: s[1].rz, lift: 0 });
-  tls[2]
-    .go(7.0, 7.5, 'power2.in', { x: -5.8, rz: -0.3 })
-    .go(7.5, 8.0, 'bounce.out', { y: -6.8 })
-    .go(8.0, 8.4, 'power2.inOut', { x: s[2].x, y: s[2].y, z: s[2].z, rx: s[2].rx, ry: s[2].ry, rz: s[2].rz, lift: 0 });
-
-  // ---- Il gradino: si incastrano dal basso, ognuna alza il suo blocco di mezzo spessore
-  const lockStart = [9.4, 8.9, 8.4];
-  for (let b = 0; b < 3; b++) {
-    tls[b]
-      .go(lockStart[b], LOCK[b], 'back.out(1.15)', { x: A[b][0], y: A[b][1], z: 0, rx: 0, ry: 0, rz: 0 })
-      .go(LOCK[b] - 0.4, LOCK[b], 'power3.out', { lift: 1 })
+    // ---- Il deploy: ognuna vola al suo posto con un avvitamento completo; la traiettoria curva nasce
+    // da andature diverse in profondità (rapida) e in altezza (morbida).
+    const t1 = LOCK[b];
+    const t0 = t1 - FLIGHT;
+    tl.go(t0, t1, 'power3.inOut', { x: A[b][0], y: A[b][1] })
+      .go(t0, t1, 'power2.inOut', { z: 0 })
+      .go(t0, t1, 'power3.inOut', { rx: -Math.PI * 2 })
+      .go(t1 - 0.35, t1, 'power3.out', { lift: 1 })
       // Il clic: la barra si abbassa di un soffio e torna al suo posto. Niente luce, niente scintille.
-      .go(LOCK[b], LOCK[b] + 0.06, 'power2.in', { y: A[b][1] - 0.14 })
-      .go(LOCK[b] + 0.06, LOCK[b] + 0.24, 'power2.out', { y: A[b][1] });
+      .go(t1, t1 + 0.06, 'power2.in', { y: A[b][1] - 0.14 })
+      .go(t1 + 0.06, t1 + 0.24, 'power2.out', { y: A[b][1] });
   }
   return tls.map((t) => t.tracks());
 }
@@ -185,31 +118,29 @@ const bars = buildBars();
 const T = (keys: Key[]) => new Track(keys);
 
 const tracks = {
-  // La camera si ferma a SILENZIO_DA, 0,3 s prima dell'ultimo clic, e resta ferma fino a SILENZIO_A.
-  az: T([[0, 0], [2.1, -0.2, 'sine.inOut'], [5.1, 0.25, 'sine.inOut'], [8.4, -0.1, 'sine.inOut'], [SILENZIO_DA, 0.05, 'sine.inOut'], [SILENZIO_A, 0.05], [11.7, 0, 'power3.inOut']]),
-  el: T([[0, 0], [2.1, 0.1, 'sine.inOut'], [5.1, 0.14, 'sine.inOut'], [8.4, 0.1, 'sine.inOut'], [SILENZIO_DA, 0.08, 'sine.inOut'], [SILENZIO_A, 0.08], [11.7, 0, 'power3.inOut']]),
-  dist: T([
-    [0, 1.1], [1.0, 1.1], [2.1, 0.95, 'sine.inOut'], [5.1, 1.1, 'sine.inOut'],
-    [8.4, 1.2, 'sine.inOut'], [SILENZIO_DA, 1.1, 'sine.inOut'], [SILENZIO_A, 1.1], [11.7, 1.0, 'power3.inOut'],
-  ]),
-  fov: T([[0, 36], [SILENZIO_A, 36], [11.7, 22, 'power3.inOut']]),
-  // Le barre sparse (dalla caduta fino a prima dell'incastro): fra 6,3 e 9,95 s occupano molta più larghezza.
-  spread: T([[0, 0], [6.3, 0], [6.9, 1, 'sine.inOut'], [9.4, 1], [9.95, 0, 'sine.inOut']]),
+  // La camera gira di lato e sale (le tre lastre), poi torna frontale mentre le barre arrivano.
+  // Si ferma a SILENZIO_DA e resta ferma fino a SILENZIO_A.
+  az: T([[0, 0], [1.15, 0], [2.65, 0.62, 'power3.inOut'], [2.85, 0.64], [SILENZIO_DA, 0, 'power3.inOut'], [SILENZIO_A, 0], [5.4, 0]]),
+  el: T([[0, 0], [1.15, 0], [2.65, 0.38, 'power3.inOut'], [2.85, 0.39], [SILENZIO_DA, 0.04, 'power3.inOut'], [SILENZIO_A, 0.04], [5.4, 0, 'power3.inOut']]),
+  dist: T([[0, 1.0], [1.15, 1.0], [2.65, 1.02, 'power3.inOut'], [2.85, 1.03], [SILENZIO_DA, 1.08, 'power3.inOut'], [SILENZIO_A, 1.08], [5.4, 1.0, 'power3.inOut']]),
+  fov: T([[0, 36], [SILENZIO_A, 36], [5.4, 22, 'power3.inOut']]),
+  // Quando le lastre sono in profondità e di lato occupano più larghezza: sui telefoni la camera si ritira.
+  spread: T([[0, 0], [1.15, 0], [2.4, 1, 'sine.inOut'], [3.2, 1], [3.75, 0, 'sine.inOut']]),
   // La camera si ritira e si sposta sul logo completo: il simbolo scivola a sinistra, il naming gli sta accanto.
-  pull: T([[0, 0], [SILENZIO_A, 0], [11.75, 1, 'power3.inOut']]),
-  flatten: T([[0, 1], [SILENZIO_A, 1], [11.6, 0.002, 'power3.inOut']]),
+  pull: T([[0, 0], [SILENZIO_A, 0], [5.45, 1, 'power3.inOut']]),
+  flatten: T([[0, 1], [SILENZIO_A, 1], [5.3, 0.002, 'power3.inOut']]),
   // La linea del finale: la testa corre da sinistra a destra, la coda la cancella subito dopo.
-  sweepHead: T([[0, 0], [SILENZIO_A, 0], [11.35, 1, 'power2.inOut']]),
-  sweepTail: T([[0, 0], [SILENZIO_A + 0.15, 0], [11.55, 1, 'power2.inOut']]),
-  claim: T([[0, 0], [11.95, 0], [12.55, 1, 'power3.out']]),
+  sweepHead: T([[0, 0], [SILENZIO_A, 0], [5.05, 1, 'power2.inOut']]),
+  sweepTail: T([[0, 0], [SILENZIO_A + 0.15, 0], [5.25, 1, 'power2.inOut']]),
+  claim: T([[0, 0], [5.65, 0], [6.25, 1, 'power3.out']]),
   // "Coming soon" e il modulo d'iscrizione: per ultimi, quando la frase è già ferma.
-  outro: T([[0, 0], [12.45, 0], [12.9, 1, 'power2.out']]),
+  outro: T([[0, 0], [6.15, 0], [6.6, 1, 'power2.out']]),
 };
 
 // Il naming: ogni lettera si apre da una linea, come le barre all'inizio, una dopo l'altra, da sinistra a destra,
 // mentre la linea del finale attraversa lo schermo. Nessun altro movimento.
 const letterTracks = Array.from({ length: WORDMARK_COUNT }, (_, i) => {
-  const t0 = 11.2 + 0.04 * i;
+  const t0 = 4.9 + 0.04 * i;
   return new Track([[0, 0], [t0, 0], [t0 + 0.38, 1, 'back.out(1.5)']]);
 });
 

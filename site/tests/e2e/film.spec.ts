@@ -1,10 +1,11 @@
 import { expect, test } from '@playwright/test';
 import { PNG } from 'pngjs';
+import { DURATION as END, LOCK, SILENZIO_A, TIMES } from '../../src/gl/timeline';
 import { brightPixels, brightness, canvasHash, darkPixels, maxChannels, openFilm, peakColumn, sample, seek } from './helpers';
 
 const LIME = [200, 242, 90];
 const FOREST = [16, 38, 27];
-const LOCK_T = 10.2; // clic dell'ultima barra (LOCK[0] in choreography.ts)
+const LOCK_T = LOCK[0]; // clic dell'ultima barra: lo schermo passa al Lime
 const near = (px: number[], ref: number[], tol: number) => ref.forEach((v, i) => expect(Math.abs(px[i] - v)).toBeLessThanOrEqual(tol));
 
 test('parte in WebGL, senza errori e senza scroll', async ({ page }) => {
@@ -20,11 +21,11 @@ test('suspense: nessun testo finché le barre non scattano al loro posto', async
   const offset = () =>
     page.evaluate(() => Array.from(document.querySelectorAll<HTMLElement>('.line')).map((l) => parseFloat(/,\s*(-?[\d.]+)%/.exec(l.style.transform)?.[1] ?? 'NaN')));
   const hidden = async () => (await offset()).every((v) => v === 110);
-  for (const t of [0.8, 3, 6.5, 9.5, 10.5]) {
+  for (const t of [0.8, TIMES.segreto, TIMES.deploy, TIMES.silenzio, SILENZIO_A + 0.4]) {
     await seek(page, t);
     expect(await hidden(), `t=${t}`).toBe(true);
   }
-  await seek(page, 12.9);
+  await seek(page, END);
   expect((await offset()).every((v) => v === 0)).toBe(true);
 });
 
@@ -37,7 +38,7 @@ test('ogni atto disegna qualcosa', async ({ page }) => {
   await seek(page, 0.8);
   expect(await peakColumn(page, 0.5, 0.45, 0.55)).toBeGreaterThan(300);
   // poi le tre carte, la caduta, l'incastro con le scintille
-  for (const t of [3.4, 5.5, 8.9, 10.25]) {
+  for (const t of [TIMES.linea, TIMES.segreto, TIMES.deploy, LOCK_T + 0.05]) {
     await seek(page, t);
     const px = await Promise.all([[0.5, 0.5], [0.45, 0.4], [0.55, 0.6], [0.5, 0.3]].map(([x, y]) => sample(page, x, y, 90)));
     expect(Math.max(...px.map(brightness)), `t=${t}`).toBeGreaterThan(dark);
@@ -46,13 +47,13 @@ test('ogni atto disegna qualcosa', async ({ page }) => {
 
 test('colori del brand esatti: barre Lime su Forest, poi al clic logo Forest su Lime', async ({ page }) => {
   await openFilm(page);
-  await seek(page, 9.0); // prima del clic: fondo Forest, barre Lime
+  await seek(page, TIMES.deploy); // prima del clic: fondo Forest, barre Lime
   near(await sample(page, 0.03, 0.03, 8), FOREST, 2);
   await seek(page, LOCK_T - 0.05);
   near(await sample(page, 0.03, 0.03, 8), FOREST, 2);
   await seek(page, LOCK_T + 0.05); // il clic dell'ultima barra: lo schermo passa al Lime
   near(await sample(page, 0.03, 0.03, 8), LIME, 2);
-  await seek(page, 12.9);
+  await seek(page, END);
   // finale: fondo Lime al valore, logo tutto Forest esatto (nessuna sfumatura rimasta)
   near(await sample(page, 0.03, 0.5, 8), LIME, 2);
   const ink = await darkPixels(page, 0.02, 0.05, 0.98, 0.75);
@@ -67,21 +68,21 @@ test('il tempo fermo dà sempre lo stesso fotogramma (anche tornando indietro)',
     for (const [x, y] of [[0.3, 0.4], [0.5, 0.5], [0.6, 0.6], [0.45, 0.35], [0.55, 0.45]]) out.push(...(await sample(page, x, y, 10)));
     return out;
   };
-  await seek(page, 6.3);
+  await seek(page, TIMES.deploy);
   const a = await sig();
-  await seek(page, 12.9);
-  await seek(page, 2.5);
-  await seek(page, 6.3);
+  await seek(page, END);
+  await seek(page, TIMES.linea);
+  await seek(page, TIMES.deploy);
   const b = await sig();
   a.forEach((v, i) => expect(Math.abs(v - b[i])).toBeLessThan(2));
 });
 
 test('dopo la rivelazione le tre barre respirano in sequenza', async ({ page }) => {
   await openFilm(page);
-  await seek(page, 12.9);
+  await seek(page, END);
   expect(await page.evaluate(() => window.__DEPLOIABLE__!.state!().bump)).toEqual([0, 0, 0]);
   // 1,5 s dopo la fine parte la spinta: prima la barra alta, poi le altre con 120 ms di sfasamento
-  await seek(page, 12.9 + 1.5 + 0.35);
+  await seek(page, END + 1.5 + 0.35);
   const [a, b, c] = await page.evaluate(() => window.__DEPLOIABLE__!.state!().bump);
   expect(a).toBeGreaterThan(0.05);
   expect(b).toBeGreaterThan(0);
@@ -91,7 +92,7 @@ test('dopo la rivelazione le tre barre respirano in sequenza', async ({ page }) 
 
 test('nessun bagliore: neppure un pixel supera il Lime del brand, in nessun momento', async ({ page }) => {
   await openFilm(page);
-  for (const t of [3.4, 8.9, 9.3, 10.25, 10.6, 11.0, 12.9]) {
+  for (const t of [TIMES.linea, TIMES.segreto, TIMES.deploy, LOCK_T + 0.05, TIMES.silenzio, TIMES.linea_finale, TIMES.logo, END]) {
     await seek(page, t);
     const m = await maxChannels(page);
     LIME.forEach((v, i) => expect(m[i], `t=${t} canale ${i}`).toBeLessThanOrEqual(v));
@@ -100,12 +101,12 @@ test('nessun bagliore: neppure un pixel supera il Lime del brand, in nessun mome
 
 test('il mondo si ferma: tra il clic e la linea il fotogramma non cambia', async ({ page }) => {
   await openFilm(page);
-  await seek(page, 10.5);
+  await seek(page, LOCK_T + 0.26);
   const a = await canvasHash(page);
-  await seek(page, 10.85);
+  await seek(page, SILENZIO_A - 0.02);
   const b = await canvasHash(page);
   expect(a).toBe(b);
-  await seek(page, 10.0); // un istante prima dell'ultimo incastro: qualcosa si muove
+  await seek(page, LOCK_T - 0.2); // un istante prima dell'ultimo incastro: qualcosa si muove
   expect(await canvasHash(page)).not.toBe(a);
 });
 
@@ -117,11 +118,11 @@ test('la linea attraversa lo schermo a 8° e sparisce prima della frase', async 
       const m = /inset\(0(?:px)? ([\d.]+)% 0(?:px)? ([\d.]+)%\)/.exec(el.style.clipPath);
       return m ? 100 - parseFloat(m[1]) - parseFloat(m[2]) : NaN; // percentuale visibile della linea
     });
-  for (const t of [0.8, 6, 10.8]) {
+  for (const t of [0.8, TIMES.deploy, SILENZIO_A - 0.05]) {
     await seek(page, t);
     expect(await visible(), `t=${t}`).toBeLessThanOrEqual(0.01);
   }
-  await seek(page, 11.1);
+  await seek(page, TIMES.linea_finale);
   expect(await visible()).toBeGreaterThan(10);
   const angle = await page.evaluate(() => {
     const t = getComputedStyle(document.querySelector('.sweep')!).transform;
@@ -129,7 +130,7 @@ test('la linea attraversa lo schermo a 8° e sparisce prima della frase', async 
     return (Math.atan2(b, a) * 180) / Math.PI;
   });
   expect(angle).toBeCloseTo(-8, 1);
-  await seek(page, 12.9);
+  await seek(page, END);
   expect(await visible()).toBeLessThanOrEqual(0.01);
 });
 
@@ -141,18 +142,18 @@ for (const tier of ['high', 'mid', 'mobile']) {
     const dark = FOREST[0] + FOREST[1] + FOREST[2] + 12;
     await seek(page, 0.8);
     expect(await peakColumn(page, 0.5, 0.45, 0.55), 'linea iniziale').toBeGreaterThan(300);
-    for (const t of [3.4, 6.3, 9.0]) {
+    for (const t of [TIMES.linea, TIMES.segreto, TIMES.deploy]) {
       await seek(page, t);
       const px = await Promise.all([[0.5, 0.5], [0.45, 0.4], [0.55, 0.6], [0.5, 0.3]].map(([x, y]) => sample(page, x, y, 90)));
       expect(Math.max(...px.map(brightness)), `t=${t}`).toBeGreaterThan(dark);
     }
-    await seek(page, 9.0);
+    await seek(page, TIMES.deploy);
     const lit = await brightPixels(page, 0.02, 0.05, 0.98, 0.95);
     expect(lit.length).toBeGreaterThan(200);
     // con l'antialiasing i bordi sono sfumature più scure del Lime: niente è più chiaro
     for (const px of lit) LIME.forEach((v, i) => expect(px[i]).toBeLessThanOrEqual(v + 3));
     near(await sample(page, 0.03, 0.03, 8), FOREST, 3);
-    await seek(page, 12.9);
+    await seek(page, END);
     // finale: il logo è Forest esatto (i bordi sfumano verso il Lime del fondo)
     const ink = await darkPixels(page, 0.02, 0.05, 0.98, 0.75);
     expect(ink.length).toBeGreaterThan(200);
@@ -166,11 +167,11 @@ for (const tier of ['high', 'mid', 'mobile']) {
 test('il naming compare alla fine, lettera dopo lettera da sinistra a destra', async ({ page }) => {
   await openFilm(page);
   const letters = () => page.evaluate(() => window.__DEPLOIABLE__!.state!().letters);
-  for (const t of [0.8, 6, 10.5, 11.0]) {
+  for (const t of [0.8, TIMES.deploy, TIMES.silenzio, SILENZIO_A + 0.25]) {
     await seek(page, t);
     expect((await letters()).every((v) => v === 0), `t=${t}`).toBe(true);
   }
-  await seek(page, 11.5);
+  await seek(page, TIMES.logo);
   const mid = await letters();
   expect(mid.length).toBe(11);
   expect(mid[0]).toBeGreaterThan(0.9); // la prima è già aperta
@@ -180,13 +181,13 @@ test('il naming compare alla fine, lettera dopo lettera da sinistra a destra', a
   const firstIdle = started.indexOf(false);
   expect(firstIdle, 'almeno una lettera non ancora partita').toBeGreaterThan(0);
   expect(started.slice(firstIdle).every((v) => !v), 'nessuna lettera parte prima di quella alla sua sinistra').toBe(true);
-  await seek(page, 12.9);
+  await seek(page, END);
   expect((await letters()).every((v) => v === 1)).toBe(true);
 });
 
 test('allineamento: logo 3D e frase centrati sulla pagina (misura sui pixel)', async ({ page }) => {
   await openFilm(page, '', 'high');
-  await seek(page, 12.9);
+  await seek(page, END);
   const rects = await page.evaluate(() => {
     const r = (el: Element) => { const b = el.getBoundingClientRect(); return { x: b.left, y: b.top, w: b.width, h: b.height }; };
     return { slot: r(document.querySelector('.logo-slot')!), lines: Array.from(document.querySelectorAll('.claim .line')).map(r) };
@@ -217,7 +218,7 @@ test('sul telefono le barre non escono mai dallo schermo', async ({ page }) => {
   await openFilm(page);
   const vp = page.viewportSize()!;
   test.skip(vp.width > vp.height, 'solo schermi verticali');
-  for (const t of [3.4, 5.6, 7.0, 7.6, 8.0, 8.4, 8.9, 9.3, 9.6]) {
+  for (const t of [TIMES.linea, 1.6, 2.0, TIMES.segreto, 2.9, TIMES.deploy, 3.5, 3.7, LOCK_T - 0.02]) {
     await seek(page, t);
     const edge = await page.evaluate(() => {
       const src = document.querySelector<HTMLCanvasElement>('canvas.gl')!;
@@ -237,11 +238,11 @@ test('sul telefono le barre non escono mai dallo schermo', async ({ page }) => {
 test('coming soon e modulo: compaiono per ultimi, dentro lo schermo, sotto la frase', async ({ page }) => {
   await openFilm(page);
   const outro = page.locator('.outro');
-  for (const t of [3, 10.5, 12.2]) {
+  for (const t of [TIMES.deploy, TIMES.silenzio, END - 0.5]) {
     await seek(page, t);
     await expect(outro, `t=${t}`).toBeHidden();
   }
-  await seek(page, 12.9);
+  await seek(page, END);
   await expect(outro).toBeVisible();
   const vp = page.viewportSize()!;
   const box = (await outro.boundingBox())!;
@@ -254,7 +255,7 @@ test('coming soon e modulo: compaiono per ultimi, dentro lo schermo, sotto la fr
 
 test('iscrizione: email non valida, invio riuscito, errore del servizio', async ({ page }) => {
   await openFilm(page);
-  await seek(page, 12.9);
+  await seek(page, END);
   const note = page.locator('.signup-note');
   await page.fill('#signup-email', 'non-una-email');
   await page.click('.signup button');
