@@ -90,3 +90,35 @@ export async function brightPixels(page: Page, x0: number, y0: number, x1: numbe
     { x0, y0, x1, y1, step },
   );
 }
+
+/** Hash del contenuto del canvas: due fotogrammi identici hanno lo stesso hash. */
+export async function canvasHash(page: Page) {
+  return page.evaluate(() => {
+    const src = document.querySelector<HTMLCanvasElement>('canvas.gl')!;
+    const c = document.createElement('canvas');
+    c.width = src.width;
+    c.height = src.height;
+    const ctx = c.getContext('2d')!;
+    ctx.drawImage(src, 0, 0);
+    const d = ctx.getImageData(0, 0, c.width, c.height).data;
+    let h = 0;
+    for (let i = 0; i < d.length; i++) h = (h * 31 + d[i]) | 0;
+    return h;
+  });
+}
+
+/** Il pixel più chiaro del canvas, canale per canale (per verificare che nulla superi il Lime del brand). */
+export async function maxChannels(page: Page) {
+  return page.evaluate(() => {
+    const src = document.querySelector<HTMLCanvasElement>('canvas.gl')!;
+    const c = document.createElement('canvas');
+    c.width = src.width;
+    c.height = src.height;
+    const ctx = c.getContext('2d')!;
+    ctx.drawImage(src, 0, 0);
+    const d = ctx.getImageData(0, 0, c.width, c.height).data;
+    const m = [0, 0, 0];
+    for (let i = 0; i < d.length; i += 4) for (let k = 0; k < 3; k++) if (d[i + k] > m[k]) m[k] = d[i + k];
+    return m;
+  });
+}

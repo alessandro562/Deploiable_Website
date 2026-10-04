@@ -14,7 +14,6 @@ await page.goto(`${base}?__test=1&tier=mobile`);
 await page.waitForFunction(() => window.__DEPLOIABLE__?.ready === true);
 await page.evaluate(() => window.__DEPLOIABLE__.seek(window.__DEPLOIABLE__.duration));
 await page.waitForTimeout(400);
-await page.addStyleTag({ content: '.grain{display:none!important}' });
 await page.screenshot({ path: 'public/og.jpg', type: 'jpeg', quality: 86 });
 
 const icon = await browser.newPage({ viewport: { width: 180, height: 180 } });

@@ -11,8 +11,9 @@ Titolo: **Ancora un gradino.** · CTA: **deploiable sta arrivando.**
 | 0–2,1 s | Buio | Una linea Lime inclinata di 8° si apre in tre barre (motion ufficiale: 120 ms di sfasamento). |
 | 2,1–5 s | Le tre carte | Le barre si scambiano di posto in 3D, sempre più veloci. |
 | 5,1–8,4 s | Il tentativo | Si impilano storte, oscillano, cadono con un rimbalzo, si disperdono. |
-| 8,4–10,7 s | Il gradino | Si incastrano dal basso; ognuna alza il suo blocco di mezzo spessore. L'ultima scatta: lampo e scintille. |
-| 10,7–12,9 s | Rivelazione | La camera si ritira, il simbolo si appiattisce nel simbolo ufficiale, compare la frase. |
+| 8,4–10,4 s | Il gradino | Si incastrano dal basso; ognuna alza il suo blocco di mezzo spessore e scatta con un clic secco. Nessuna luce, nessun effetto. |
+| 10,4–10,9 s | Silenzio | Tutto fermo, mezzo secondo. |
+| 10,9–12,9 s | Rivelazione | Una linea Lime a 8° attraversa lo schermo (come quella con cui si apre), il simbolo si appiattisce nel simbolo ufficiale, compare la frase. |
 | dopo | Vivo | Ogni ~6 s le tre barre si danno una piccola spinta in sequenza. |
 
 Tutta la regia è in `src/gl/choreography.ts`: ogni movimento è una funzione del tempo, quindi con
@@ -38,16 +39,15 @@ node scripts/render-film.mjs 720 1280 30 high 1.5 artifacts/film-verticale.mp4  
 node scripts/make-posters.mjs                                     # public/og.jpg e apple-touch-icon.png
 ```
 
-Parametri URL: `?tier=high|mid|mobile|minimal`, `?mode=static`, `?__test=1` (hook per i test).
+Parametri URL: `?tier=high|mid|mobile|minimal` (cambia solo nitidezza: densità di pixel e antialiasing), `?mode=static`, `?__test=1` (hook per i test).
 
 ## Struttura
 
 - `src/gl/symbol/symbolSpec.ts` · il simbolo, dal generatore del brand book (`geo()`): identico all'SVG ufficiale.
 - `src/gl/symbol/barGeometry.ts` · barre estruse centrate sul loro perno, con il gradino regolabile (`lift`).
 - `src/gl/choreography.ts` · la regia: tracce a keyframe sul tempo.
-- `src/gl/stage.ts` · camera, barre e scintille; calcola quanto spazio occupa il simbolo.
-- `src/gl/sparks.ts` · le scintille dell'incastro.
-- `src/gl/engine.ts` · renderer e post-processing (bloom, vignettatura, aberrazione cromatica).
+- `src/gl/stage.ts` · camera e barre; calcola quanto spazio occupa il simbolo.
+- `src/gl/engine.ts` · renderer semplice: niente post-produzione, niente tone mapping.
 - `src/main.ts`, `src/core/capabilities.ts` · scelta tra animazione 3D e versione statica.
 
 ## Versione statica
@@ -58,7 +58,7 @@ simbolo piatto ufficiale con la sua motion (barre dall'alto, 120 ms, 400 ms) e l
 ## Regole del brand rispettate
 
 - Nell'inquadratura finale i due colori sono **esattamente** Forest #10261B e Lime #C8F25A (test automatico, tolleranza 2).
-- Niente tone mapping, niente grana né vignettatura sul finale. Il lampo dell'incastro è l'unico momento in cui il Lime va oltre il valore del brand.
+- Nessun effetto: niente bagliore, grana, vignettatura o scintille. Neppure un pixel supera il Lime del brand (test automatico) e il fondo è Forest esatto in ogni fotogramma.
 - Le barre ruotate e inclinate sono supergrafica; il simbolo conforme e piatto compare solo alla fine.
 - Titolo a sinistra, due pesi (Satoshi 300 + 900); il testo non sta mai sopra le barre.
 

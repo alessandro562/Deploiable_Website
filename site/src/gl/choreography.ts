@@ -7,8 +7,9 @@ import { PIVOT } from './symbol/symbolSpec';
 //   0.0 –  2.1  Buio          una linea Lime si apre in tre barre (motion ufficiale: 120 ms, ease-out)
 //   2.1 –  5.0  Le tre carte  le barre si scambiano di posto in 3D, sempre più veloci
 //   5.1 –  8.4  Il tentativo  si impilano storte, oscillano, cadono, si disperdono
-//   8.4 – 10.7  Il gradino    si incastrano una dopo l'altra, l'ultima scatta: lampo e scintille
-//  10.7 – 12.9  Rivelazione   la camera si ritira, il simbolo si appiattisce, compare la frase
+//   8.4 – 10.4  Il gradino    si incastrano una dopo l'altra, ognuna con un clic secco (niente luce)
+//  10.4 – 10.9  Silenzio      tutto fermo
+//  10.9 – 12.9  Rivelazione   una linea Lime a 8° attraversa lo schermo, il simbolo si appiattisce, compare la frase
 
 export const DURATION = 12.9;
 
@@ -33,12 +34,8 @@ export interface SceneState {
   fov: number;
   shiftY: number;
   flatten: number;
-  flash: number;
-  bloom: number;
-  ca: number;
-  grain: number;
-  vignette: number;
-  spark: [number, number, number];
+  sweepHead: number; // la linea del finale: 0..1 quanto si è tracciata
+  sweepTail: number; // 0..1 quanto si è già cancellata
   claim: number;
   cta: number;
 }
@@ -100,6 +97,9 @@ const SWAPS: [number, number, number, number][] = [
 ];
 // Istante in cui ogni barra (alta, centrale, bassa) scatta al suo posto: prima la bassa.
 export const LOCK: [number, number, number] = [10.2, 9.7, 9.2];
+/** Il silenzio: nessun movimento di camera tra l'ultimo clic (meno 0,3 s) e la linea del finale. */
+const SILENZIO_DA = LOCK[0] - 0.3;
+const SILENZIO_A = 10.9;
 
 function buildBars(): Record<Ch, Track>[] {
   const slot = [0, 1, 2]; // slot[b] = riga occupata dalla barra b
@@ -169,40 +169,31 @@ function buildBars(): Record<Ch, Track>[] {
   for (let b = 0; b < 3; b++) {
     tls[b]
       .go(lockStart[b], LOCK[b], 'back.out(1.15)', { x: A[b][0], y: A[b][1], z: 0, rx: 0, ry: 0, rz: 0 })
-      .go(LOCK[b] - 0.4, LOCK[b], 'power3.out', { lift: 1 });
+      .go(LOCK[b] - 0.4, LOCK[b], 'power3.out', { lift: 1 })
+      // Il clic: la barra si abbassa di un soffio e torna al suo posto. Niente luce, niente scintille.
+      .go(LOCK[b], LOCK[b] + 0.06, 'power2.in', { y: A[b][1] - 0.14 })
+      .go(LOCK[b] + 0.06, LOCK[b] + 0.24, 'power2.out', { y: A[b][1] });
   }
   return tls.map((t) => t.tracks());
 }
 
 const bars = buildBars();
 const T = (keys: Key[]) => new Track(keys);
-const ageKeys = (lock: number): Key[] => [[0, -1], [lock - 0.001, -1], [lock, 0], [lock + 1.7, 1, 'none']];
 
 const tracks = {
-  az: T([[0, 0], [2.1, -0.2, 'sine.inOut'], [5.1, 0.25, 'sine.inOut'], [8.4, -0.1, 'sine.inOut'], [10.7, 0, 'sine.inOut']]),
-  el: T([[0, 0], [2.1, 0.1, 'sine.inOut'], [5.1, 0.14, 'sine.inOut'], [8.4, 0.1, 'sine.inOut'], [10.7, 0, 'sine.inOut']]),
+  // La camera si ferma a SILENZIO_DA, 0,3 s prima dell'ultimo clic, e resta ferma fino a SILENZIO_A.
+  az: T([[0, 0], [2.1, -0.2, 'sine.inOut'], [5.1, 0.25, 'sine.inOut'], [8.4, -0.1, 'sine.inOut'], [SILENZIO_DA, 0.05, 'sine.inOut'], [SILENZIO_A, 0.05], [11.7, 0, 'power3.inOut']]),
+  el: T([[0, 0], [2.1, 0.1, 'sine.inOut'], [5.1, 0.14, 'sine.inOut'], [8.4, 0.1, 'sine.inOut'], [SILENZIO_DA, 0.08, 'sine.inOut'], [SILENZIO_A, 0.08], [11.7, 0, 'power3.inOut']]),
   dist: T([
     [0, 1.1], [1.0, 1.1], [2.1, 0.95, 'sine.inOut'], [5.1, 1.1, 'sine.inOut'],
-    [8.4, 1.2, 'sine.inOut'], [10.7, 1.08, 'sine.inOut'], [11.7, 1.0, 'power3.inOut'],
+    [8.4, 1.2, 'sine.inOut'], [SILENZIO_DA, 1.1, 'sine.inOut'], [SILENZIO_A, 1.1], [11.7, 1.0, 'power3.inOut'],
   ]),
-  fov: T([[0, 36], [10.7, 36], [11.7, 22, 'power3.inOut']]),
-  shiftY: T([[0, 0], [10.7, 0], [11.7, 0.1, 'power3.inOut']]),
-  flatten: T([[0, 1], [10.9, 1], [11.6, 0.002, 'power3.inOut']]),
-  flash: T([
-    [0, 0], [9.14, 0], [9.2, 0.35, 'power2.out'], [9.5, 0, 'power2.out'],
-    [9.64, 0], [9.7, 0.35, 'power2.out'], [10.0, 0, 'power2.out'],
-    [10.14, 0], [10.22, 1, 'power2.out'], [10.8, 0, 'power2.out'],
-  ]),
-  bloom: T([
-    [0, 0.8], [9.15, 0.9], [9.22, 1.4], [9.6, 0.9], [9.65, 0.9], [9.72, 1.4], [10.0, 0.9],
-    [10.15, 0.9], [10.22, 2.4], [10.9, 0.8],
-  ]),
-  ca: T([[0, 0], [10.15, 0], [10.22, 1], [10.7, 0, 'power2.out']]),
-  grain: T([[0, 1], [11.5, 1], [12.2, 0]]),
-  vignette: T([[0, 1], [10.7, 1], [11.7, 0, 'power2.inOut']]),
-  spark0: T(ageKeys(LOCK[0])),
-  spark1: T(ageKeys(LOCK[1])),
-  spark2: T(ageKeys(LOCK[2])),
+  fov: T([[0, 36], [SILENZIO_A, 36], [11.7, 22, 'power3.inOut']]),
+  shiftY: T([[0, 0], [SILENZIO_A, 0], [11.7, 0.1, 'power3.inOut']]),
+  flatten: T([[0, 1], [SILENZIO_A, 1], [11.6, 0.002, 'power3.inOut']]),
+  // La linea del finale: la testa corre da sinistra a destra, la coda la cancella subito dopo.
+  sweepHead: T([[0, 0], [SILENZIO_A, 0], [11.35, 1, 'power2.inOut']]),
+  sweepTail: T([[0, 0], [SILENZIO_A + 0.15, 0], [11.55, 1, 'power2.inOut']]),
   claim: T([[0, 0], [11.6, 0], [12.3, 1, 'power3.out']]),
   cta: T([[0, 0], [12.2, 0], [12.85, 1, 'power2.out']]),
 };
@@ -218,7 +209,7 @@ export function createState(): SceneState {
   const pose = (): BarPose => ({ x: 0, y: 0, z: 0, rx: 0, ry: 0, rz: 0, sx: 1, sy: 1, lift: 0 });
   return {
     t: 0, bars: [pose(), pose(), pose()], bump: [0, 0, 0], az: 0, el: 0, dist: 1.5, fov: 36, shiftY: 0,
-    flatten: 1, flash: 0, bloom: 1, ca: 0, grain: 1, vignette: 1, spark: [-1, -1, -1], claim: 0, cta: 0,
+    flatten: 1, sweepHead: 0, sweepTail: 0, claim: 0, cta: 0,
   };
 }
 
@@ -236,14 +227,8 @@ export function stateAt(t: number, s: SceneState): SceneState {
   s.fov = tracks.fov.at(t);
   s.shiftY = tracks.shiftY.at(t);
   s.flatten = tracks.flatten.at(t);
-  s.flash = tracks.flash.at(t);
-  s.bloom = tracks.bloom.at(t);
-  s.ca = tracks.ca.at(t);
-  s.grain = tracks.grain.at(t);
-  s.vignette = tracks.vignette.at(t);
-  s.spark[0] = tracks.spark0.at(t);
-  s.spark[1] = tracks.spark1.at(t);
-  s.spark[2] = tracks.spark2.at(t);
+  s.sweepHead = tracks.sweepHead.at(t);
+  s.sweepTail = tracks.sweepTail.at(t);
   s.claim = tracks.claim.at(t);
   s.cta = tracks.cta.at(t);
   return s;

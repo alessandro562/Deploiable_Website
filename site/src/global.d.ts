@@ -10,7 +10,7 @@ interface DeploiableHooks {
   /** Riprende la riproduzione normale. */
   play?: () => void;
   /** Stato corrente dell'animazione (solo per i test). */
-  state?: () => { t: number; bump: number[]; sparks: number[] };
+  state?: () => { t: number; bump: number[]; sweep: number[] };
 }
 
 interface Window {

@@ -2,8 +2,7 @@ import { Color, ShaderMaterial, Vector3 } from 'three';
 import { COLORS } from '../../config/brand';
 
 // Faccia frontale in Lime esatto (nessuna luce, nessun tone mapping): il colore del brand esce identico.
-// Pareti da Lime Deep a Pine con una luce chiave e un bordo Lime. uFlash gonfia il Lime oltre 1 solo
-// nell'istante dell'incastro, così il bloom lo trasforma in un lampo; a riposo vale 0.
+// Pareti da Lime Deep a Pine con una luce chiave e un bordo Lime; nessun pixel supera mai il Lime del brand.
 export function createBarMaterial() {
   return new ShaderMaterial({
     uniforms: {
@@ -12,7 +11,6 @@ export function createBarMaterial() {
       uPine: { value: new Color(COLORS.pine) },
       uMoss: { value: new Color(COLORS.moss) },
       uCam: { value: new Vector3() },
-      uFlash: { value: 0 },
     },
     vertexShader: /* glsl */ `
       attribute float aKind;
@@ -31,7 +29,6 @@ export function createBarMaterial() {
     `,
     fragmentShader: /* glsl */ `
       uniform vec3 uLime, uLimeDeep, uPine, uMoss, uCam;
-      uniform float uFlash;
       varying vec3 vN;
       varying vec3 vLocalN;
       varying vec3 vWorld;
@@ -52,7 +49,7 @@ export function createBarMaterial() {
           float rim = pow(1.0 - abs(dot(n, V)), 3.0);
           col += uLime * rim * 0.4;
         }
-        col *= 1.0 + uFlash * 1.7;
+        col = min(col, uLime);
         gl_FragColor = vec4(col, 1.0);
         #include <colorspace_fragment>
       }

@@ -107,8 +107,24 @@ p {
 }
 
 .gl,
-.grain {
+.sweep {
   display: none;
+}
+
+/* La linea del finale: stessa inclinazione di 8° delle barre, alla quota del centro del simbolo.
+   La testa e la coda si regolano con clip-path (src/app.ts). Sulle barre Lime non si vede: le attraversa. */
+.is-webgl .sweep {
+  display: block;
+  position: fixed;
+  z-index: 2;
+  left: -10vw;
+  width: 120vw;
+  top: calc(40svh - 1px);
+  height: 2px;
+  background: var(--lime);
+  transform: rotate(-8deg);
+  clip-path: inset(0 100% 0 0);
+  pointer-events: none;
 }
 
 .static-symbol {
@@ -129,23 +145,6 @@ p {
   width: 100vw;
   height: 100svh;
   z-index: 0;
-}
-
-.is-webgl .grain {
-  display: block;
-  position: fixed;
-  inset: -50%;
-  z-index: 5;
-  pointer-events: none;
-  opacity: calc(0.05 * var(--grain, 1));
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.95 0 0 0 0 0.95 0 0 0 0 0.92 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
-  animation: grain 0.5s steps(4) infinite;
-}
-@keyframes grain {
-  0% { transform: translate(0, 0); }
-  25% { transform: translate(-6%, 4%); }
-  50% { transform: translate(4%, -7%); }
-  75% { transform: translate(-3%, -3%); }
 }
 
 /* Senza WebGL (o con riduzione del movimento): il simbolo piatto ufficiale e la frase. */

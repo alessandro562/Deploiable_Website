@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { brightPixels, brightness, openFilm, peakColumn, sample, seek } from './helpers';
+import { brightPixels, brightness, canvasHash, maxChannels, openFilm, peakColumn, sample, seek } from './helpers';
 
 const LIME = [200, 242, 90];
 const FOREST = [16, 38, 27];
@@ -81,10 +81,53 @@ test('dopo la rivelazione le tre barre respirano in sequenza', async ({ page }) 
   expect(b).toBeGreaterThan(c);
 });
 
-// Regressione: con il post-processing completo (livello "high": bloom, vignettatura, aberrazione cromatica,
-// antialiasing) il canvas restava vuoto quando l'aberrazione era spenta. I test al livello minimo non lo vedevano.
+test('nessun bagliore: neppure un pixel supera il Lime del brand, in nessun momento', async ({ page }) => {
+  await openFilm(page);
+  for (const t of [3.4, 8.9, 9.3, 10.25, 10.6, 11.0, 12.9]) {
+    await seek(page, t);
+    const m = await maxChannels(page);
+    LIME.forEach((v, i) => expect(m[i], `t=${t} canale ${i}`).toBeLessThanOrEqual(v));
+  }
+});
+
+test('il mondo si ferma: tra il clic e la linea il fotogramma non cambia', async ({ page }) => {
+  await openFilm(page);
+  await seek(page, 10.5);
+  const a = await canvasHash(page);
+  await seek(page, 10.85);
+  const b = await canvasHash(page);
+  expect(a).toBe(b);
+  await seek(page, 10.0); // un istante prima dell'ultimo incastro: qualcosa si muove
+  expect(await canvasHash(page)).not.toBe(a);
+});
+
+test('la linea attraversa lo schermo a 8° e sparisce prima della frase', async ({ page }) => {
+  await openFilm(page);
+  const visible = () =>
+    page.evaluate(() => {
+      const el = document.querySelector<HTMLElement>('.sweep')!;
+      const m = /inset\(0(?:px)? ([\d.]+)% 0(?:px)? ([\d.]+)%\)/.exec(el.style.clipPath);
+      return m ? 100 - parseFloat(m[1]) - parseFloat(m[2]) : NaN; // percentuale visibile della linea
+    });
+  for (const t of [0.8, 6, 10.8]) {
+    await seek(page, t);
+    expect(await visible(), `t=${t}`).toBeLessThanOrEqual(0.01);
+  }
+  await seek(page, 11.1);
+  expect(await visible()).toBeGreaterThan(10);
+  const angle = await page.evaluate(() => {
+    const t = getComputedStyle(document.querySelector('.sweep')!).transform;
+    const [a, b] = t.replace('matrix(', '').split(',').map(Number);
+    return (Math.atan2(b, a) * 180) / Math.PI;
+  });
+  expect(angle).toBeCloseTo(-8, 1);
+  await seek(page, 12.9);
+  expect(await visible()).toBeLessThanOrEqual(0.01);
+});
+
+// Regressione: ai livelli con antialiasing il canvas deve restare visibile in ogni atto.
 for (const tier of ['high', 'mid', 'mobile']) {
-  test(`con il post-processing (livello ${tier}) l'animazione è sempre visibile`, async ({ page }) => {
+  test(`al livello ${tier} l'animazione è sempre visibile`, async ({ page }) => {
     test.setTimeout(240_000);
     const errors = await openFilm(page, '', tier);
     const dark = FOREST[0] + FOREST[1] + FOREST[2] + 12;

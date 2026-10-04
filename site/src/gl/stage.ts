@@ -1,9 +1,8 @@
-import { Group, MathUtils, Mesh, PerspectiveCamera, type Scene, type ShaderMaterial, Vector2 } from 'three';
+import { Group, MathUtils, Mesh, PerspectiveCamera, type Scene, type ShaderMaterial } from 'three';
 import type { SceneState } from './choreography';
-import { BarGeometry, DEPTH } from './symbol/barGeometry';
+import { BarGeometry } from './symbol/barGeometry';
 import { createBarMaterial } from './symbol/barMaterial';
-import { PIVOT, SYMBOL_H, SYMBOL_W } from './symbol/symbolSpec';
-import { Sparks } from './sparks';
+import { SYMBOL_H, SYMBOL_W } from './symbol/symbolSpec';
 
 // Quanto del viewport occupa il simbolo assemblato: metà altezza, oppure il 62% della larghezza
 // (su telefono in verticale). Lo stesso calcolo è replicato in CSS (--sym-w), così testo e 3D combaciano.
@@ -20,9 +19,8 @@ export function fitDistance(fovDeg: number, aspect: number) {
 export class Stage {
   readonly group = new Group();
   private readonly bars: { geo: BarGeometry; mesh: Mesh; mat: ShaderMaterial }[] = [];
-  private readonly sparks: Sparks;
 
-  constructor(scene: Scene, sparkCount: number) {
+  constructor(scene: Scene) {
     for (let i = 0; i < 3; i++) {
       const geo = new BarGeometry(i);
       const mat = createBarMaterial();
@@ -32,20 +30,15 @@ export class Stage {
       this.group.add(mesh);
       this.bars.push({ geo, mesh, mat });
     }
-    this.sparks = new Sparks(
-      sparkCount,
-      PIVOT.map((p) => [p[0], p[1], DEPTH / 2] as [number, number, number]),
-    );
-    scene.add(this.group, this.sparks.mesh);
+    scene.add(this.group);
   }
 
   /** Rende visibili tutti gli oggetti: serve al disegno di riscaldamento, per compilare ogni shader in anticipo. */
   forceVisible() {
     for (const b of this.bars) b.mesh.visible = true;
-    this.sparks.mesh.visible = true;
   }
 
-  apply(s: SceneState, camera: PerspectiveCamera, res: Vector2, px: number, width: number, height: number) {
+  apply(s: SceneState, camera: PerspectiveCamera, width: number, height: number) {
     // la camera si aggiorna per prima: le barre usano la sua posizione del fotogramma corrente
     // camera: orbita attorno al centro del simbolo; la distanza segue il campo visivo
     const aspect = width / height;
@@ -69,12 +62,10 @@ export class Stage {
       mesh.rotation.set(p.rx, p.ry, p.rz);
       mesh.scale.set(Math.max(p.sx, 1e-4), Math.max(p.sy, 1e-4), 1);
       geo.update({ lift: p.lift, extend: 0, front: 1 });
-      mat.uniforms.uFlash.value = s.flash;
       mat.uniforms.uCam.value.copy(camera.position);
     }
     this.group.scale.z = Math.max(s.flatten, 0.001);
     this.group.updateMatrixWorld();
 
-    this.sparks.update(s.spark, res, px);
   }
 }
