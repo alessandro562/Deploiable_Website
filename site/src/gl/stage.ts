@@ -39,6 +39,12 @@ export class Stage {
     scene.add(this.group, this.sparks.mesh);
   }
 
+  /** Rende visibili tutti gli oggetti: serve al disegno di riscaldamento, per compilare ogni shader in anticipo. */
+  forceVisible() {
+    for (const b of this.bars) b.mesh.visible = true;
+    this.sparks.mesh.visible = true;
+  }
+
   apply(s: SceneState, camera: PerspectiveCamera, res: Vector2, px: number, width: number, height: number) {
     // la camera si aggiorna per prima: le barre usano la sua posizione del fotogramma corrente
     // camera: orbita attorno al centro del simbolo; la distanza segue il campo visivo

@@ -50,7 +50,11 @@ export async function start(caps: Capabilities) {
   claim.forEach((el) => (el.style.transform = 'translate3d(0, 110%, 0)'));
   cta.style.transform = 'translate3d(0, 110%, 0)';
   await document.fonts.ready;
+  // Riscaldamento: shader e geometrie vengono compilati e caricati sulla GPU ora, con la pagina ancora
+  // nel Forest iniziale, così nessun scatto arriva all'incastro (9,2 s) o al lampo (10,2 s).
+  stage.forceVisible();
   await engine.warmup();
+  engine.render(1, 0, 1, 0);
   draw(0);
 
   gsap.ticker.lagSmoothing(0);
