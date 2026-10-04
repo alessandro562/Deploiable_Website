@@ -11,7 +11,7 @@ test.describe('versione statica', () => {
     expect(await page.evaluate(() => window.__DEPLOIABLE__!.mode)).toBe('static');
     expect(scripts.some((u) => /\/app-.*\.js/.test(u))).toBe(false);
     await expect(page.locator('.static-symbol')).toBeVisible();
-    await expect(page.getByRole('heading', { name: /Ancora un gradino/ })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /We deploy AI/ })).toBeVisible();
     await expect(page.getByText('sta arrivando.')).toBeVisible();
     // testo dentro lo schermo, sotto il simbolo
     const sym = (await page.locator('.static-symbol').boundingBox())!;

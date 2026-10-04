@@ -1,8 +1,8 @@
-# Deploiable · "Ancora un gradino."
+# Deploiable · "We deploy AI. Measurably."
 
 Landing pre-lancio: una sola schermata, nessuno scroll, nessuna interazione. Le tre barre del simbolo
 giocano da sole in 3D finché non scattano al loro posto; poi compare la frase.
-Titolo: **Ancora un gradino.** · CTA: **deploiable sta arrivando.**
+Titolo: **We deploy AI. Measurably.** (in inglese) · CTA: **deploiable sta arrivando.**
 
 ## L'animazione (circa 13 secondi, poi resta ferma e "viva")
 

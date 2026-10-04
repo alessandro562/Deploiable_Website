@@ -61,7 +61,7 @@ p {
   white-space: nowrap;
 }
 .claim {
-  font-size: calc(var(--sym-w) / 5);
+  font-size: calc(var(--sym-w) / 5.4);
   line-height: 0.98;
   letter-spacing: -0.045em;
   font-weight: 300;
