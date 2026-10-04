@@ -1,32 +1,29 @@
 import { Color, ShaderMaterial, Vector3 } from 'three';
-import { COLORS } from '../../config/brand';
+import { PALETTES, type Palette } from '../../config/brand';
 
-// Faccia frontale in Lime esatto (nessuna luce, nessun tone mapping): il colore del brand esce identico.
-// Pareti da Lime Deep a Pine con una luce chiave e un bordo Lime; nebbia Forest per "l'infinito".
+// Faccia frontale nel colore pieno della palette (nessuna luce, nessun tone mapping): esce identico al brand.
+// Pareti con una luce chiave e un bordo controluce; nessun pixel supera il colore "cap" della palette.
 export function createBarMaterial() {
-  return new ShaderMaterial({
+  const m = new ShaderMaterial({
     uniforms: {
-      uLime: { value: new Color(COLORS.lime) },
-      uLimeDeep: { value: new Color(COLORS.limeDeep) },
-      uPine: { value: new Color(COLORS.pine) },
-      uMoss: { value: new Color(COLORS.moss) },
-      uForest: { value: new Color(COLORS.forest) },
+      uFront: { value: new Color() },
+      uTop: { value: new Color() },
+      uBottom: { value: new Color() },
+      uSide: { value: new Color() },
+      uBack: { value: new Color() },
+      uRim: { value: new Color() },
+      uRimAmount: { value: 0 },
+      uCap: { value: new Color() },
       uCam: { value: new Vector3() },
-      uHeadX: { value: 0 },
-      uHead: { value: 0 },
-      uFogNear: { value: 18 },
-      uFogFar: { value: 70 },
     },
     vertexShader: /* glsl */ `
       attribute float aKind;
       varying vec3 vN;
       varying vec3 vLocalN;
       varying vec3 vWorld;
-      varying vec3 vLocal;
       varying float vKind;
       void main() {
         vKind = aKind;
-        vLocal = position;
         vLocalN = normal;
         vec4 w = modelMatrix * vec4(position, 1.0);
         vWorld = w.xyz;
@@ -35,36 +32,48 @@ export function createBarMaterial() {
       }
     `,
     fragmentShader: /* glsl */ `
-      uniform vec3 uLime, uLimeDeep, uPine, uMoss, uForest, uCam;
-      uniform float uHeadX, uHead, uFogNear, uFogFar;
+      uniform vec3 uFront, uTop, uBottom, uSide, uBack, uRim, uCap, uCam;
+      uniform float uRimAmount;
       varying vec3 vN;
       varying vec3 vLocalN;
       varying vec3 vWorld;
-      varying vec3 vLocal;
       varying float vKind;
       void main() {
         vec3 n = normalize(vN);
         vec3 V = normalize(uCam - vWorld);
         vec3 col;
         if (vKind < 0.5) {
-          col = uLime;
+          col = uFront;
         } else if (vKind < 1.5) {
-          col = mix(uPine, uMoss, 0.35);
+          col = uBack;
         } else {
           float up = vLocalN.y;
-          vec3 base = up > 0.35 ? uLimeDeep : (up < -0.35 ? uPine : mix(uMoss, uLimeDeep, 0.45));
+          vec3 base = up > 0.35 ? uTop : (up < -0.35 ? uBottom : uSide);
           vec3 L = normalize(vec3(0.35, 0.85, 0.4));
           col = base * (0.5 + 0.62 * max(dot(n, L), 0.0));
           float rim = pow(1.0 - abs(dot(n, V)), 3.0);
-          col += uLime * rim * 0.4;
+          col += uRim * rim * uRimAmount;
+          col = min(col, uCap);
         }
-        float head = exp(-pow((vLocal.x - uHeadX) * 2.2, 2.0)) * uHead;
-        col += uLime * head * 1.8;
-        float f = smoothstep(uFogNear, uFogFar, length(uCam - vWorld));
-        col = mix(col, uForest, f);
         gl_FragColor = vec4(col, 1.0);
         #include <colorspace_fragment>
       }
     `,
   });
+  setPalette(m, PALETTES.forest);
+  return m;
+}
+
+const mix = (a: string, b: string, t: number, out: Color) => out.set(a).lerp(new Color(b), t);
+
+export function setPalette(m: ShaderMaterial, p: Palette) {
+  const u = m.uniforms;
+  u.uFront.value.set(p.front);
+  u.uTop.value.set(p.top);
+  u.uBottom.value.set(p.bottom);
+  mix(p.side[0], p.side[1], p.side[2], u.uSide.value);
+  mix(p.back[0], p.back[1], p.back[2], u.uBack.value);
+  u.uRim.value.set(p.rim);
+  u.uRimAmount.value = p.rimAmount;
+  u.uCap.value.set(p.cap);
 }

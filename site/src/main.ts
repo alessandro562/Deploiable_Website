@@ -1,24 +1,24 @@
-import '@fontsource/instrument-serif/400.css';
-import '@fontsource-variable/jetbrains-mono/wght.css';
 import './styles/fonts.css';
 import './styles/main.css';
 import { detect } from './core/capabilities';
-import { TOTAL_VH } from './config/scenes';
+import { initSignup } from './signup';
 
+initSignup();
 const caps = detect();
 const root = document.documentElement;
-root.style.setProperty('--total-vh', String(caps.mobile ? Math.round(TOTAL_VH * 0.8) : TOTAL_VH));
 
-async function startStatic(reason?: string) {
+function startStatic(reason?: string) {
   root.classList.remove('is-webgl');
   root.classList.add('is-static');
   root.dataset.mode = 'static';
-  const { startStatic } = await import('./fallback/staticMode');
-  startStatic(reason);
+  root.dataset.palette = 'lime'; // la versione statica è il finale: logo Forest su Lime
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', '#C8F25A');
+  window.__DEPLOIABLE__ = { ready: true, mode: 'static', tier: 'minimal', reason, errors: [] };
 }
 
 if (caps.mode === 'webgl') {
   root.dataset.mode = 'webgl';
+  root.classList.add('is-webgl'); // subito: il canvas Forest copre la pagina mentre il 3D si prepara
   import('./app')
     .then((m) => m.start(caps))
     .catch((err) => {

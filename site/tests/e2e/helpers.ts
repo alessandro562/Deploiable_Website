@@ -1,24 +1,23 @@
 import type { Page } from '@playwright/test';
 
-export async function openFilm(page: Page, extra = '') {
+export async function openFilm(page: Page, extra = '', tier = 'minimal') {
   const errors: string[] = [];
   page.on('pageerror', (e) => errors.push(e.message));
   page.on('console', (m) => {
     if (m.type() === 'error') errors.push(m.text());
   });
-  await page.goto(`/?__test=1&tier=minimal${extra}`);
+  await page.goto(`/?__test=1&tier=${tier}${extra}`);
   await page.waitForFunction(() => window.__DEPLOIABLE__?.ready === true, null, { timeout: 90_000 });
-  await page.evaluate(() => window.__DEPLOIABLE__!.freezeTime!(3));
   return errors;
 }
 
-export async function seek(page: Page, p: number | string) {
-  await page.evaluate((p) => window.__DEPLOIABLE__!.seek!(p), p);
-  await page.waitForTimeout(120);
-  await page.evaluate((p) => window.__DEPLOIABLE__!.seek!(p), p);
+/** Porta l'animazione al secondo indicato (la ferma e disegna un solo fotogramma). */
+export async function seek(page: Page, seconds: number) {
+  await page.evaluate((s) => window.__DEPLOIABLE__!.seek!(s), seconds);
+  await page.waitForTimeout(80);
 }
 
-/** Colore medio di una zona del canvas WebGL (preserveDrawingBuffer è attivo in modalità test). */
+/** Colore medio di una zona del canvas WebGL (in modalità test il buffer è conservato). */
 export async function sample(page: Page, x: number, y: number, size = 6) {
   return page.evaluate(
     ({ x, y, size }) => {
@@ -39,4 +38,92 @@ export async function sample(page: Page, x: number, y: number, size = 6) {
     },
     { x, y, size },
   );
+}
+
+/** Quanto è "acceso" un punto: distanza dal colore Forest. */
+export const brightness = (px: number[]) => px[0] + px[1] + px[2];
+
+/** Luminosità massima lungo una colonna di pixel: serve per le linee sottili. */
+export async function peakColumn(page: Page, x: number, y0: number, y1: number) {
+  return page.evaluate(
+    ({ x, y0, y1 }) => {
+      const src = document.querySelector<HTMLCanvasElement>('canvas.gl')!;
+      const c = document.createElement('canvas');
+      c.width = src.width;
+      c.height = src.height;
+      const ctx = c.getContext('2d')!;
+      ctx.drawImage(src, 0, 0);
+      const sx = Math.round(x * src.width);
+      const from = Math.round(y0 * src.height), to = Math.round(y1 * src.height);
+      const d = ctx.getImageData(sx, from, 1, to - from).data;
+      let max = 0;
+      for (let i = 0; i < d.length; i += 4) max = Math.max(max, d[i] + d[i + 1] + d[i + 2]);
+      return max;
+    },
+    { x, y0, y1 },
+  );
+}
+
+/** Tutti i pixel molto luminosi dell'area indicata, con il loro colore: servono a verificare il Lime esatto. */
+export async function brightPixels(page: Page, x0: number, y0: number, x1: number, y1: number, step = 3, dark = false) {
+  return page.evaluate(
+    ({ x0, y0, x1, y1, step, dark }) => {
+      const src = document.querySelector<HTMLCanvasElement>('canvas.gl')!;
+      const c = document.createElement('canvas');
+      c.width = src.width;
+      c.height = src.height;
+      const ctx = c.getContext('2d')!;
+      ctx.drawImage(src, 0, 0);
+      const out: number[][] = [];
+      const fx = Math.round(x0 * src.width), tx = Math.round(x1 * src.width);
+      const fy = Math.round(y0 * src.height), ty = Math.round(y1 * src.height);
+      const d = ctx.getImageData(fx, fy, tx - fx, ty - fy).data;
+      const w = tx - fx;
+      for (let y = 0; y < ty - fy; y += step) {
+        for (let x = 0; x < w; x += step) {
+          const i = (y * w + x) * 4;
+          const b = d[i] + d[i + 1] + d[i + 2];
+          if (dark ? b < 200 : b > 450) out.push([d[i], d[i + 1], d[i + 2]]);
+        }
+      }
+      return out;
+    },
+    { x0, y0, x1, y1, step, dark },
+  );
+}
+
+/** Tutti i pixel scuri dell'area indicata: sul fondo Lime del finale servono a verificare il Forest esatto. */
+export const darkPixels = (page: Page, x0: number, y0: number, x1: number, y1: number, step = 3) =>
+  brightPixels(page, x0, y0, x1, y1, step, true);
+
+/** Hash del contenuto del canvas: due fotogrammi identici hanno lo stesso hash. */
+export async function canvasHash(page: Page) {
+  return page.evaluate(() => {
+    const src = document.querySelector<HTMLCanvasElement>('canvas.gl')!;
+    const c = document.createElement('canvas');
+    c.width = src.width;
+    c.height = src.height;
+    const ctx = c.getContext('2d')!;
+    ctx.drawImage(src, 0, 0);
+    const d = ctx.getImageData(0, 0, c.width, c.height).data;
+    let h = 0;
+    for (let i = 0; i < d.length; i++) h = (h * 31 + d[i]) | 0;
+    return h;
+  });
+}
+
+/** Il pixel più chiaro del canvas, canale per canale (per verificare che nulla superi il Lime del brand). */
+export async function maxChannels(page: Page) {
+  return page.evaluate(() => {
+    const src = document.querySelector<HTMLCanvasElement>('canvas.gl')!;
+    const c = document.createElement('canvas');
+    c.width = src.width;
+    c.height = src.height;
+    const ctx = c.getContext('2d')!;
+    ctx.drawImage(src, 0, 0);
+    const d = ctx.getImageData(0, 0, c.width, c.height).data;
+    const m = [0, 0, 0];
+    for (let i = 0; i < d.length; i += 4) for (let k = 0; k < 3; k++) if (d[i + k] > m[k]) m[k] = d[i + k];
+    return m;
+  });
 }

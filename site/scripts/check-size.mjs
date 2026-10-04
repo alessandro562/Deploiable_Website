@@ -9,7 +9,7 @@ const sum = (re) => files.filter((f) => re.test(f)).reduce((s, f) => s + gz(f), 
 
 const checks = [
   ['JS di ingresso', sum(/^index-.*\.js$/), 60],
-  ['JS film (three + gsap + post)', sum(/^app-.*\.js$/), 230],
+  ['JS animazione (three + gsap)', sum(/^app-.*\.js$/), 190],
   ['CSS', sum(/\.css$/), 20],
 ];
 let ok = true;

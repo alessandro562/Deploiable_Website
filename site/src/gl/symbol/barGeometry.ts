@@ -1,5 +1,5 @@
 import { BufferAttribute, BufferGeometry, ShapeUtils, Vector2 } from 'three';
-import { OUTLINES, REST, toLocal, vertexAt, type Deform, type OutlineVertex, type Vec2 } from './symbolSpec';
+import { OUTLINES, PIVOT, REST, toLocal, vertexAt, type Deform, type OutlineVertex, type Vec2 } from './symbolSpec';
 
 // Geometria estrusa di una barra, ricalcolata sulla CPU quando cambiano gradino, estensione o
 // accensione (poche centinaia di vertici: costa meno di un frame di shader).
@@ -54,8 +54,9 @@ export class BarGeometry {
     this.outline.forEach((v, i) => {
       vertexAt(this.bar, v, d, tmp);
       const l = toLocal(tmp);
-      this.pts[i][0] = l[0];
-      this.pts[i][1] = l[1];
+      // centrata sul perno: la posizione della mesh è la posizione della barra
+      this.pts[i][0] = l[0] - PIVOT[this.bar][0];
+      this.pts[i][1] = l[1] - PIVOT[this.bar][1];
     });
   }
 

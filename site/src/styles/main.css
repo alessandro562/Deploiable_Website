@@ -2,17 +2,26 @@
   --lime: #c8f25a;
   --forest: #10261b;
   --mist: #f1f3ea;
-  --pine: #1c3a2a;
-  --lime-deep: #b0dd3c;
-  --moss: #4f6a55;
-  --sage: #8fa596;
-  --next: #2e4a3b;
-  --m: clamp(20px, 5vw, 80px);
+  /* colori della pagina: cambiano con la palette (html[data-palette]) */
+  --bg: var(--forest);
+  --ink-light: var(--mist);
+  --ink-strong: var(--lime);
+  --sweep-color: var(--lime);
   --sans: 'Satoshi', 'Helvetica Neue', Arial, sans-serif;
-  --mono: 'JetBrains Mono Variable', ui-monospace, monospace;
-  --serif: 'Instrument Serif', Georgia, serif;
-  --total-vh: 1160;
+
+  /* Composizione del finale: il logo orizzontale in alto, la frase sotto, tutto allineato al bordo sinistro del logo.
+     La larghezza del logo è l'unica misura: la camera 3D inquadra il segnaposto .logo-slot (src/gl/stage.ts). */
+  --logo-w: min(88vw, max(52vw, 360px), 150svh);
   color-scheme: dark;
+}
+
+/* Su Lime solo Forest: logo, frase e linea diventano tutti Forest. */
+html[data-palette='lime'] {
+  --bg: var(--lime);
+  --ink-light: var(--forest);
+  --ink-strong: var(--forest);
+  --sweep-color: var(--forest);
+  color-scheme: light;
 }
 
 *,
@@ -21,640 +30,310 @@
   box-sizing: border-box;
 }
 
-html {
-  background: var(--forest);
+html,
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg);
   overscroll-behavior: none;
   -webkit-text-size-adjust: 100%;
 }
 
 body {
-  margin: 0;
-  background: var(--forest);
-  color: var(--mist);
+  color: var(--ink-light);
   font-family: var(--sans);
   font-weight: 500;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
 
-html[data-theme='lime'],
-html[data-theme='lime'] body {
-  background: var(--lime);
-}
-
 h1,
-h2,
-h3,
 p {
   margin: 0;
 }
 
-a {
-  color: inherit;
+/* ---------- La pila: logo, frase, CTA ---------- */
+
+.stack {
+  position: fixed;
+  z-index: 10;
+  top: 0;
+  bottom: 0;
+  left: calc((100vw - var(--logo-w)) / 2);
+  width: var(--logo-w);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: calc(var(--logo-w) / 14);
+  /* il centro ottico sta un po' sopra il centro geometrico */
+  padding-bottom: 8svh;
 }
 
+.logo-slot {
+  width: 100%;
+  aspect-ratio: 514.158 / 97.3;
+  color: var(--ink-strong);
+}
+.logo-slot svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+/* Nella versione 3D il logo lo disegna il canvas: il segnaposto resta solo per misurare e per l'accessibilità. */
+.is-webgl .logo-slot svg {
+  opacity: 0;
+}
+
+/* Titoli a sinistra, due pesi di Satoshi (300 + 900): la parte leggera introduce, quella pesante dice la cosa. */
+.claim {
+  display: flex;
+  flex-direction: column;
+  gap: 0.05em;
+  font-size: calc(var(--logo-w) / 9);
+  line-height: 1;
+  letter-spacing: -0.045em;
+  font-weight: 300;
+  white-space: nowrap;
+  /* la frase è centrata sulla pagina (e quindi sul logo, che è centrato anche lui) */
+  text-align: center;
+}
+.line--light {
+  font-weight: 300;
+  color: var(--ink-light);
+}
+.line--black {
+  font-weight: 900;
+  color: var(--ink-strong);
+  /* centratura ottica: la M ha più spazio a sinistra del punto a destra (−0,03 em, misurato in scripts/align.mjs) */
+  margin-left: -0.06em;
+}
+
+.mask {
+  display: block;
+  overflow: hidden;
+  /* la maschera taglia solo in verticale: ai lati si estende oltre il blocco senza spostare il layout */
+  padding: 0 0.5em 0.08em;
+  margin: 0 -0.5em -0.08em;
+}
+.line {
+  display: block;
+  will-change: transform;
+}
+
+/* ---------- Coming soon e iscrizione ---------- */
+/* Piccoli, sotto la frase: compaiono per ultimi. Su Lime solo Forest (i colori seguono la palette). */
+
+.outro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  /* un respiro in più rispetto allo spazio fra logo e frase: è un blocco a parte */
+  opacity: 0;
+  visibility: hidden;
+}
+
+.soon {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6em;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-strong);
+}
+.soon-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  animation: soon-pulse 1.8s ease-in-out infinite;
+}
+@keyframes soon-pulse {
+  50% { opacity: 0.2; }
+}
+
+.signup {
+  display: flex;
+  width: min(100%, 400px);
+  height: 48px;
+  padding: 4px;
+  border: 1.5px solid var(--ink-strong);
+  border-radius: 999px;
+}
+.signup input[type='email'] {
+  flex: 1;
+  min-width: 0;
+  padding: 0 14px 0 16px;
+  border: 0;
+  background: transparent;
+  color: var(--ink-strong);
+  font: 500 16px/1 var(--sans); /* 16 px: iOS non ingrandisce la pagina al tocco */
+  outline: none;
+}
+.signup input[type='email']::placeholder {
+  color: var(--ink-strong);
+  opacity: 0.45;
+}
+.signup button {
+  flex: none;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--ink-strong);
+  color: var(--bg);
+  font: 900 14px/1 var(--sans);
+  letter-spacing: -0.01em;
+  cursor: pointer;
+}
+.signup:focus-within {
+  box-shadow: 0 0 0 1.5px var(--ink-strong);
+}
+.signup[aria-busy='true'] button {
+  opacity: 0.6;
+  cursor: progress;
+}
+.signup-note {
+  font-size: 13px;
+  text-align: center;
+  white-space: nowrap; /* può uscire dalla larghezza del logo, che sui telefoni in orizzontale è stretta */
+  font-weight: 500;
+  color: var(--ink-light);
+  opacity: 0.75;
+}
+/* Iscritto: il modulo lascia il posto al messaggio. */
+.outro[data-state='done'] .signup {
+  display: none;
+}
+.outro[data-state='done'] .signup-note {
+  font-weight: 900;
+  opacity: 1;
+}
+
+.hp,
 .sr-only {
   position: absolute;
   width: 1px;
   height: 1px;
   overflow: hidden;
-  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
   white-space: nowrap;
 }
 
-:focus-visible {
-  outline: 2px solid var(--lime);
-  outline-offset: 4px;
-}
-html[data-theme='lime'] :focus-visible {
-  outline-color: var(--forest);
-}
-
-.skip {
-  position: fixed;
-  left: var(--m);
-  top: 12px;
-  z-index: 60;
-  padding: 10px 14px;
-  background: var(--lime);
-  color: var(--forest);
-  font: 500 12px/1 var(--mono);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  text-decoration: none;
-  transform: translateY(-200%);
-}
-.skip:focus-visible {
-  transform: none;
-  outline-color: var(--mist);
+/* Schermi bassi (telefono in orizzontale): logo più piccolo, così logo, frase e modulo stanno tutti dentro. */
+@media (max-height: 520px) {
+  :root {
+    --logo-w: min(88vw, 72svh);
+  }
+  .stack {
+    padding-bottom: 0;
+  }
+  .outro {
+    gap: 8px;
+  }
+  .signup {
+    height: 42px;
+  }
 }
 
-/* ---------- Tipografia ---------- */
-
-.title {
-  font-family: var(--sans);
-  font-weight: 300;
-  font-size: clamp(2.1rem, 4.6vw, 4.9rem);
-  line-height: 0.98;
-  letter-spacing: -0.045em;
-  color: var(--mist);
-  text-wrap: balance;
-}
-.title strong {
-  font-weight: 900;
-  color: var(--lime);
-}
-.title--xl {
-  font-size: clamp(2.7rem, 7vw, 7.6rem);
-}
-.title--xxl {
-  font-size: clamp(3.2rem, 10.4vw, 11.5rem);
-  line-height: 0.92;
-  letter-spacing: -0.055em;
-}
-.title--cta {
-  font-size: clamp(2.9rem, 9.6vw, 10.5rem);
-  line-height: 0.92;
-  letter-spacing: -0.055em;
-  color: var(--forest);
-}
-.title--cta strong {
-  color: var(--forest);
+/* Su schermi verticali (telefono) il logo occupa quasi tutta la larghezza e sotto c'è molto spazio:
+   la frase è più grande, in proporzione. */
+@media (max-aspect-ratio: 1/1) {
+  .claim {
+    font-size: calc(var(--logo-w) / 7);
+  }
 }
 
-.label {
-  font: 500 12px/1.2 var(--mono);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--sage);
-  margin-bottom: 1.4em;
-}
-.label--lime {
-  color: var(--lime);
-}
+/* ---------- Canvas e simbolo statico ---------- */
+/* Di default (prima che parta il JavaScript) il testo è nascosto: niente anticipazioni, la suspense parte subito. */
 
-.body {
-  font-weight: 500;
-  font-size: clamp(1rem, 1.2vw, 1.2rem);
-  line-height: 1.4;
-  color: var(--mist);
-  max-width: 34ch;
-  margin-top: 1.4em;
+.line {
+  transform: translateY(110%);
 }
-
-.numeral {
-  position: absolute;
-  z-index: -1;
-  left: -0.06em;
-  bottom: -0.28em;
-  font: 400 clamp(11rem, 30vw, 28rem) / 1 var(--serif);
-  color: var(--pine);
-  pointer-events: none;
-}
-
-/* ---------- Topbar ---------- */
-
-.topbar {
-  position: fixed;
-  inset: 0 0 auto 0;
-  z-index: 40;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: clamp(18px, 3vw, 40px) var(--m);
-  color: var(--lime);
-  pointer-events: none;
-}
-.topbar a {
-  pointer-events: auto;
-}
-html[data-theme='lime'] .topbar {
-  color: var(--forest);
-}
-.logo {
-  display: block;
-  width: clamp(112px, 10vw, 148px);
-  height: auto;
-}
-.topbar__meta {
-  display: flex;
-  align-items: center;
-  gap: 18px;
-}
-.timecode {
-  font: 500 11px/1 var(--mono);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--sage);
-  font-variant-numeric: tabular-nums;
-}
-html[data-theme='lime'] .timecode {
-  color: var(--forest);
-}
-.phase {
-  width: auto;
-  height: 22px;
-}
-.phase .bar {
-  fill: var(--next);
-  transition: fill 0.3s;
-}
-.phase .bar.is-done {
-  fill: var(--sage);
-}
-.phase .bar.is-current {
-  fill: var(--lime);
-}
-html[data-theme='lime'] .phase .bar {
-  fill: var(--forest);
-}
-
-/* ---------- Canvas, grana, loader, cursore ---------- */
 
 .gl,
-.grain,
-.loader,
-.cursor,
-.track,
-.fragments,
-.flood {
+.sweep {
   display: none;
 }
 
-/* ---------- Modalità statica (default: senza JS, reduced motion, niente WebGL) ---------- */
-
-.film {
-  position: relative;
-}
-.scene {
-  position: relative;
-  min-height: 100svh;
-  padding: calc(var(--m) + 96px) var(--m) var(--m);
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  gap: 8vh;
-  overflow: hidden;
-  background: var(--forest) url('/supergraphic.svg') no-repeat right -12vw center / auto 115%;
-}
-.scene:nth-child(odd) {
-  background-position: left -22vw bottom -30vh;
-}
-.scene .blk {
-  position: relative;
-  max-width: 1100px;
-}
-.blk--right {
-  align-self: flex-end;
-}
-.blk--act {
-  padding-top: 18vh;
-}
-.scene--finale {
-  background: var(--lime);
-  color: var(--forest);
-  justify-content: center;
-}
-.finale {
-  display: flex;
-  flex-direction: column;
-  gap: clamp(28px, 5vh, 56px);
-}
-.finale__logo {
-  color: var(--forest);
-}
-.logo-finale {
+/* La linea del finale: stessa inclinazione di 8° delle barre, alla quota del centro del simbolo.
+   La testa e la coda si regolano con clip-path (src/app.ts). Sulle barre Lime non si vede: le attraversa. */
+.is-webgl .sweep {
   display: block;
-  width: min(62vw, 420px);
-  height: auto;
-}
-.finale__footer {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px 32px;
-  font: 500 12px/1.4 var(--mono);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--forest);
-}
-.hint {
-  display: inline-flex;
-  align-items: center;
-  gap: 14px;
-  font: 500 12px/1 var(--mono);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--sage);
-}
-.hint i {
-  display: block;
-  width: 56px;
-  height: 1px;
-  background: var(--lime);
+  position: fixed;
+  z-index: 2;
+  left: -10vw;
+  width: 120vw;
+  top: calc(50svh - 1px);
+  height: 2px;
+  background: var(--sweep-color);
   transform: rotate(-8deg);
+  clip-path: inset(0 100% 0 0);
+  pointer-events: none;
 }
 
-.is-static .blk {
-  opacity: 0;
-  transform: translateY(28px);
-  transition:
-    opacity 0.9s cubic-bezier(0.2, 0.7, 0.2, 1),
-    transform 0.9s cubic-bezier(0.2, 0.7, 0.2, 1);
-}
-.is-static .blk.in-view {
-  opacity: 1;
-  transform: none;
-}
-@media (prefers-reduced-motion: reduce) {
-  .is-static .blk {
-    transform: none;
-    transition: opacity 0.6s linear;
-  }
-}
-
-/* Motion ufficiale del logo (statica): barre dall'alto, 120 ms, 400 ms ease-out, lettering per ultimo. */
-.is-static .finale__logo.in-view .bar {
-  animation: bar-in 0.4s cubic-bezier(0.2, 0.7, 0.3, 1) both;
-}
-.is-static .finale__logo.in-view .bar-2 {
-  animation-delay: 0.12s;
-}
-.is-static .finale__logo.in-view .bar-3 {
-  animation-delay: 0.24s;
-}
-.is-static .finale__logo.in-view .logo-lettering {
-  animation: fade-in 0.01s 0.8s both;
-}
-@keyframes bar-in {
-  from {
-    transform: translateY(-60px);
-    opacity: 0;
-  }
-}
-@keyframes fade-in {
-  from {
-    opacity: 0;
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .is-static .finale__logo.in-view .bar,
-  .is-static .finale__logo.in-view .logo-lettering {
-    animation: none;
-  }
-}
-
-/* ---------- Modalità film (WebGL) ---------- */
-
-.is-webgl body {
-  cursor: none;
-}
 .is-webgl .gl {
   display: block;
   position: fixed;
   inset: 0;
   width: 100vw;
-  height: 100lvh;
+  height: 100svh;
   z-index: 0;
 }
-.is-webgl .grain {
-  display: block;
-  position: fixed;
-  inset: -50%;
-  z-index: 30;
-  pointer-events: none;
-  opacity: 0.05;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.95 0 0 0 0 0.95 0 0 0 0 0.92 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
-  animation: grain 0.5s steps(4) infinite;
+
+/* Senza WebGL (o con riduzione del movimento): il logo ufficiale e la frase. */
+.is-static .line {
+  transform: none;
 }
-html[data-theme='lime'] .grain {
-  display: none;
+
+/* Motion ufficiale del logo: le barre entrano dall'alto (120 ms di sfasamento, 400 ms ease-out), il lettering per ultimo, senza movimento. */
+.is-static .logo-slot .bar {
+  animation: bar-in 0.4s cubic-bezier(0.2, 0.7, 0.3, 1) both;
 }
-@keyframes grain {
-  0% { transform: translate(0, 0); }
-  25% { transform: translate(-6%, 4%); }
-  50% { transform: translate(4%, -7%); }
-  75% { transform: translate(-3%, -3%); }
+.is-static .logo-slot .bar-2 {
+  animation-delay: 0.12s;
 }
-.is-webgl .track {
-  display: block;
-  height: calc(var(--total-vh) * 1vh);
-  height: calc(var(--total-vh) * 1svh);
+.is-static .logo-slot .bar-3 {
+  animation-delay: 0.24s;
 }
-.is-webgl .film {
-  position: fixed;
-  inset: 0;
-  height: 100lvh;
-  z-index: 10;
-  pointer-events: none;
+.is-static .logo-slot .logo-lettering {
+  animation: letters-in 0.01s 0.8s both;
 }
-.is-webgl .scene {
-  position: absolute;
-  inset: 0;
-  min-height: 0;
-  padding: 0;
-  display: block;
-  background: none;
-  overflow: visible;
-  visibility: hidden;
+.is-static .line {
+  animation: rise 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  animation-delay: 0.9s;
 }
-.is-webgl .scene.is-active {
+.is-static .outro {
   visibility: visible;
-}
-.is-webgl .blk {
-  position: absolute;
-  visibility: hidden;
-  max-width: min(88vw, 1000px);
-}
-.is-webgl .blk::before {
-  content: '';
-  position: absolute;
-  inset: -14vmin -18vmin;
-  z-index: -2;
-  background: radial-gradient(closest-side, rgb(16 38 27 / 0.72), rgb(16 38 27 / 0));
-  opacity: var(--scrim, 0);
-}
-.is-webgl .blk--bl {
-  left: var(--m);
-  bottom: calc(var(--m) + 3vh);
-}
-.is-webgl .blk--br {
-  right: var(--m);
-  bottom: calc(var(--m) + 3vh);
-}
-.is-webgl .blk--tl {
-  left: var(--m);
-  top: calc(var(--m) + 84px);
-}
-.is-webgl .blk--tl::before {
-  display: none;
-}
-.is-webgl .blk--left {
-  left: var(--m);
-  top: 15vh;
-  max-width: min(80vw, 30rem);
-}
-.is-webgl .blk--right {
-  right: var(--m);
-  top: 52vh;
-  max-width: min(80vw, 32rem);
-}
-.is-webgl .blk--act {
-  right: var(--m);
-  bottom: calc(var(--m) + 2vh);
-  max-width: min(88vw, 36rem);
-  padding: 0;
-}
-.is-webgl .blk--act .title {
-  font-size: clamp(2.1rem, 4.4vw, 4.6rem);
-}
-.is-webgl .blk--step {
-  right: var(--m);
-  top: 22vh;
-  max-width: min(88vw, 40rem);
-}
-.is-webgl .blk--manifesto {
-  right: var(--m);
-  top: 50%;
-  translate: 0 -50%;
-  max-width: min(94vw, 46rem);
-}
-.is-webgl .blk--ml {
-  left: var(--m);
-  top: 50%;
-  translate: 0 -50%;
-  max-width: min(88vw, 44rem);
-}
-.is-webgl .blk--ml .body {
-  max-width: 30ch;
-}
-.is-webgl .blk--hint {
-  right: var(--m);
-  bottom: calc(var(--m) + 3vh);
-}
-.is-webgl .blk--hint::before {
-  display: none;
-}
-.step-title .step-word {
-  display: inline-block;
-}
-
-.is-webgl .fragments {
-  display: block;
-  position: absolute;
-  inset: 0;
-}
-.fragments span {
-  position: absolute;
-  left: 0;
-  top: 0;
-  font: 500 12px/1 var(--mono);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--sage);
-  white-space: nowrap;
-  opacity: 0;
-  will-change: transform, opacity;
-}
-.fragments span.is-hot {
-  color: var(--lime);
-}
-
-/* Finale */
-.is-webgl .flood {
-  display: block;
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  overflow: hidden;
-}
-.flood i {
-  position: absolute;
-  left: -10vw;
-  width: 120vw;
-  height: 40lvh;
-  background: var(--lime);
-  transform-origin: left center;
-  transform: translateX(-102%) skewY(-8deg);
-}
-.flood i:nth-child(1) {
-  top: -8lvh;
-}
-.flood i:nth-child(2) {
-  top: 28lvh;
-}
-.flood i:nth-child(3) {
-  top: 64lvh;
-}
-.is-webgl .scene--finale {
-  background: none;
-}
-.is-webgl .finale {
-  position: absolute;
-  left: var(--m);
-  right: var(--m);
-  bottom: calc(var(--m) + 2vh);
-  visibility: hidden;
-}
-.is-webgl .finale__footer {
-  margin-top: clamp(8px, 3vh, 32px);
-}
-
-/* Loader */
-.is-webgl .loader {
-  display: flex;
-  position: fixed;
-  inset: 0;
-  z-index: 50;
-  background: var(--forest);
-  align-items: flex-end;
-  justify-content: space-between;
-  padding: var(--m);
-  transition: opacity 0.6s ease, visibility 0.6s;
-}
-.loader.is-done {
-  opacity: 0;
-  visibility: hidden;
-}
-.loader__lines {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  width: min(40vw, 320px);
-}
-.loader__lines i {
-  display: block;
-  height: 3px;
-  background: var(--lime);
-  transform-origin: left center;
-  transform: skewY(-8deg) scaleX(var(--p, 0));
-}
-.loader__lines i:nth-child(2) {
-  margin-left: -8%;
-}
-.loader__lines i:nth-child(3) {
-  margin-left: -16%;
-}
-.loader__count {
-  font: 500 12px/1 var(--mono);
-  letter-spacing: 0.06em;
-  color: var(--sage);
-  font-variant-numeric: tabular-nums;
-}
-
-/* Cursore */
-.is-webgl.has-fine-pointer .cursor {
-  display: block;
-  position: fixed;
-  left: 0;
-  top: 0;
-  z-index: 45;
-  width: 34px;
-  height: 34px;
-  margin: -17px 0 0 -17px;
-  pointer-events: none;
-  border: 1px solid var(--lime);
-  border-radius: 50%;
-  opacity: 0;
-  transition:
-    opacity 0.3s,
-    width 0.25s,
-    height 0.25s,
-    margin 0.25s,
-    border-color 0.3s;
-}
-.cursor::after {
-  content: '';
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 4px;
-  height: 4px;
-  margin: -2px 0 0 -2px;
-  border-radius: 50%;
-  background: var(--lime);
-}
-html[data-theme='lime'] .cursor {
-  border-color: var(--forest);
-}
-html[data-theme='lime'] .cursor::after {
-  background: var(--forest);
-}
-.is-webgl:not(.has-fine-pointer) body {
-  cursor: auto;
-}
-
-@media (max-width: 720px) {
-  .timecode {
-    display: none;
-  }
-  .is-webgl .blk--left {
-    top: 18vh;
-  }
-  .is-webgl .blk--right {
-    top: auto;
-    bottom: 30vh;
-  }
-  .is-webgl .blk--ml {
-    top: auto;
-    bottom: calc(var(--m) + 3vh);
-    translate: none;
-  }
-  .is-webgl .blk--manifesto {
-    left: var(--m);
-    right: auto;
-    top: auto;
-    bottom: calc(var(--m) + 3vh);
-    translate: none;
-  }
-}
-
-.is-static .topbar__meta,
-.is-static .blk--hint,
-html:not(.is-webgl) .topbar__meta,
-html:not(.is-webgl) .blk--hint {
-  display: none;
-}
-
-.cursor.is-on {
   opacity: 1;
+  animation: fade-up 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) 1.5s both;
+}
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(0.6em); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes bar-in {
+  from { transform: translateY(-40%); opacity: 0; }
+}
+@keyframes rise {
+  from { transform: translateY(110%); }
+}
+@keyframes letters-in {
+  from { opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .is-static .logo-slot .bar,
+  .is-static .logo-slot .logo-lettering,
+  .is-static .line,
+  .is-static .outro,
+  .soon-dot {
+    animation: none;
+  }
+}
+
+:focus-visible {
+  outline: 2px solid var(--ink-strong);
+  outline-offset: 4px;
 }

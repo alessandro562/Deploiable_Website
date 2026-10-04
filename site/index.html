@@ -3,139 +3,46 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <title>Deploiable · sta arrivando</title>
-    <meta name="description" content="Tutti parlano di AI. Pochi la fanno funzionare. Deploiable porta l'innovazione dal pilota alla produzione. Sta arrivando." />
+    <title>Deploiable · We deploy AI. Measurably.</title>
+    <meta name="description" content="We deploy AI. Measurably." />
     <meta name="theme-color" content="#10261B" />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="Deploiable · sta arrivando" />
-    <meta property="og:description" content="Tre barre, tre fasi, un solo movimento. Dal pilota alla produzione." />
+    <meta property="og:title" content="Deploiable · We deploy AI. Measurably." />
+    <meta property="og:description" content="We deploy AI. Measurably." />
     <meta property="og:image" content="%VITE_SITE_URL%og.jpg" />
     <meta property="og:url" content="%VITE_SITE_URL%" />
     <meta name="twitter:card" content="summary_large_image" />
     <link rel="icon" href="favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="apple-touch-icon.png" />
-    <script>
-      // Prima di tutto: niente ripristino dello scroll, il film parte dall'inizio.
-      if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
-      document.documentElement.classList.add('js');
-    </script>
+    <noscript>
+      <style>
+        .line { transform: none !important; }
+      </style>
+    </noscript>
   </head>
   <body>
-    <a class="skip" href="#finale">Salta all'invito</a>
-
-    <header class="topbar">
-      <a class="topbar__logo" href="#prologo" aria-label="Deploiable, torna all'inizio"><!-- logo:logo --></a>
-      <div class="topbar__meta" aria-hidden="true">
-        <span class="timecode" data-timecode>SC 00 · 00:00:00</span>
-        <!-- symbol:phase -->
-      </div>
-    </header>
-
     <canvas class="gl" aria-hidden="true"></canvas>
-    <div class="grain" aria-hidden="true"></div>
-
-    <div class="loader" aria-hidden="true">
-      <div class="loader__lines"><i></i><i></i><i></i></div>
-      <span class="loader__count" data-loader-count>000</span>
-    </div>
-
-    <main id="film" class="film">
-      <h1 class="sr-only">Deploiable: dal pilota alla produzione. Sta arrivando.</h1>
-
-      <section class="scene" id="prologo" data-scene="prologue" aria-labelledby="t-prologo">
-        <div class="blk blk--bl" data-intro data-out="prologue+0.55">
-          <p class="label">00 — Prologo</p>
-          <h2 id="t-prologo" class="title" data-split>Tre barre. <strong>Un passo avanti.</strong></h2>
-        </div>
-        <div class="blk blk--hint" data-intro data-out="prologue+0.3">
-          <p class="hint"><span>Scorri</span><i aria-hidden="true"></i></p>
-        </div>
-      </section>
-
-      <section class="scene" id="rumore" data-scene="noise" aria-labelledby="t-rumore">
-        <div class="blk blk--bl" data-in="noise+0.4" data-out="split-0.15">
-          <p class="label">01 — Il rumore</p>
-          <h2 id="t-rumore" class="title title--xl" data-split>Tutti parlano <strong>di AI.</strong></h2>
-          <p class="body" data-split>Demo, slide, progetti pilota. Pochi arrivano a lavorare davvero.</p>
-        </div>
-        <div class="fragments" aria-hidden="true">
-          <span>demo</span><span>slide</span><span>POC</span><span>roadmap</span><span>pilota</span>
-          <span>webinar</span><span>hype</span><span>prototipo</span><span>framework</span><span>use case</span>
-        </div>
-      </section>
-
-      <section class="scene" id="vuoto" data-scene="split" aria-labelledby="t-vuoto">
-        <div class="blk blk--tl" data-in="split+0.2" data-out="lines-0.3">
-          <p class="label">02 — Due mezze risposte</p>
-        </div>
-        <div class="blk blk--left" data-in="split+0.7" data-out="lines-0.45">
-          <h2 id="t-vuoto" class="title" data-split>La consulenza si ferma <strong>al piano.</strong></h2>
-        </div>
-        <div class="blk blk--right" data-in="split+0.95" data-out="lines-0.45">
-          <h2 class="title" data-split>La tecnologia si ferma <strong>allo strumento.</strong></h2>
-        </div>
-        <div class="blk blk--bl" data-in="split+1.45" data-out="lines+0.02">
-          <h2 class="title title--xl" data-split>In mezzo, <strong>il vuoto.</strong></h2>
-        </div>
-      </section>
-
-      <section class="scene" id="tre-linee" data-scene="lines" aria-labelledby="t-linee">
-        <div class="blk blk--tl" data-in="ignite+0.1" data-out="manifesto+0.2">
-          <p class="label">03 — Tre linee</p>
-        </div>
-        <div class="blk blk--br" data-in="ignite+0.12" data-out="analisi+0.05">
-          <h2 id="t-linee" class="title title--xl" data-split>È lì che <strong>lavoriamo.</strong></h2>
-        </div>
-
-        <div class="blk blk--act" data-in="analisi+0.15" data-out="pilota-0.1">
-          <span class="numeral" aria-hidden="true">01</span>
-          <p class="label label--lime">Fase 01 · Analisi</p>
-          <h3 class="title" data-split>Mappiamo processi e dati. <strong>Scegliamo dove rende.</strong></h3>
-        </div>
-        <div class="blk blk--act" data-in="pilota+0.1" data-out="pilota+0.6">
-          <span class="numeral" aria-hidden="true">02</span>
-          <p class="label label--lime">Fase 02 · Pilota</p>
-          <h3 class="title" data-split>Costruiamo su un perimetro reale. <strong>E lo misuriamo.</strong></h3>
-        </div>
-        <div class="blk blk--step" data-in="pilota+0.62" data-out="produzione-0.02">
-          <h3 class="title title--xxl step-title">Il <strong class="step-word">gradino.</strong></h3>
-          <p class="body" data-split>Il momento in cui un progetto passa dal pilota alla produzione.</p>
-        </div>
-        <div class="blk blk--act" data-in="produzione+0.15" data-out="manifesto-0.05">
-          <span class="numeral" aria-hidden="true">03</span>
-          <p class="label label--lime">Fase 03 · Produzione</p>
-          <h3 class="title" data-split>Nell'uso quotidiano. <strong>Ogni giorno.</strong></h3>
-        </div>
-        <div class="blk blk--manifesto" data-in="manifesto-0.15" data-out="symbol+0.35">
-          <h2 class="title title--xxl" data-split>Meno demo. <strong>Più deploy.</strong></h2>
-        </div>
-      </section>
-
-      <section class="scene" id="simbolo" data-scene="symbol" aria-labelledby="t-simbolo">
-        <div class="blk blk--tl" data-in="symbol+0.4" data-out="finale-0.1">
-          <p class="label">04 — Il simbolo</p>
-        </div>
-        <div class="blk blk--ml" data-in="symbol+0.5" data-out="finale+0.05">
-          <h2 id="t-simbolo" class="title title--xl" data-split>Portiamo l'innovazione <strong>fino al risultato.</strong></h2>
-          <p class="body" data-split>Tre barre, tre fasi, un solo movimento. L'AI non è un'offerta tra le altre: è il metodo.</p>
-        </div>
-      </section>
-
-      <section class="scene scene--finale" id="finale" data-scene="finale" aria-labelledby="t-finale" tabindex="-1">
-        <div class="flood" aria-hidden="true"><i></i><i></i><i></i></div>
-        <div class="finale">
-          <div class="finale__logo"><!-- logo:logo-finale --></div>
-          <h2 id="t-finale" class="title title--cta">deploiable <strong>sta arrivando.</strong></h2>
-          <footer class="finale__footer">
-            <span>Deploiable è un brand di WDA S.r.l.</span>
-            <span>© 2026</span>
-          </footer>
-        </div>
-      </section>
+    <i class="sweep" aria-hidden="true"></i>
+    <main class="stack">
+      <!-- Il segnaposto del logo: nella versione 3D la camera finale lo inquadra esattamente qui;
+           nella versione statica è il logo ufficiale. -->
+      <div class="logo-slot"><!-- logo:static-logo --></div>
+      <h1 class="claim">
+        <span class="mask"><span class="line line--light" lang="en">We deploy AI.</span></span>
+        <span class="mask"><span class="line line--black" lang="en">Measurably.</span></span>
+      </h1>
+      <div class="outro" lang="en">
+        <p class="soon"><i class="soon-dot" aria-hidden="true"></i>Coming soon</p>
+        <form class="signup" novalidate>
+          <label class="sr-only" for="signup-email">Email</label>
+          <input id="signup-email" name="email" type="email" required autocomplete="email" inputmode="email" spellcheck="false" placeholder="your@email.com" />
+          <!-- trappola per i bot: invisibile alle persone -->
+          <input class="hp" name="_gotcha" type="text" tabindex="-1" autocomplete="off" aria-hidden="true" />
+          <button type="submit">Notify me</button>
+        </form>
+        <p class="signup-note" role="status" aria-live="polite">Be the first to know when we launch. No spam.</p>
+      </div>
     </main>
-
-    <div class="track" aria-hidden="true"></div>
-    <div class="cursor" aria-hidden="true"></div>
 
     <script type="module" src="/src/main.ts"></script>
   </body>
