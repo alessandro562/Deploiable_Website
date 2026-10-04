@@ -233,3 +233,46 @@ test('sul telefono le barre non escono mai dallo schermo', async ({ page }) => {
     expect(edge, `t=${t}: una barra tocca il bordo`).toBe(false);
   }
 });
+
+test('coming soon e modulo: compaiono per ultimi, dentro lo schermo, sotto la frase', async ({ page }) => {
+  await openFilm(page);
+  const outro = page.locator('.outro');
+  for (const t of [3, 10.5, 12.2]) {
+    await seek(page, t);
+    await expect(outro, `t=${t}`).toBeHidden();
+  }
+  await seek(page, 12.9);
+  await expect(outro).toBeVisible();
+  const vp = page.viewportSize()!;
+  const box = (await outro.boundingBox())!;
+  const claim = (await page.locator('.claim').boundingBox())!;
+  expect(box.y).toBeGreaterThanOrEqual(claim.y + claim.height);
+  expect(box.y + box.height).toBeLessThanOrEqual(vp.height);
+  expect(box.x).toBeGreaterThanOrEqual(0);
+  expect(box.x + box.width).toBeLessThanOrEqual(vp.width);
+});
+
+test('iscrizione: email non valida, invio riuscito, errore del servizio', async ({ page }) => {
+  await openFilm(page);
+  await seek(page, 12.9);
+  const note = page.locator('.signup-note');
+  await page.fill('#signup-email', 'non-una-email');
+  await page.click('.signup button');
+  await expect(note).toHaveText(/valid email/);
+
+  let status = 500;
+  let body = '';
+  await page.route('https://signup.test/**', (route) => {
+    body = route.request().postData() ?? '';
+    return route.fulfill({ status, contentType: 'application/json', body: '{}' });
+  });
+  await page.evaluate(() => (document.querySelector<HTMLFormElement>('.signup')!.dataset.endpoint = 'https://signup.test/f'));
+  await page.fill('#signup-email', ' ciao@deploiable.com ');
+  await page.click('.signup button');
+  await expect(note).toHaveText(/went wrong/);
+  status = 200;
+  await page.click('.signup button');
+  await expect(note).toHaveText(/on the list/);
+  expect(body).toContain('ciao@deploiable.com');
+  await expect(page.locator('.signup')).toBeHidden();
+});

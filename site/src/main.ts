@@ -1,7 +1,9 @@
 import './styles/fonts.css';
 import './styles/main.css';
 import { detect } from './core/capabilities';
+import { initSignup } from './signup';
 
+initSignup();
 const caps = detect();
 const root = document.documentElement;
 

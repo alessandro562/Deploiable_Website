@@ -31,6 +31,17 @@
         <span class="mask"><span class="line line--light" lang="en">We deploy AI.</span></span>
         <span class="mask"><span class="line line--black" lang="en">Measurably.</span></span>
       </h1>
+      <div class="outro" lang="en">
+        <p class="soon"><i class="soon-dot" aria-hidden="true"></i>Coming soon</p>
+        <form class="signup" novalidate>
+          <label class="sr-only" for="signup-email">Email</label>
+          <input id="signup-email" name="email" type="email" required autocomplete="email" inputmode="email" spellcheck="false" placeholder="your@email.com" />
+          <!-- trappola per i bot: invisibile alle persone -->
+          <input class="hp" name="_gotcha" type="text" tabindex="-1" autocomplete="off" aria-hidden="true" />
+          <button type="submit">Notify me</button>
+        </form>
+        <p class="signup-note" role="status" aria-live="polite">Be the first to know when we launch. No spam.</p>
+      </div>
     </main>
 
     <script type="module" src="/src/main.ts"></script>

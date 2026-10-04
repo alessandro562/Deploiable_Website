@@ -65,6 +65,13 @@ logo completo ufficiale con la sua motion (barre dall'alto, 120 ms, 400 ms; lett
 - Le barre ruotate e inclinate sono supergrafica; il simbolo conforme e piatto compare solo alla fine.
 - Logo e frase centrati sulla pagina, due pesi (Satoshi 300 + 900); il testo non sta mai sopra le barre.
 
+## Coming soon e iscrizione
+
+Sotto la frase compaiono per ultimi (12,45–12,9 s) un piccolo "Coming soon" e il modulo email per il lancio.
+Il modulo invia l'email con una POST all'indirizzo in `VITE_SIGNUP_ENDPOINT` (build), in formato FormData con
+`Accept: application/json`: va bene un endpoint Formspree (`https://formspree.io/f/…`) o un servizio compatibile.
+Senza indirizzo il modulo non finge l'iscrizione: risponde "Sign-ups open very soon.". C'è un campo nascosto anti-bot.
+
 ## Deploy
 
 GitHub Pages via `.github/workflows/deploy-pages.yml` (push su `main`). Settings → Pages → Source: **GitHub Actions**.

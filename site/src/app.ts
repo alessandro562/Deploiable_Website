@@ -31,6 +31,7 @@ export async function start(caps: Capabilities) {
 
   const claim = Array.from(document.querySelectorAll<HTMLElement>('.claim .line'));
   const sweep = document.querySelector<HTMLElement>('.sweep')!;
+  const outro = document.querySelector<HTMLElement>('.outro')!;
   const slotEl = document.querySelector<HTMLElement>('.logo-slot')!;
   const state = createState();
 
@@ -65,6 +66,10 @@ export async function start(caps: Capabilities) {
       const p = Math.min(1, Math.max(0, state.claim * 1.25 - i * 0.25));
       el.style.transform = `translate3d(0, ${((1 - p) * 110).toFixed(2)}%, 0)`;
     });
+    // "Coming soon" e modulo: salgono di poco e compaiono; finché sono invisibili non si possono raggiungere col tab
+    outro.style.opacity = state.outro.toFixed(3);
+    outro.style.transform = `translate3d(0, ${((1 - state.outro) * 0.6).toFixed(3)}em, 0)`;
+    outro.style.visibility = state.outro > 0.01 ? 'visible' : 'hidden';
     // la linea: testa e coda sono percentuali della sua lunghezza
     sweep.style.clipPath = `inset(0 ${((1 - state.sweepHead) * 100).toFixed(2)}% 0 ${(state.sweepTail * 100).toFixed(2)}%)`;
     engine.render();

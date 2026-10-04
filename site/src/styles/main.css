@@ -121,6 +121,123 @@ p {
   will-change: transform;
 }
 
+/* ---------- Coming soon e iscrizione ---------- */
+/* Piccoli, sotto la frase: compaiono per ultimi. Su Lime solo Forest (i colori seguono la palette). */
+
+.outro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  /* un respiro in più rispetto allo spazio fra logo e frase: è un blocco a parte */
+  opacity: 0;
+  visibility: hidden;
+}
+
+.soon {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6em;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-strong);
+}
+.soon-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  animation: soon-pulse 1.8s ease-in-out infinite;
+}
+@keyframes soon-pulse {
+  50% { opacity: 0.2; }
+}
+
+.signup {
+  display: flex;
+  width: min(100%, 400px);
+  height: 48px;
+  padding: 4px;
+  border: 1.5px solid var(--ink-strong);
+  border-radius: 999px;
+}
+.signup input[type='email'] {
+  flex: 1;
+  min-width: 0;
+  padding: 0 14px 0 16px;
+  border: 0;
+  background: transparent;
+  color: var(--ink-strong);
+  font: 500 16px/1 var(--sans); /* 16 px: iOS non ingrandisce la pagina al tocco */
+  outline: none;
+}
+.signup input[type='email']::placeholder {
+  color: var(--ink-strong);
+  opacity: 0.45;
+}
+.signup button {
+  flex: none;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--ink-strong);
+  color: var(--bg);
+  font: 900 14px/1 var(--sans);
+  letter-spacing: -0.01em;
+  cursor: pointer;
+}
+.signup:focus-within {
+  box-shadow: 0 0 0 1.5px var(--ink-strong);
+}
+.signup[aria-busy='true'] button {
+  opacity: 0.6;
+  cursor: progress;
+}
+.signup-note {
+  font-size: 13px;
+  text-align: center;
+  white-space: nowrap; /* può uscire dalla larghezza del logo, che sui telefoni in orizzontale è stretta */
+  font-weight: 500;
+  color: var(--ink-light);
+  opacity: 0.75;
+}
+/* Iscritto: il modulo lascia il posto al messaggio. */
+.outro[data-state='done'] .signup {
+  display: none;
+}
+.outro[data-state='done'] .signup-note {
+  font-weight: 900;
+  opacity: 1;
+}
+
+.hp,
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Schermi bassi (telefono in orizzontale): logo più piccolo, così logo, frase e modulo stanno tutti dentro. */
+@media (max-height: 520px) {
+  :root {
+    --logo-w: min(88vw, 72svh);
+  }
+  .stack {
+    padding-bottom: 0;
+  }
+  .outro {
+    gap: 8px;
+  }
+  .signup {
+    height: 42px;
+  }
+}
+
 /* Su schermi verticali (telefono) il logo occupa quasi tutta la larghezza e sotto c'è molto spazio:
    la frase è più grande, in proporzione. */
 @media (max-aspect-ratio: 1/1) {
@@ -188,6 +305,15 @@ p {
   animation: rise 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both;
   animation-delay: 0.9s;
 }
+.is-static .outro {
+  visibility: visible;
+  opacity: 1;
+  animation: fade-up 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) 1.5s both;
+}
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(0.6em); }
+  to { opacity: 1; transform: none; }
+}
 @keyframes bar-in {
   from { transform: translateY(-40%); opacity: 0; }
 }
@@ -200,7 +326,9 @@ p {
 @media (prefers-reduced-motion: reduce) {
   .is-static .logo-slot .bar,
   .is-static .logo-slot .logo-lettering,
-  .is-static .line {
+  .is-static .line,
+  .is-static .outro,
+  .soon-dot {
     animation: none;
   }
 }

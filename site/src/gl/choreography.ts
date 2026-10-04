@@ -41,6 +41,7 @@ export interface SceneState {
   sweepHead: number; // la linea del finale: 0..1 quanto si è tracciata
   sweepTail: number; // 0..1 quanto si è già cancellata
   claim: number;
+  outro: number;
 }
 
 /** Costruisce le tracce di una barra "andando da un punto al successivo", senza sovrapposizioni. */
@@ -201,6 +202,8 @@ const tracks = {
   sweepHead: T([[0, 0], [SILENZIO_A, 0], [11.35, 1, 'power2.inOut']]),
   sweepTail: T([[0, 0], [SILENZIO_A + 0.15, 0], [11.55, 1, 'power2.inOut']]),
   claim: T([[0, 0], [11.95, 0], [12.55, 1, 'power3.out']]),
+  // "Coming soon" e il modulo d'iscrizione: per ultimi, quando la frase è già ferma.
+  outro: T([[0, 0], [12.45, 0], [12.9, 1, 'power2.out']]),
 };
 
 // Il naming: ogni lettera si apre da una linea, come le barre all'inizio, una dopo l'altra, da sinistra a destra,
@@ -221,7 +224,7 @@ export function createState(): SceneState {
   const pose = (): BarPose => ({ x: 0, y: 0, z: 0, rx: 0, ry: 0, rz: 0, sx: 1, sy: 1, lift: 0 });
   return {
     t: 0, bars: [pose(), pose(), pose()], bump: [0, 0, 0], az: 0, el: 0, dist: 1.5, fov: 36, spread: 0, pull: 0,
-    letters: Array(WORDMARK_COUNT).fill(0), flatten: 1, sweepHead: 0, sweepTail: 0, claim: 0,
+    letters: Array(WORDMARK_COUNT).fill(0), flatten: 1, sweepHead: 0, sweepTail: 0, claim: 0, outro: 0,
   };
 }
 
@@ -244,5 +247,6 @@ export function stateAt(t: number, s: SceneState): SceneState {
   s.sweepHead = tracks.sweepHead.at(t);
   s.sweepTail = tracks.sweepTail.at(t);
   s.claim = tracks.claim.at(t);
+  s.outro = tracks.outro.at(t);
   return s;
 }
