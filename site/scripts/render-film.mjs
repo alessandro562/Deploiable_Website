@@ -5,6 +5,7 @@
 import { chromium } from '@playwright/test';
 import { execFileSync } from 'node:child_process';
 import { mkdirSync, rmSync } from 'node:fs';
+import { basename } from 'node:path';
 
 const [W = 1280, H = 720, FPS = 30] = process.argv.slice(2, 5).map(Number);
 const tier = process.argv[5] ?? 'mobile';
@@ -12,7 +13,8 @@ const hold = Number(process.argv[6] ?? 1.5);
 const out = process.argv[7] ?? 'artifacts/film.mp4';
 const base = process.env.BASE_URL ?? 'http://localhost:4173/';
 const limit = Number(process.env.FRAMES ?? Infinity);
-const dir = 'artifacts/film-frames';
+// Una cartella di fotogrammi per ogni video: più render possono girare insieme senza pestarsi.
+const dir = `artifacts/film-frames-${basename(out, '.mp4')}`;
 rmSync(dir, { recursive: true, force: true });
 mkdirSync(dir, { recursive: true });
 
@@ -39,5 +41,6 @@ await browser.close();
 if (limit >= total) {
   execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-framerate', String(FPS), '-i', `${dir}/%05d.png`,
     '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-crf', '20', '-preset', 'slow', '-movflags', '+faststart', out]);
+  rmSync(dir, { recursive: true, force: true });
   console.log(out);
 }
