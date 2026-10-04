@@ -35,7 +35,7 @@ export async function start(caps: Capabilities) {
 
   const draw = (dt: number) => {
     stateAt(time, state);
-    stage.apply(state, engine.camera, engine.res, engine.dpr, window.innerWidth, window.innerHeight);
+    stage.apply(state, engine.camera, engine.res, engine.dpr, engine.width, engine.height);
     claim.forEach((el, i) => {
       const p = Math.min(1, Math.max(0, state.claim * 1.25 - i * 0.25));
       el.style.transform = `translate3d(0, ${((1 - p) * 110).toFixed(2)}%, 0)`;

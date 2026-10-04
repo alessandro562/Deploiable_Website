@@ -1,4 +1,4 @@
-import { HalfFloatType, NoToneMapping, PerspectiveCamera, Scene, SRGBColorSpace, Color, Vector2, WebGLRenderer } from 'three';
+import { HalfFloatType, UnsignedByteType, NoToneMapping, PerspectiveCamera, Scene, SRGBColorSpace, Color, Vector2, WebGLRenderer } from 'three';
 import {
   BloomEffect,
   ChromaticAberrationEffect,
@@ -21,8 +21,9 @@ export class Engine {
   private bloom: BloomEffect | null = null;
   private vignette: VignetteEffect | null = null;
   private ca: ChromaticAberrationEffect | null = null;
-  private width = 0;
-  private height = 0;
+  /** Dimensione (in pixel CSS) con cui è stato impostato il canvas: la camera deve usare la stessa. */
+  width = 0;
+  height = 0;
 
   constructor(
     readonly canvas: HTMLCanvasElement,
@@ -48,8 +49,12 @@ export class Engine {
 
   private setupPost() {
     const q = this.quality;
+    // Il buffer a 16 bit conserva i colori esatti anche con il bloom; dove non è renderizzabile (alcuni
+    // dispositivi mobili) si ripiega sul buffer a 8 bit invece di mostrare uno schermo nero.
+    const ext = this.renderer.extensions;
+    const canHalf = ext.has('EXT_color_buffer_float') || ext.has('EXT_color_buffer_half_float');
     const composer = new EffectComposer(this.renderer, {
-      frameBufferType: HalfFloatType,
+      frameBufferType: canHalf ? HalfFloatType : UnsignedByteType,
       multisampling: q.msaa,
     });
     composer.addPass(new RenderPass(this.scene, this.camera));
