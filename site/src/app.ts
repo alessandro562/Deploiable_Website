@@ -13,7 +13,7 @@ import { Color } from 'three';
 //  · testo   DOM, mosso dallo stesso tempo
 // Un solo ciclo di rendering (il ticker di GSAP); si ferma quando la scheda è nascosta.
 /** Palette predefinita dell'animazione (vedi src/config/brand.ts). */
-const DEFAULT_PALETTE: PaletteName | 'flip' = 'forest';
+const DEFAULT_PALETTE: PaletteName | 'flip' = 'flip';
 
 export async function start(caps: Capabilities) {
   const q = new URLSearchParams(location.search);

@@ -27,7 +27,7 @@ for (const [w, h] of SIZES) {
     for (let y = Math.max(0, Math.floor(y0)); y < Math.min(png.height, Math.ceil(y1)); y++)
       for (let x = 0; x < png.width; x++) {
         const i = (y * png.width + x) * 4;
-        if (Math.abs(png.data[i] - 16) + Math.abs(png.data[i + 1] - 38) + Math.abs(png.data[i + 2] - 27) > 60) {
+        if (Math.abs(png.data[i] - 200) + Math.abs(png.data[i + 1] - 242) + Math.abs(png.data[i + 2] - 90) > 60) {
           if (x < L) L = x; if (x > R) R = x; if (y < T) T = y; if (y > B) B = y;
         }
       }

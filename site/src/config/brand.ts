@@ -51,6 +51,6 @@ export const PALETTES: Record<PaletteName, Palette> = {
     back: [COLORS.forest, COLORS.pine, 0.5],
     rim: COLORS.limeDeep,
     rimAmount: 0.18,
-    cap: COLORS.sage,
+    cap: COLORS.lime,
   },
 };

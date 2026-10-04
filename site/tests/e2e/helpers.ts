@@ -65,9 +65,9 @@ export async function peakColumn(page: Page, x: number, y0: number, y1: number) 
 }
 
 /** Tutti i pixel molto luminosi dell'area indicata, con il loro colore: servono a verificare il Lime esatto. */
-export async function brightPixels(page: Page, x0: number, y0: number, x1: number, y1: number, step = 3) {
+export async function brightPixels(page: Page, x0: number, y0: number, x1: number, y1: number, step = 3, dark = false) {
   return page.evaluate(
-    ({ x0, y0, x1, y1, step }) => {
+    ({ x0, y0, x1, y1, step, dark }) => {
       const src = document.querySelector<HTMLCanvasElement>('canvas.gl')!;
       const c = document.createElement('canvas');
       c.width = src.width;
@@ -82,14 +82,19 @@ export async function brightPixels(page: Page, x0: number, y0: number, x1: numbe
       for (let y = 0; y < ty - fy; y += step) {
         for (let x = 0; x < w; x += step) {
           const i = (y * w + x) * 4;
-          if (d[i] + d[i + 1] + d[i + 2] > 450) out.push([d[i], d[i + 1], d[i + 2]]);
+          const b = d[i] + d[i + 1] + d[i + 2];
+          if (dark ? b < 200 : b > 450) out.push([d[i], d[i + 1], d[i + 2]]);
         }
       }
       return out;
     },
-    { x0, y0, x1, y1, step },
+    { x0, y0, x1, y1, step, dark },
   );
 }
+
+/** Tutti i pixel scuri dell'area indicata: sul fondo Lime del finale servono a verificare il Forest esatto. */
+export const darkPixels = (page: Page, x0: number, y0: number, x1: number, y1: number, step = 3) =>
+  brightPixels(page, x0, y0, x1, y1, step, true);
 
 /** Hash del contenuto del canvas: due fotogrammi identici hanno lo stesso hash. */
 export async function canvasHash(page: Page) {

@@ -9,6 +9,8 @@ function startStatic(reason?: string) {
   root.classList.remove('is-webgl');
   root.classList.add('is-static');
   root.dataset.mode = 'static';
+  root.dataset.palette = 'lime'; // la versione statica è il finale: logo Forest su Lime
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', '#C8F25A');
   window.__DEPLOIABLE__ = { ready: true, mode: 'static', tier: 'minimal', reason, errors: [] };
 }
 

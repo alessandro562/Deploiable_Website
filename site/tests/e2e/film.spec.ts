@@ -1,9 +1,10 @@
 import { expect, test } from '@playwright/test';
 import { PNG } from 'pngjs';
-import { brightPixels, brightness, canvasHash, maxChannels, openFilm, peakColumn, sample, seek } from './helpers';
+import { brightPixels, brightness, canvasHash, darkPixels, maxChannels, openFilm, peakColumn, sample, seek } from './helpers';
 
 const LIME = [200, 242, 90];
 const FOREST = [16, 38, 27];
+const LOCK_T = 10.2; // clic dell'ultima barra (LOCK[0] in choreography.ts)
 const near = (px: number[], ref: number[], tol: number) => ref.forEach((v, i) => expect(Math.abs(px[i] - v)).toBeLessThanOrEqual(tol));
 
 test('parte in WebGL, senza errori e senza scroll', async ({ page }) => {
@@ -43,14 +44,20 @@ test('ogni atto disegna qualcosa', async ({ page }) => {
   }
 });
 
-test('colori del brand esatti nell’inquadratura finale', async ({ page }) => {
+test('colori del brand esatti: barre Lime su Forest, poi al clic logo Forest su Lime', async ({ page }) => {
   await openFilm(page);
+  await seek(page, 9.0); // prima del clic: fondo Forest, barre Lime
+  near(await sample(page, 0.03, 0.03, 8), FOREST, 2);
+  await seek(page, LOCK_T - 0.05);
+  near(await sample(page, 0.03, 0.03, 8), FOREST, 2);
+  await seek(page, LOCK_T + 0.05); // il clic dell'ultima barra: lo schermo passa al Lime
+  near(await sample(page, 0.03, 0.03, 8), LIME, 2);
   await seek(page, 12.9);
-  // tutte le facce luminose del simbolo sono Lime esatto (nessun lampo, nessuna sfumatura rimasta)
-  const lit = await brightPixels(page, 0.02, 0.05, 0.98, 0.75);
-  expect(lit.length).toBeGreaterThan(200);
-  for (const px of lit) near(px, LIME, 2);
-  near(await sample(page, 0.05, 0.5, 8), FOREST, 2); // fondo: Forest, al valore
+  // finale: fondo Lime al valore, logo tutto Forest esatto (nessuna sfumatura rimasta)
+  near(await sample(page, 0.03, 0.5, 8), LIME, 2);
+  const ink = await darkPixels(page, 0.02, 0.05, 0.98, 0.75);
+  expect(ink.length).toBeGreaterThan(200);
+  for (const px of ink) near(px, FOREST, 2);
 });
 
 test('il tempo fermo dà sempre lo stesso fotogramma (anche tornando indietro)', async ({ page }) => {
@@ -139,14 +146,19 @@ for (const tier of ['high', 'mid', 'mobile']) {
       const px = await Promise.all([[0.5, 0.5], [0.45, 0.4], [0.55, 0.6], [0.5, 0.3]].map(([x, y]) => sample(page, x, y, 90)));
       expect(Math.max(...px.map(brightness)), `t=${t}`).toBeGreaterThan(dark);
     }
-    await seek(page, 12.9);
-    const lit = await brightPixels(page, 0.02, 0.05, 0.98, 0.75);
+    await seek(page, 9.0);
+    const lit = await brightPixels(page, 0.02, 0.05, 0.98, 0.95);
     expect(lit.length).toBeGreaterThan(200);
-    // con l'antialiasing i bordi sono sfumature più scure del Lime: quasi tutto è Lime esatto, e niente è più chiaro
-    const exact = lit.filter((px) => px.every((v, i) => Math.abs(v - LIME[i]) <= 3));
-    expect(exact.length / lit.length, 'quota di Lime esatto').toBeGreaterThan(0.9);
+    // con l'antialiasing i bordi sono sfumature più scure del Lime: niente è più chiaro
     for (const px of lit) LIME.forEach((v, i) => expect(px[i]).toBeLessThanOrEqual(v + 3));
-    near(await sample(page, 0.05, 0.5, 8), FOREST, 3);
+    near(await sample(page, 0.03, 0.03, 8), FOREST, 3);
+    await seek(page, 12.9);
+    // finale: il logo è Forest esatto (i bordi sfumano verso il Lime del fondo)
+    const ink = await darkPixels(page, 0.02, 0.05, 0.98, 0.75);
+    expect(ink.length).toBeGreaterThan(200);
+    const exact = ink.filter((px) => px.every((v, i) => Math.abs(v - FOREST[i]) <= 3));
+    expect(exact.length / ink.length, 'quota di Forest esatto').toBeGreaterThan(0.9);
+    near(await sample(page, 0.03, 0.5, 8), LIME, 3);
     expect(errors).toEqual([]);
   });
 }
@@ -185,7 +197,7 @@ test('allineamento: logo 3D e frase centrati sulla pagina (misura sui pixel)', a
     for (let y = Math.max(0, Math.floor(y0)); y < Math.min(png.height, Math.ceil(y1)); y++)
       for (let x = Math.floor(x0); x < Math.ceil(x1); x++) {
         const i = (y * png.width + x) * 4;
-        if (Math.abs(png.data[i] - 16) + Math.abs(png.data[i + 1] - 38) + Math.abs(png.data[i + 2] - 27) > 60) { L = Math.min(L, x); R = Math.max(R, x + 1); }
+        if (Math.abs(png.data[i] - LIME[0]) + Math.abs(png.data[i + 1] - LIME[1]) + Math.abs(png.data[i + 2] - LIME[2]) > 60) { L = Math.min(L, x); R = Math.max(R, x + 1); }
       }
     return { L, R };
   };
