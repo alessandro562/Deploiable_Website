@@ -172,7 +172,7 @@ test('il naming compare alla fine, lettera dopo lettera da sinistra a destra', a
   expect((await letters()).every((v) => v === 1)).toBe(true);
 });
 
-test('allineamento: logo 3D e frase partono dallo stesso bordo sinistro (misura sui pixel)', async ({ page }) => {
+test('allineamento: logo 3D e frase centrati sulla pagina (misura sui pixel)', async ({ page }) => {
   await openFilm(page, '', 'high');
   await seek(page, 12.9);
   const rects = await page.evaluate(() => {
@@ -193,9 +193,11 @@ test('allineamento: logo 3D e frase partono dallo stesso bordo sinistro (misura 
   const logo = inkLeft(slot.x - 4, slot.y - 4, slot.x + slot.w + 4, slot.y + slot.h + 4);
   expect(Math.abs(logo.L - slot.x), 'bordo sinistro del logo 3D contro il segnaposto').toBeLessThanOrEqual(2);
   expect(Math.abs(logo.R - (slot.x + slot.w)), 'bordo destro del logo 3D contro il segnaposto').toBeLessThanOrEqual(2);
+  const mid = png.width / 2;
+  expect(Math.abs((logo.L + logo.R) / 2 - mid), 'centro del logo contro il centro della pagina').toBeLessThanOrEqual(2);
   for (const [i, l] of lines.entries()) {
     const ink = inkLeft(l.x - 4, l.y, l.x + l.w + 4, l.y + l.h);
-    expect(Math.abs(ink.L - logo.L), `riga ${i + 1} contro il bordo del logo`).toBeLessThanOrEqual(2);
+    expect(Math.abs((ink.L + ink.R) / 2 - mid), `centro della riga ${i + 1} contro il centro della pagina`).toBeLessThanOrEqual(2);
   }
 });
 

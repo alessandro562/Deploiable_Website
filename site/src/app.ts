@@ -3,13 +3,18 @@ import type { Capabilities } from './core/capabilities';
 import { QUALITY } from './config/quality';
 import { Engine } from './gl/engine';
 import { Stage } from './gl/stage';
-import { DURATION, createState, stateAt } from './gl/choreography';
+import { DURATION, LOCK, createState, stateAt } from './gl/choreography';
+import { PALETTES, type PaletteName } from './config/brand';
+import { Color } from 'three';
 
 // Tre livelli, come nella skill web3d-integration-patterns (Pattern 1):
 //  · 3D      Three.js: renderer, barre, scintille (src/gl)
 //  · regia   keyframe sul tempo, con le curve di GSAP (src/gl/choreography.ts)
 //  · testo   DOM, mosso dallo stesso tempo
 // Un solo ciclo di rendering (il ticker di GSAP); si ferma quando la scheda è nascosta.
+/** Palette predefinita dell'animazione (vedi src/config/brand.ts). */
+const DEFAULT_PALETTE: PaletteName | 'flip' = 'forest';
+
 export async function start(caps: Capabilities) {
   const q = new URLSearchParams(location.search);
   const testMode = q.has('__test');
@@ -38,8 +43,23 @@ export async function start(caps: Capabilities) {
     stage.setSlot({ cx: r.left + r.width / 2, cy: r.top + r.height / 2, w: r.width });
   };
 
+  // Palette: "forest" (barre Lime su Forest), "lime" (barre Forest su Lime) oppure "flip" (Forest fino al clic
+  // dell'ultima barra, poi Lime). Si sceglie con ?palette=; il valore predefinito è in DEFAULT_PALETTE.
+  const mode = (q.get('palette') ?? DEFAULT_PALETTE) as PaletteName | 'flip';
+  const paletteAt = (t: number): PaletteName => (mode === 'flip' ? (t >= LOCK[0] ? 'lime' : 'forest') : mode);
+  let current: PaletteName | null = null;
+  const applyPalette = (name: PaletteName) => {
+    if (name === current) return;
+    current = name;
+    stage.setPalette(name);
+    (engine.scene.background as Color).set(PALETTES[name].background);
+    document.documentElement.dataset.palette = name;
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', PALETTES[name].background);
+  };
+
   const draw = () => {
     stateAt(time, state);
+    applyPalette(paletteAt(time));
     stage.apply(state, engine.camera, engine.width, engine.height);
     claim.forEach((el, i) => {
       const p = Math.min(1, Math.max(0, state.claim * 1.25 - i * 0.25));

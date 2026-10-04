@@ -2,12 +2,26 @@
   --lime: #c8f25a;
   --forest: #10261b;
   --mist: #f1f3ea;
+  /* colori della pagina: cambiano con la palette (html[data-palette]) */
+  --bg: var(--forest);
+  --ink-light: var(--mist);
+  --ink-strong: var(--lime);
+  --sweep-color: var(--lime);
   --sans: 'Satoshi', 'Helvetica Neue', Arial, sans-serif;
 
   /* Composizione del finale: il logo orizzontale in alto, la frase sotto, tutto allineato al bordo sinistro del logo.
      La larghezza del logo è l'unica misura: la camera 3D inquadra il segnaposto .logo-slot (src/gl/stage.ts). */
   --logo-w: min(88vw, max(52vw, 360px), 150svh);
   color-scheme: dark;
+}
+
+/* Su Lime solo Forest: logo, frase e linea diventano tutti Forest. */
+html[data-palette='lime'] {
+  --bg: var(--lime);
+  --ink-light: var(--forest);
+  --ink-strong: var(--forest);
+  --sweep-color: var(--forest);
+  color-scheme: light;
 }
 
 *,
@@ -21,13 +35,13 @@ body {
   margin: 0;
   height: 100%;
   overflow: hidden;
-  background: var(--forest);
+  background: var(--bg);
   overscroll-behavior: none;
   -webkit-text-size-adjust: 100%;
 }
 
 body {
-  color: var(--mist);
+  color: var(--ink-light);
   font-family: var(--sans);
   font-weight: 500;
   -webkit-font-smoothing: antialiased;
@@ -59,7 +73,7 @@ p {
 .logo-slot {
   width: 100%;
   aspect-ratio: 514.158 / 97.3;
-  color: var(--lime);
+  color: var(--ink-strong);
 }
 .logo-slot svg {
   display: block;
@@ -81,35 +95,30 @@ p {
   letter-spacing: -0.045em;
   font-weight: 300;
   white-space: nowrap;
+  /* la frase è centrata sulla pagina (e quindi sul logo, che è centrato anche lui) */
+  text-align: center;
 }
 .line--light {
   font-weight: 300;
-  color: var(--mist);
+  color: var(--ink-light);
 }
 .line--black {
   font-weight: 900;
-  color: var(--lime);
+  color: var(--ink-strong);
+  /* centratura ottica: la M ha più spazio a sinistra del punto a destra (−0,03 em, misurato in scripts/align.mjs) */
+  margin-left: -0.06em;
 }
 
 .mask {
   display: block;
   overflow: hidden;
-  /* la maschera taglia solo in verticale: a destra si estende oltre il blocco senza spostare il layout */
-  padding: 0 0.5em 0.08em 0;
-  margin: 0 -0.5em -0.08em 0;
+  /* la maschera taglia solo in verticale: ai lati si estende oltre il blocco senza spostare il layout */
+  padding: 0 0.5em 0.08em;
+  margin: 0 -0.5em -0.08em;
 }
 .line {
   display: block;
   will-change: transform;
-}
-
-/* Allineamento ottico: il bordo vuoto a sinistra di ogni lettera (la W, la M) si compensa sulla maschera,
-   così l'inchiostro della prima lettera parte esattamente dal bordo sinistro del logo (misurato in scripts/align.mjs). */
-.claim .mask:nth-child(1) {
-  margin-left: -0.02em;
-}
-.claim .mask:nth-child(2) {
-  margin-left: -0.08em;
 }
 
 /* Su schermi verticali (telefono) il logo occupa quasi tutta la larghezza e sotto c'è molto spazio:
@@ -142,7 +151,7 @@ p {
   width: 120vw;
   top: calc(50svh - 1px);
   height: 2px;
-  background: var(--lime);
+  background: var(--sweep-color);
   transform: rotate(-8deg);
   clip-path: inset(0 100% 0 0);
   pointer-events: none;
@@ -197,6 +206,6 @@ p {
 }
 
 :focus-visible {
-  outline: 2px solid var(--lime);
+  outline: 2px solid var(--ink-strong);
   outline-offset: 4px;
 }

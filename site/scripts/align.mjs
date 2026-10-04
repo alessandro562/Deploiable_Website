@@ -1,5 +1,5 @@
 // Misura l'allineamento vero dell'inquadratura finale sui pixel (non sui riquadri del DOM):
-// bordi sinistro/destro dell'inchiostro del logo e delle righe della frase, e gli spazi verticali.
+// bordi dell'inchiostro del logo, centro del logo e delle righe della frase rispetto al centro pagina, spazi verticali.
 //   node scripts/align.mjs   (con `npm run preview` attivo)
 import { chromium } from '@playwright/test';
 import { PNG } from 'pngjs';
@@ -38,7 +38,7 @@ for (const [w, h] of SIZES) {
   out.push({ w, h, slot: rects.slot, logo, lines });
   const f = (v) => v.toFixed(1).padStart(6);
   console.log(`${w}x${h}`.padEnd(10), 'logo L', f(logo.L - rects.slot.x), 'R', f(logo.R - (rects.slot.x + rects.slot.w)),
-    '| riga1 L', f(lines[0].L - logo.L), '| riga2 L', f(lines[1].L - logo.L),
+    '| centro: logo', f((logo.L + logo.R) / 2 - w / 2), 'riga1', f((lines[0].L + lines[0].R) / 2 - w / 2), 'riga2', f((lines[1].L + lines[1].R) / 2 - w / 2),
     '| gap logo→riga1', f(lines[0].T - logo.B), '| gap riga1→2', f(lines[1].T - lines[0].B),
     '| blocco', f(logo.T), '→', f(lines[1].B), `(margine sopra ${f(logo.T).trim()} / sotto ${(h - lines[1].B).toFixed(1)})`);
   await page.close();

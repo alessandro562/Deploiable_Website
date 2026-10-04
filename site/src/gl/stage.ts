@@ -1,7 +1,8 @@
 import { Group, MathUtils, Mesh, PerspectiveCamera, type Scene, type ShaderMaterial } from 'three';
 import type { SceneState } from './choreography';
 import { BarGeometry } from './symbol/barGeometry';
-import { createBarMaterial } from './symbol/barMaterial';
+import { createBarMaterial, setPalette } from './symbol/barMaterial';
+import { PALETTES, type PaletteName } from '../config/brand';
 import { SYMBOL_H, SYMBOL_W } from './symbol/symbolSpec';
 import { LOGO_CENTER, LOGO_W, buildWordmark, type Letter } from './wordmark';
 
@@ -30,6 +31,7 @@ export class Stage {
   private readonly letters: Letter[];
   private readonly letterMat: ShaderMaterial;
   private slot: LogoSlot = { cx: 0, cy: 0, w: 1 };
+  private palette: PaletteName | null = null;
 
   constructor(scene: Scene) {
     for (let i = 0; i < 3; i++) {
@@ -46,6 +48,14 @@ export class Stage {
     this.letterMat = word.material;
     for (const l of this.letters) this.group.add(l.mesh);
     scene.add(this.group);
+  }
+
+  /** Colori di barre e lettere. Il fondo lo imposta l'app (canvas e pagina insieme). */
+  setPalette(name: PaletteName) {
+    if (name === this.palette) return;
+    this.palette = name;
+    for (const b of this.bars) setPalette(b.mat, PALETTES[name]);
+    setPalette(this.letterMat, PALETTES[name]);
   }
 
   /** Il segnaposto del logo cambia con le dimensioni della finestra: la camera finale si adatta. */

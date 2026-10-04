@@ -39,7 +39,7 @@ node scripts/render-film.mjs 720 1280 30 high 1.5 artifacts/film-verticale.mp4  
 node scripts/make-posters.mjs                                     # public/og.jpg e apple-touch-icon.png
 ```
 
-Parametri URL: `?tier=high|mid|mobile|minimal` (cambia solo nitidezza: densità di pixel e antialiasing), `?mode=static`, `?__test=1` (hook per i test).
+Parametri URL: `?tier=high|mid|mobile|minimal` (cambia solo nitidezza: densità di pixel e antialiasing), `?mode=static`, `?palette=forest|lime|flip` (barre Lime su Forest, barre Forest su Lime, oppure Forest che passa a Lime al clic dell'ultima barra; il valore predefinito è in `src/app.ts`), `?__test=1` (hook per i test).
 
 ## Struttura
 
@@ -50,7 +50,7 @@ Parametri URL: `?tier=high|mid|mobile|minimal` (cambia solo nitidezza: densità 
 - `src/gl/stage.ts` · camera, barre e lettere. Nel finale inquadra il segnaposto `.logo-slot` della pagina, così il logo 3D coincide con il layout (misurato: entro 1 px).
 - `src/gl/engine.ts` · renderer semplice: niente post-produzione, niente tone mapping.
 - `src/main.ts`, `src/core/capabilities.ts` · scelta tra animazione 3D e versione statica.
-- `scripts/align.mjs` · misura sui pixel l'allineamento del finale (bordi del logo e della frase, spazi) a nove formati di schermo.
+- `scripts/align.mjs` · misura sui pixel l'allineamento del finale (centri del logo e delle due righe, spazi) a nove formati di schermo.
 
 ## Versione statica
 
@@ -62,7 +62,7 @@ logo completo ufficiale con la sua motion (barre dall'alto, 120 ms, 400 ms; lett
 - Nell'inquadratura finale i due colori sono **esattamente** Forest #10261B e Lime #C8F25A (test automatico, tolleranza 2).
 - Nessun effetto: niente bagliore, grana, vignettatura o scintille. Neppure un pixel supera il Lime del brand (test automatico) e il fondo è Forest esatto in ogni fotogramma.
 - Le barre ruotate e inclinate sono supergrafica; il simbolo conforme e piatto compare solo alla fine.
-- Titolo a sinistra, due pesi (Satoshi 300 + 900); il testo non sta mai sopra le barre.
+- Logo e frase centrati sulla pagina, due pesi (Satoshi 300 + 900); il testo non sta mai sopra le barre.
 
 ## Deploy
 
