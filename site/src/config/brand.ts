@@ -54,3 +54,30 @@ export const PALETTES: Record<PaletteName, Palette> = {
     cap: COLORS.lime,
   },
 };
+
+// Supergrafica tono su tono (brand book, 05 · Elementi grafici): il simbolo ingrandito dietro ai contenuti.
+// Lime Deep su Lime ("texture leggera"), Pine su Forest. Il contrasto del testo non cambia.
+export const TONE_PALETTES: Record<PaletteName, Palette> = {
+  lime: {
+    background: COLORS.lime,
+    front: COLORS.limeDeep,
+    top: COLORS.lime,
+    bottom: COLORS.limeDeep,
+    side: [COLORS.limeDeep, COLORS.lime, 0.35],
+    back: [COLORS.limeDeep, COLORS.moss, 0.15],
+    rim: COLORS.lime,
+    rimAmount: 0.15,
+    cap: COLORS.lime,
+  },
+  forest: {
+    background: COLORS.forest,
+    front: COLORS.pine,
+    top: COLORS.pine,
+    bottom: COLORS.forest,
+    side: [COLORS.pine, COLORS.forest, 0.35],
+    back: [COLORS.pine, COLORS.forest, 0.5],
+    rim: COLORS.moss,
+    rimAmount: 0.15,
+    cap: COLORS.moss,
+  },
+};

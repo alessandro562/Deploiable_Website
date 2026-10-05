@@ -1,10 +1,11 @@
 import { expect, test } from '@playwright/test';
 import { PNG } from 'pngjs';
-import { DURATION as END, LOCK, SILENZIO_A, TIMES } from '../../src/gl/timeline';
+import { DURATION as END, LOCK, LOOP_PERIOD, LOOP_START, SILENZIO_A, TIMES } from '../../src/gl/timeline';
 import { brightPixels, brightness, canvasHash, darkPixels, maxChannels, openFilm, peakColumn, sample, seek } from './helpers';
 
 const LIME = [200, 242, 90];
 const FOREST = [16, 38, 27];
+const LIME_DEEP = [176, 221, 60];
 const LOCK_T = LOCK[0]; // clic dell'ultima barra: lo schermo passa al Lime
 const near = (px: number[], ref: number[], tol: number) => ref.forEach((v, i) => expect(Math.abs(px[i] - v)).toBeLessThanOrEqual(tol));
 
@@ -77,17 +78,57 @@ test('il tempo fermo dà sempre lo stesso fotogramma (anche tornando indietro)',
   a.forEach((v, i) => expect(Math.abs(v - b[i])).toBeLessThan(2));
 });
 
-test('dopo la rivelazione le tre barre respirano in sequenza', async ({ page }) => {
+test('dopo la fine il logo gira in ciclo e torna identico, pixel per pixel', async ({ page }) => {
   await openFilm(page);
+  const st = () => page.evaluate(() => window.__DEPLOIABLE__!.state!());
   await seek(page, END);
-  expect(await page.evaluate(() => window.__DEPLOIABLE__!.state!().bump)).toEqual([0, 0, 0]);
-  // 1,5 s dopo la fine parte la spinta: prima la barra alta, poi le altre con 120 ms di sfasamento
-  await seek(page, END + 1.5 + 0.35);
-  const [a, b, c] = await page.evaluate(() => window.__DEPLOIABLE__!.state!().bump);
-  expect(a).toBeGreaterThan(0.05);
-  expect(b).toBeGreaterThan(0);
-  expect(a).toBeGreaterThan(b);
-  expect(b).toBeGreaterThan(c);
+  expect((await st()).roll).toEqual([0, 0, 0]);
+  const logo = await page.locator('.logo-slot').boundingBox();
+  // solo l'inchiostro del logo (Forest): dietro, la supergrafica continua a muoversi
+  const shot = async () => {
+    const png = PNG.sync.read(await page.screenshot({ clip: logo! }));
+    const ink: boolean[] = [];
+    for (let i = 0; i < png.data.length; i += 4) ink.push(png.data[i] + png.data[i + 1] + png.data[i + 2] < 160);
+    return ink;
+  };
+  const same = (a: boolean[], b: boolean[]) => a.filter((v, i) => v !== b[i]).length / a.length < 0.002;
+  const rest = await shot();
+  // nel ciclo: prima la barra alta, poi le altre con 120 ms di sfasamento
+  await seek(page, LOOP_START + 0.3);
+  const [a, b, c] = (await st()).roll;
+  expect(Math.abs(a)).toBeGreaterThan(Math.abs(b));
+  expect(Math.abs(b)).toBeGreaterThan(Math.abs(c));
+  expect(same(await shot(), rest)).toBe(false);
+  // a fine giro (e un ciclo dopo) il logo è di nuovo fermo e allineato
+  for (const t of [LOOP_START + 1.5, LOOP_START + LOOP_PERIOD + 1.5]) {
+    await seek(page, t);
+    expect((await st()).roll).toEqual([0, 0, 0]);
+    expect(same(await shot(), rest), `t=${t}`).toBe(true);
+  }
+});
+
+test('supergrafica: entra con la linea del finale e continua a muoversi, Lime Deep su Lime', async ({ page }) => {
+  await openFilm(page);
+  const st = () => page.evaluate(() => window.__DEPLOIABLE__!.state!());
+  await seek(page, TIMES.deploy);
+  expect((await st()).bgIn).toEqual([0, 0, 0]);
+  await seek(page, END);
+  expect((await st()).bgIn.every((v) => v === 1)).toBe(true);
+  // il fondo contiene Lime Deep esatto (la faccia frontale della supergrafica) e Lime esatto
+  const vp = page.viewportSize()!;
+  const png = PNG.sync.read(await page.screenshot());
+  let deep = 0;
+  for (let i = 0; i < png.data.length; i += 4 * 7) {
+    const px = [png.data[i], png.data[i + 1], png.data[i + 2]];
+    if (px.every((v, k) => Math.abs(v - LIME_DEEP[k]) <= 2)) deep++;
+  }
+  expect(deep / (vp.width * vp.height / 7), 'quota di Lime Deep').toBeGreaterThan(0.05);
+  // si muove: due istanti del ciclo danno fotogrammi diversi
+  await seek(page, LOOP_START + LOOP_PERIOD / 2 + 0.6);
+  expect((await st()).bgSlide[0]).toBeGreaterThan(0.1);
+  const h1 = await canvasHash(page);
+  await seek(page, LOOP_START + LOOP_PERIOD * 2 + 0.2);
+  expect(await canvasHash(page)).not.toBe(h1);
 });
 
 test('nessun bagliore: neppure un pixel supera il Lime del brand, in nessun momento', async ({ page }) => {
@@ -198,7 +239,7 @@ test('allineamento: logo 3D e frase centrati sulla pagina (misura sui pixel)', a
     for (let y = Math.max(0, Math.floor(y0)); y < Math.min(png.height, Math.ceil(y1)); y++)
       for (let x = Math.floor(x0); x < Math.ceil(x1); x++) {
         const i = (y * png.width + x) * 4;
-        if (Math.abs(png.data[i] - LIME[0]) + Math.abs(png.data[i + 1] - LIME[1]) + Math.abs(png.data[i + 2] - LIME[2]) > 60) { L = Math.min(L, x); R = Math.max(R, x + 1); }
+        if (Math.abs(png.data[i] - 16) + Math.abs(png.data[i + 1] - 38) + Math.abs(png.data[i + 2] - 27) < 110 /* inchiostro Forest: la supergrafica dietro non conta */) { L = Math.min(L, x); R = Math.max(R, x + 1); }
       }
     return { L, R };
   };

@@ -6,6 +6,7 @@ import { Stage } from './gl/stage';
 import { DURATION, LOCK, createState, stateAt } from './gl/choreography';
 import { PALETTES, type PaletteName } from './config/brand';
 import { Color } from 'three';
+import { Backdrop } from './gl/backdrop';
 
 // Tre livelli, come nella skill web3d-integration-patterns (Pattern 1):
 //  · 3D      Three.js: renderer, barre, scintille (src/gl)
@@ -28,6 +29,7 @@ export async function start(caps: Capabilities) {
   const canvas = document.querySelector<HTMLCanvasElement>('canvas.gl')!;
   const engine = new Engine(canvas, quality, testMode);
   const stage = new Stage(engine.scene);
+  const backdrop = new Backdrop(engine.bgScene);
 
   const claim = Array.from(document.querySelectorAll<HTMLElement>('.claim .line'));
   const sweep = document.querySelector<HTMLElement>('.sweep')!;
@@ -53,7 +55,8 @@ export async function start(caps: Capabilities) {
     if (name === current) return;
     current = name;
     stage.setPalette(name);
-    (engine.scene.background as Color).set(PALETTES[name].background);
+    backdrop.setPalette(name);
+    (engine.bgScene.background as Color).set(PALETTES[name].background);
     document.documentElement.dataset.palette = name;
     document.querySelector('meta[name="theme-color"]')?.setAttribute('content', PALETTES[name].background);
   };
@@ -62,6 +65,7 @@ export async function start(caps: Capabilities) {
     stateAt(time, state);
     applyPalette(paletteAt(time));
     stage.apply(state, engine.camera, engine.width, engine.height);
+    backdrop.apply(state, engine.bgCamera, engine.width, engine.height);
     claim.forEach((el, i) => {
       const p = Math.min(1, Math.max(0, state.claim * 1.25 - i * 0.25));
       el.style.transform = `translate3d(0, ${((1 - p) * 110).toFixed(2)}%, 0)`;
@@ -83,6 +87,7 @@ export async function start(caps: Capabilities) {
   // Riscaldamento: shader e geometrie vengono compilati e caricati sulla GPU ora, con la pagina ancora
   // nel Forest iniziale, così nessun scatto arriva all'incastro (9,2 s) o al lampo (10,2 s).
   stage.forceVisible();
+  backdrop.forceVisible();
   await engine.warmup();
   engine.render();
   draw();
@@ -114,6 +119,6 @@ export async function start(caps: Capabilities) {
   hooks.play = () => {
     playing = true;
   };
-  hooks.state = () => ({ t: state.t, bump: [...state.bump], sweep: [state.sweepHead, state.sweepTail], letters: [...state.letters] });
+  hooks.state = () => ({ t: state.t, roll: [...state.roll], bgIn: [...state.bgIn], bgSlide: [...state.bgSlide], sweep: [state.sweepHead, state.sweepTail], letters: [...state.letters] });
   hooks.ready = true;
 }

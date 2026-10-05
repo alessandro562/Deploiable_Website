@@ -1,5 +1,6 @@
 :root {
   --lime: #c8f25a;
+  --lime-deep: #b0dd3c;
   --forest: #10261b;
   --mist: #f1f3ea;
   /* colori della pagina: cambiano con la palette (html[data-palette]) */
@@ -281,6 +282,29 @@ p {
   width: 100vw;
   height: 100svh;
   z-index: 0;
+}
+
+/* Supergrafica tono su tono (Lime Deep su Lime): il simbolo ingrandito, tagliato in basso a destra. */
+.supergraphic {
+  display: none;
+}
+.is-static .supergraphic {
+  display: block;
+  position: fixed;
+  z-index: 0;
+  right: -12vw;
+  bottom: -38svh;
+  height: 140svh;
+  width: auto;
+  color: var(--lime-deep);
+  pointer-events: none;
+}
+@media (max-aspect-ratio: 1/1) {
+  .is-static .supergraphic {
+    right: -60vw;
+    bottom: -30svh;
+    height: 95svh;
+  }
 }
 
 /* Senza WebGL (o con riduzione del movimento): il logo ufficiale e la frase. */

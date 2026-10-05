@@ -12,8 +12,12 @@ Titolo: **We deploy AI. Measurably.** (in inglese)
 | 1,2–2,7 s | Il segreto | La camera gira di lato e sale: la barra si sfoglia in tre lastre parallele. |
 | 2,65–4,1 s | Il deploy | Ognuna vola al suo posto nel simbolo con un avvitamento completo (120–150 ms di sfasamento), la camera torna frontale. Si incastrano dal basso con un clic secco; all'ultimo lo schermo passa al Lime e le barre diventano Forest. |
 | 4,1–4,6 s | Silenzio | Tutto fermo. |
-| 4,6–6,6 s | Il logo | Una linea Forest a 8° attraversa lo schermo; la camera si ritira sul logo completo e le undici lettere del naming, in 3D, si aprono una dopo l'altra. Poi la frase, poi "Coming soon" e il modulo. |
-| dopo | Vivo | Ogni ~6 s le tre barre si danno una piccola spinta in sequenza. |
+| 4,6–6,6 s | Il logo | Una linea Forest a 8° attraversa lo schermo; la camera si ritira sul logo completo e le undici lettere del naming, in 3D, si aprono una dopo l'altra. Intanto entra dal bordo la supergrafica. Poi la frase, poi "Coming soon" e il modulo. |
+| dopo | Vivo, in ciclo di 5 s | Le barre del logo fanno un giro completo su se stesse (sfalsate di 120 ms) e tornano ferme e allineate; la supergrafica ruota lentissima e a metà ciclo le sue barre scivolano in avanti lungo gli 8°. |
+
+**Supergrafica** (`src/gl/backdrop.ts`): il simbolo ingrandito e tagliato dal bordo, tono su tono, come da brand book
+(05 · Elementi grafici): Lime Deep su Lime, a tutto campo e anche dietro al testo. In 3D, con una camera propria
+(non segue zoom e spostamenti del logo). Nella versione statica è lo stesso simbolo in SVG, fermo.
 
 I tempi sono in `src/gl/timeline.ts` (li usano anche test e script). Tutta la regia è in `src/gl/choreography.ts`: ogni movimento è una funzione del tempo, quindi con
 lo stesso tempo si ottiene sempre lo stesso fotogramma (è ciò che permette test e render del video).
@@ -60,6 +64,7 @@ logo completo ufficiale con la sua motion (barre dall'alto, 120 ms, 400 ms; lett
 
 - Il gioco delle barre è Lime su Forest; dal clic dell'ultima barra in poi è Forest su Lime, come le copertine e gli annunci del brand book (su Lime solo Forest). Fondo, barre e logo sono **esattamente** Forest #10261B e Lime #C8F25A (test automatico, tolleranza 2).
 - La versione statica e l'anteprima social mostrano il finale: logo e frase Forest su Lime.
+- La texture del fondo è solo la supergrafica tono su tono (Lime Deep esatto sulla faccia frontale, test automatico).
 - Nessun effetto: niente bagliore, grana, vignettatura o scintille. Neppure un pixel supera il Lime del brand (test automatico).
 - Le barre ruotate e inclinate sono supergrafica; il simbolo conforme e piatto compare solo alla fine.
 - Logo e frase centrati sulla pagina, due pesi (Satoshi 300 + 900); il testo non sta mai sopra le barre.

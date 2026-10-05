@@ -13,9 +13,9 @@ import { WORDMARK_COUNT } from './wordmark';
 //   4.6 – 6.6  Il logo      una linea a 8° attraversa lo schermo, la camera si ritira sul logo completo,
 //                           le lettere del naming si aprono una dopo l'altra, compare la frase, poi il modulo
 
-import { DURATION, LOCK, SILENZIO_A } from './timeline';
+import { DURATION, LOCK, LOOP_PERIOD, LOOP_START, SILENZIO_A } from './timeline';
 
-export { DURATION, LOCK, TIMES } from './timeline';
+export { DURATION, LOCK, LOOP_PERIOD, LOOP_START, TIMES } from './timeline';
 
 type Ch = 'x' | 'y' | 'z' | 'rx' | 'ry' | 'rz' | 'sx' | 'sy' | 'lift';
 type Key = [time: number, value: number, ease?: string];
@@ -31,7 +31,11 @@ export interface BarPose {
 export interface SceneState {
   t: number;
   bars: [BarPose, BarPose, BarPose];
-  bump: [number, number, number];
+  roll: [number, number, number]; // giro su se stessa di ogni barra del logo, nel ciclo dopo la fine
+  bgIn: [number, number, number]; // 0..1 ingresso delle barre della supergrafica
+  bgSlide: [number, number, number]; // 0..1 il "deploy" in ciclo delle barre della supergrafica
+  bgRx: number;
+  bgRy: number;
   az: number;
   el: number;
   dist: number; // moltiplicatore della distanza che inquadra il simbolo
@@ -144,17 +148,41 @@ const letterTracks = Array.from({ length: WORDMARK_COUNT }, (_, i) => {
   return new Track([[0, 0], [t0, 0], [t0 + 0.38, 1, 'back.out(1.5)']]);
 });
 
-const bump = (t: number, i: number) => {
-  // dopo la rivelazione: ogni ~6 s le tre barre si danno una piccola spinta in sequenza (120 ms)
-  if (t < DURATION) return 0;
-  const u = ((t - DURATION - 1.5) % 6) - 0.12 * i;
-  return u >= 0 && u < 0.7 ? Math.pow(Math.sin((Math.PI * u) / 0.7), 2) * 0.16 : 0;
+const smooth = (x: number) => (x <= 0 ? 0 : x >= 1 ? 1 : x * x * (3 - 2 * x));
+const inOutCubic = (x: number) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
+
+// La supergrafica entra con la linea del finale: le barre giganti arrivano dal bordo, prima la bassa.
+const bgInTracks = [0, 1, 2].map((b) => {
+  const t0 = SILENZIO_A + 0.1 + 0.12 * (2 - b);
+  return new Track([[0, 0], [t0, 0], [t0 + 1.1, 1, 'power3.out']]);
+});
+
+/** Posizione nel ciclo dopo la fine (secondi dall'inizio del ciclo corrente), o -1 prima che il ciclo parta. */
+const loopPhase = (t: number) => (t < LOOP_START ? -1 : (t - LOOP_START) % LOOP_PERIOD);
+
+// Il logo: ogni ciclo le tre barre fanno un giro completo su se stesse (come nell'intro), sfalsate di 120 ms.
+// Il logo è piatto: ogni barra si chiude in una linea e si riapre. Fra un giro e l'altro è fermo e allineato.
+const ROLL_DUR = 0.9;
+const roll = (t: number, b: number) => {
+  const u = loopPhase(t);
+  if (u < 0) return 0;
+  const v = (u - 0.12 * b) / ROLL_DUR;
+  return v > 0 && v < 1 ? -Math.PI * 2 * inOutCubic(v) : 0;
+};
+
+// La supergrafica: a metà ciclo le barre scivolano in avanti lungo gli 8° e tornano, sfalsate.
+const SLIDE_DUR = 1.4;
+const bgSlide = (t: number, b: number) => {
+  const u = loopPhase(t);
+  if (u < 0) return 0;
+  const v = (u - LOOP_PERIOD / 2 - 0.12 * b) / SLIDE_DUR;
+  return v > 0 && v < 1 ? Math.pow(Math.sin(Math.PI * v), 2) : 0;
 };
 
 export function createState(): SceneState {
   const pose = (): BarPose => ({ x: 0, y: 0, z: 0, rx: 0, ry: 0, rz: 0, sx: 1, sy: 1, lift: 0 });
   return {
-    t: 0, bars: [pose(), pose(), pose()], bump: [0, 0, 0], az: 0, el: 0, dist: 1.5, fov: 36, spread: 0, pull: 0,
+    t: 0, bars: [pose(), pose(), pose()], roll: [0, 0, 0], bgIn: [0, 0, 0], bgSlide: [0, 0, 0], bgRx: 0, bgRy: 0, az: 0, el: 0, dist: 1.5, fov: 36, spread: 0, pull: 0,
     letters: Array(WORDMARK_COUNT).fill(0), flatten: 1, sweepHead: 0, sweepTail: 0, claim: 0, outro: 0,
   };
 }
@@ -165,7 +193,9 @@ export function stateAt(t: number, s: SceneState): SceneState {
     const p = s.bars[b];
     const tr = bars[b];
     for (const c of CHANNELS) p[c] = tr[c].at(t);
-    s.bump[b] = bump(t, b);
+    s.roll[b] = roll(t, b);
+    s.bgIn[b] = bgInTracks[b].at(t);
+    s.bgSlide[b] = bgSlide(t, b);
   }
   s.az = tracks.az.at(t);
   s.el = tracks.el.at(t);
@@ -179,5 +209,10 @@ export function stateAt(t: number, s: SceneState): SceneState {
   s.sweepTail = tracks.sweepTail.at(t);
   s.claim = tracks.claim.at(t);
   s.outro = tracks.outro.at(t);
+  // la supergrafica ruota lentissima su due assi con periodi diversi: non si ripete in modo meccanico
+  const k = smooth((t - DURATION) / 2);
+  const w = t - DURATION;
+  s.bgRy = k * 0.2 * Math.sin((2 * Math.PI * w) / 11);
+  s.bgRx = k * 0.1 * Math.sin((2 * Math.PI * w) / 7.3);
   return s;
 }
