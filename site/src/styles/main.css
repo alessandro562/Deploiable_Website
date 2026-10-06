@@ -13,7 +13,6 @@
   --sweep-color: var(--lime);
   --ink-soft: var(--sage); /* testo secondario su fondo scuro (brand: Sage, AA) */
   --ink-hover: var(--lime-deep);
-  --mono: 'JetBrains Mono', ui-monospace, monospace;
   --sans: 'Satoshi', 'Helvetica Neue', Arial, sans-serif;
 
   /* Composizione del finale: il logo orizzontale in alto, la frase sotto, tutto centrato sulla pagina.
@@ -166,7 +165,7 @@ p {
 
 /* ---------- Coming soon e iscrizione ---------- */
 /* Piccoli, sotto la frase: compaiono per ultimi. Su Lime solo Forest (i colori seguono la palette);
-   etichetta e nota in JetBrains Mono, come le didascalie del brand book; testo secondario in Moss. */
+   un solo carattere, Satoshi: etichetta in maiuscolo Light spaziato, nota in Moss. */
 
 .outro {
   --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
@@ -187,9 +186,11 @@ p {
   align-items: center;
   gap: 10px;
   margin-bottom: 18px;
-  font: 500 11px/1 var(--mono);
-  letter-spacing: 0.12em;
+  font: 300 13px/1 var(--sans);
+  letter-spacing: 0.24em;
   text-transform: uppercase;
+  /* la spaziatura aggiunge aria anche dopo l'ultima lettera: la si compensa per restare centrati */
+  margin-right: -0.24em;
   color: var(--ink-strong);
 }
 .soon-dot {
@@ -317,8 +318,8 @@ p {
 
 .signup-note {
   margin-top: 14px;
-  font: 500 11px/1.4 var(--mono);
-  letter-spacing: 0.02em;
+  font: 500 13px/1.45 var(--sans);
+  letter-spacing: 0.005em;
   text-align: center;
   max-width: min(92vw, 440px);
   text-wrap: balance;

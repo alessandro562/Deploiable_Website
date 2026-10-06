@@ -83,7 +83,7 @@ Senza indirizzo il modulo non finge l'iscrizione: risponde "Sign-ups open very s
 GitHub Pages via `.github/workflows/deploy-pages.yml` (push su `main`). Settings → Pages → Source: **GitHub Actions**.
 Con un dominio proprio: `public/CNAME`, `BASE_PATH=/` nel workflow e `VITE_SITE_URL` in `.env`.
 
-Font: Satoshi (Fontshare, licenza ITF FFL) e JetBrains Mono (OFL, per etichetta e nota come le didascalie del brand book), serviti dal sito.
+Font: solo Satoshi (Fontshare, licenza ITF FFL), servito dal sito. L'etichetta è in maiuscolo Light spaziato.
 
 ## Dettagli
 

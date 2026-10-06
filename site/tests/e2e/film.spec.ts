@@ -329,7 +329,7 @@ test('iscrizione: email non valida, invio riuscito, errore del servizio', async 
   await expect(page.locator('.signup')).toBeHidden();
 });
 
-test('dettagli: testo secondario in Moss pieno, etichette in JetBrains Mono', async ({ page }) => {
+test('dettagli: testo secondario in Moss pieno, un solo carattere (Satoshi)', async ({ page }) => {
   await openFilm(page);
   await seek(page, END);
   const css = (sel: string, prop: string, pseudo?: string) =>
@@ -338,8 +338,10 @@ test('dettagli: testo secondario in Moss pieno, etichette in JetBrains Mono', as
   expect(await css('.signup-note', 'color')).toBe(MOSS);
   expect(await css('#signup-email', 'color', '::placeholder')).toBe(MOSS);
   expect(await css('.signup-note', 'opacity')).toBe('1');
-  expect(await css('.soon', 'font-family')).toContain('JetBrains Mono');
-  expect(await page.evaluate(() => document.fonts.check('500 11px "JetBrains Mono"'))).toBe(true);
+  for (const sel of ['.soon', '.signup-note', '.sub', '.signup button', '#signup-email'])
+    expect(await css(sel, 'font-family'), sel).toMatch(/^"?Satoshi/);
+  expect(await css('.soon', 'text-transform')).toBe('uppercase');
+  expect(await css('.soon', 'font-weight')).toBe('300');
 });
 
 test('ritmo verticale: stesso spazio a inchiostro fra logo e frase e fra sottotitolo e blocco iscrizione', async ({ page }) => {
