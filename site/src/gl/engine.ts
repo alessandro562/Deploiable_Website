@@ -7,6 +7,9 @@ import type { Quality } from '../config/quality';
 export class Engine {
   readonly renderer: WebGLRenderer;
   readonly scene = new Scene();
+  /** Il fondo: colore pieno e supergrafica, con una camera propria (non segue zoom e pan del logo). */
+  readonly bgScene = new Scene();
+  readonly bgCamera = new PerspectiveCamera(30, 1, 1, 4000);
   readonly camera = new PerspectiveCamera(36, 1, 1, 2000);
   readonly res = new Vector2(1, 1);
   dpr = 1;
@@ -29,7 +32,8 @@ export class Engine {
     });
     this.renderer.outputColorSpace = SRGBColorSpace;
     this.renderer.toneMapping = NoToneMapping;
-    this.scene.background = new Color(COLORS.forest);
+    this.bgScene.background = new Color(COLORS.forest);
+    this.renderer.autoClear = false;
     this.dpr = Math.min(window.devicePixelRatio || 1, quality.dprMax);
     this.renderer.setPixelRatio(this.dpr);
     this.resize(true);
@@ -49,6 +53,9 @@ export class Engine {
   }
 
   render() {
+    this.renderer.clear();
+    this.renderer.render(this.bgScene, this.bgCamera);
+    this.renderer.clearDepth();
     this.renderer.render(this.scene, this.camera);
   }
 
@@ -60,6 +67,7 @@ export class Engine {
   async warmup() {
     try {
       await this.renderer.compileAsync(this.scene, this.camera);
+      await this.renderer.compileAsync(this.bgScene, this.bgCamera);
     } catch {
       /* compileAsync non disponibile: si compila al primo frame */
     }

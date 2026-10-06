@@ -11,6 +11,6 @@ export interface Quality {
 export const QUALITY: Record<Tier, Quality> = {
   high: { tier: 'high', dprMax: 2, antialias: true },
   mid: { tier: 'mid', dprMax: 1.5, antialias: true },
-  mobile: { tier: 'mobile', dprMax: 1.5, antialias: true },
+  mobile: { tier: 'mobile', dprMax: 2, antialias: true }, // 2: il logo 3D nitido quanto il testo accanto
   minimal: { tier: 'minimal', dprMax: 1, antialias: false },
 };

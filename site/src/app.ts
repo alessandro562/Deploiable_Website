@@ -6,6 +6,7 @@ import { Stage } from './gl/stage';
 import { DURATION, LOCK, createState, stateAt } from './gl/choreography';
 import { PALETTES, type PaletteName } from './config/brand';
 import { Color } from 'three';
+import { Backdrop } from './gl/backdrop';
 
 // Tre livelli, come nella skill web3d-integration-patterns (Pattern 1):
 //  · 3D      Three.js: renderer, barre, scintille (src/gl)
@@ -28,10 +29,15 @@ export async function start(caps: Capabilities) {
   const canvas = document.querySelector<HTMLCanvasElement>('canvas.gl')!;
   const engine = new Engine(canvas, quality, testMode);
   const stage = new Stage(engine.scene);
+  const backdrop = new Backdrop(engine.bgScene);
 
   const claim = Array.from(document.querySelectorAll<HTMLElement>('.claim .line'));
   const sweep = document.querySelector<HTMLElement>('.sweep')!;
   const outro = document.querySelector<HTMLElement>('.outro')!;
+  // la pillola di conferma prende il posto del modulo: entra con lui
+  const outroItems = [['.sub'], ['.soon'], ['.signup', '.signup-done'], ['.signup-note']].map((sel) =>
+    sel.map((q) => document.querySelector<HTMLElement>(q)!),
+  );
   const slotEl = document.querySelector<HTMLElement>('.logo-slot')!;
   const state = createState();
 
@@ -53,8 +59,14 @@ export async function start(caps: Capabilities) {
     if (name === current) return;
     current = name;
     stage.setPalette(name);
-    (engine.scene.background as Color).set(PALETTES[name].background);
-    document.documentElement.dataset.palette = name;
+    backdrop.setPalette(name);
+    (engine.bgScene.background as Color).set(PALETTES[name].background);
+    // il cambio di palette è un taglio netto: nessuna transizione CSS deve sfumarlo
+    const root = document.documentElement;
+    root.classList.add('palette-snap');
+    root.dataset.palette = name;
+    void root.offsetWidth;
+    root.classList.remove('palette-snap');
     document.querySelector('meta[name="theme-color"]')?.setAttribute('content', PALETTES[name].background);
   };
 
@@ -62,14 +74,22 @@ export async function start(caps: Capabilities) {
     stateAt(time, state);
     applyPalette(paletteAt(time));
     stage.apply(state, engine.camera, engine.width, engine.height);
+    backdrop.apply(state, engine.bgCamera, engine.width, engine.height);
     claim.forEach((el, i) => {
       const p = Math.min(1, Math.max(0, state.claim * 1.25 - i * 0.25));
       el.style.transform = `translate3d(0, ${((1 - p) * 110).toFixed(2)}%, 0)`;
     });
-    // "Coming soon" e modulo: salgono di poco e compaiono; finché sono invisibili non si possono raggiungere col tab
-    outro.style.opacity = state.outro.toFixed(3);
-    outro.style.transform = `translate3d(0, ${((1 - state.outro) * 0.6).toFixed(3)}em, 0)`;
+    // "Coming soon", modulo e nota: entrano uno dopo l'altro (80 ms), salendo di poco; finché sono invisibili
+    // non si possono raggiungere col tab
     outro.style.visibility = state.outro > 0.01 ? 'visible' : 'hidden';
+    outroItems.forEach((els, i) => {
+      const p = Math.min(1, Math.max(0, state.outro * 1.6 - i * 0.18));
+      const e = 1 - Math.pow(1 - p, 3);
+      for (const el of els) {
+        el.style.opacity = e.toFixed(3);
+        el.style.transform = `translate3d(0, ${((1 - e) * 10).toFixed(2)}px, 0)`;
+      }
+    });
     // la linea: testa e coda sono percentuali della sua lunghezza
     sweep.style.clipPath = `inset(0 ${((1 - state.sweepHead) * 100).toFixed(2)}% 0 ${(state.sweepTail * 100).toFixed(2)}%)`;
     engine.render();
@@ -83,6 +103,7 @@ export async function start(caps: Capabilities) {
   // Riscaldamento: shader e geometrie vengono compilati e caricati sulla GPU ora, con la pagina ancora
   // nel Forest iniziale, così nessun scatto arriva all'incastro (9,2 s) o al lampo (10,2 s).
   stage.forceVisible();
+  backdrop.forceVisible();
   await engine.warmup();
   engine.render();
   draw();
@@ -114,6 +135,6 @@ export async function start(caps: Capabilities) {
   hooks.play = () => {
     playing = true;
   };
-  hooks.state = () => ({ t: state.t, bump: [...state.bump], sweep: [state.sweepHead, state.sweepTail], letters: [...state.letters] });
+  hooks.state = () => ({ t: state.t, roll: [...state.roll], bgIn: [...state.bgIn], bgSlide: [...state.bgSlide], sweep: [state.sweepHead, state.sweepTail], letters: [...state.letters] });
   hooks.ready = true;
 }

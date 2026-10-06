@@ -3,12 +3,12 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <title>Deploiable · We deploy AI. Measurably.</title>
-    <meta name="description" content="We deploy AI. Measurably." />
+    <title>Deploiable · Make AI deployable.</title>
+    <meta name="description" content="Make AI deployable. We find where AI pays off, build the product, and measure the result. Launching October 2026." />
     <meta name="theme-color" content="#10261B" />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="Deploiable · We deploy AI. Measurably." />
-    <meta property="og:description" content="We deploy AI. Measurably." />
+    <meta property="og:title" content="Deploiable · Make AI deployable." />
+    <meta property="og:description" content="We find where AI pays off, build the product, and measure the result. Launching October 2026." />
     <meta property="og:image" content="%VITE_SITE_URL%og.jpg" />
     <meta property="og:url" content="%VITE_SITE_URL%" />
     <meta name="twitter:card" content="summary_large_image" />
@@ -17,30 +17,36 @@
     <noscript>
       <style>
         .line { transform: none !important; }
+        .sub, .outro > * { opacity: 1 !important; }
+        .outro { visibility: visible !important; }
       </style>
     </noscript>
   </head>
   <body>
     <canvas class="gl" aria-hidden="true"></canvas>
     <i class="sweep" aria-hidden="true"></i>
+    <!-- supergrafica della versione statica (in quella 3D la disegna il canvas) -->
+    <!-- symbol:supergraphic -->
     <main class="stack">
       <!-- Il segnaposto del logo: nella versione 3D la camera finale lo inquadra esattamente qui;
            nella versione statica è il logo ufficiale. -->
       <div class="logo-slot"><!-- logo:static-logo --></div>
       <h1 class="claim">
-        <span class="mask"><span class="line line--light" lang="en">We deploy AI.</span></span>
-        <span class="mask"><span class="line line--black" lang="en">Measurably.</span></span>
+        <span class="mask"><span class="line line--light" lang="en">Make AI</span></span>
+        <span class="mask"><span class="line line--black" lang="en">deployable.</span></span>
       </h1>
+      <p class="sub" lang="en">We find where AI pays off, build the product, and measure the result.</p>
       <div class="outro" lang="en">
-        <p class="soon"><i class="soon-dot" aria-hidden="true"></i>Coming soon</p>
+        <p class="soon"><i class="soon-dot" aria-hidden="true"></i>Launching October 2026</p>
         <form class="signup" novalidate>
           <label class="sr-only" for="signup-email">Email</label>
-          <input id="signup-email" name="email" type="email" required autocomplete="email" inputmode="email" spellcheck="false" placeholder="your@email.com" />
+          <input id="signup-email" name="email" type="email" required autocomplete="email" inputmode="email" enterkeyhint="send" spellcheck="false" placeholder="your@email.com" />
           <!-- trappola per i bot: invisibile alle persone -->
           <input class="hp" name="_gotcha" type="text" tabindex="-1" autocomplete="off" aria-hidden="true" />
-          <button type="submit">Notify me</button>
+          <button type="submit">Claim your spot<svg class="arrow" viewBox="0 0 12 12" aria-hidden="true"><path d="M1 6h9M6.5 2.5 10 6l-3.5 3.5" /></svg></button>
         </form>
-        <p class="signup-note" role="status" aria-live="polite">Be the first to know when we launch. No spam.</p>
+        <p class="signup-done" aria-hidden="true"><svg class="check" viewBox="0 0 12 12"><path d="M2 6.3 4.8 9 10 3" /></svg>You’re on the list</p>
+        <p class="signup-note" role="status" aria-live="polite">The first 20 companies get a free AI process review.</p>
       </div>
     </main>
 

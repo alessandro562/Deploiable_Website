@@ -26,6 +26,8 @@ export interface Palette {
   rim: string; // bordo controluce
   rimAmount: number;
   cap: string; // nessun pixel supera questo colore
+  ambient?: number; // luce delle pareti: base * (ambient + diffuse * luce)
+  diffuse?: number;
 }
 
 export const PALETTES: Record<PaletteName, Palette> = {
@@ -52,5 +54,35 @@ export const PALETTES: Record<PaletteName, Palette> = {
     rim: COLORS.limeDeep,
     rimAmount: 0.18,
     cap: COLORS.lime,
+  },
+};
+
+// Supergrafica tono su tono (brand book, 05 · Elementi grafici): il simbolo ingrandito dietro ai contenuti.
+// Lime Deep su Lime ("texture leggera"), Pine su Forest. Il contrasto del testo non cambia.
+export const TONE_PALETTES: Record<PaletteName, Palette> = {
+  // Pareti solo nella famiglia del Lime, con poca luce: il rilievo si legge come carta incisa, non come muro.
+  lime: {
+    background: COLORS.lime,
+    front: COLORS.limeDeep,
+    top: COLORS.lime,
+    bottom: COLORS.limeDeep,
+    side: [COLORS.limeDeep, COLORS.lime, 0.5],
+    back: [COLORS.limeDeep, COLORS.lime, 0.3],
+    rim: COLORS.lime,
+    rimAmount: 0,
+    cap: COLORS.lime,
+    ambient: 0.9,
+    diffuse: 0.16,
+  },
+  forest: {
+    background: COLORS.forest,
+    front: COLORS.pine,
+    top: COLORS.pine,
+    bottom: COLORS.forest,
+    side: [COLORS.pine, COLORS.forest, 0.35],
+    back: [COLORS.pine, COLORS.forest, 0.5],
+    rim: COLORS.moss,
+    rimAmount: 0.15,
+    cap: COLORS.moss,
   },
 };

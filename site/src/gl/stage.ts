@@ -97,8 +97,8 @@ export class Stage {
       const p = s.bars[i];
       const { mesh, geo, mat } = this.bars[i];
       mesh.visible = p.sx > 0.002 && p.sy > 0.002;
-      mesh.position.set(p.x, p.y + s.bump[i], p.z);
-      mesh.rotation.set(p.rx, p.ry, p.rz);
+      mesh.position.set(p.x, p.y, p.z);
+      mesh.rotation.set(p.rx + s.roll[i], p.ry, p.rz);
       mesh.scale.set(Math.max(p.sx, 1e-4), Math.max(p.sy, 1e-4), 1);
       geo.update({ lift: p.lift, extend: 0, front: 1 });
       mat.uniforms.uCam.value.copy(camera.position);

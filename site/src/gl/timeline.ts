@@ -19,3 +19,7 @@ export const TIMES = {
   linea_finale: 4.8, // la linea a 8° attraversa lo schermo
   logo: 5.1, // il naming si sta aprendo
 };
+
+/** Dopo la fine, tutto continua a muoversi in un ciclo di LOOP_PERIOD secondi che parte a LOOP_START. */
+export const LOOP_PERIOD = 5;
+export const LOOP_START = DURATION + 1.2;

@@ -11,7 +11,7 @@ test.describe('versione statica', () => {
     expect(await page.evaluate(() => window.__DEPLOIABLE__!.mode)).toBe('static');
     expect(scripts.some((u) => /\/app-.*\.js/.test(u))).toBe(false);
     await expect(page.locator('.logo-slot svg')).toBeVisible();
-    await expect(page.getByRole('heading', { name: /We deploy AI/ })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /Make AI/ })).toBeVisible();
     // il logo completo sta sopra la frase, e tutto dentro lo schermo
     const sym = (await page.locator('.logo-slot svg').boundingBox())!;
     const txt = (await page.locator('.claim').boundingBox())!;
@@ -41,6 +41,6 @@ test('senza WebGL si usa la versione statica', async ({ browser }) => {
 test('versione statica: coming soon e modulo visibili', async ({ page }) => {
   await page.goto('/?mode=static');
   await expect(page.locator('.outro')).toBeVisible();
-  await expect(page.locator('.soon')).toHaveText(/Coming soon/i);
+  await expect(page.locator('.soon')).toHaveText(/Launching October 2026/i);
   await expect(page.locator('#signup-email')).toBeVisible();
 });

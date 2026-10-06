@@ -5,8 +5,8 @@ const ENDPOINT: string | undefined = import.meta.env.VITE_SIGNUP_ENDPOINT;
 
 const MESSAGES = {
   invalid: 'Please enter a valid email address.',
-  sending: 'Adding you to the list…',
-  done: 'You’re on the list. See you at launch.',
+  sending: 'Saving your spot…',
+  done: 'We’ll be in touch before launch.',
   error: 'Something went wrong. Please try again.',
   closed: 'Sign-ups open very soon.',
 };
@@ -19,6 +19,7 @@ export function initSignup() {
   const email = form.querySelector<HTMLInputElement>('input[type="email"]')!;
   const trap = form.querySelector<HTMLInputElement>('.hp')!;
   const say = (text: string) => (note.textContent = text);
+  const DEFAULT_NOTE = note.textContent ?? '';
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -26,11 +27,12 @@ export function initSignup() {
     email.value = email.value.trim();
     if (!email.checkValidity()) {
       email.setAttribute('aria-invalid', 'true');
-      say(MESSAGES.invalid);
+      fail(MESSAGES.invalid);
       email.focus();
       return;
     }
     email.removeAttribute('aria-invalid');
+    if (outro.dataset.state === 'error') delete outro.dataset.state;
     // un bot ha riempito il campo nascosto: lo si saluta come un iscritto, senza inviare nulla
     if (trap.value) return finish();
 
@@ -44,14 +46,29 @@ export function initSignup() {
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       finish();
     } catch {
-      say(MESSAGES.error);
+      fail(MESSAGES.error);
     } finally {
       form.removeAttribute('aria-busy');
     }
   });
 
+  // Errore: bordo più spesso e una vibrazione (CSS). Ritoccando l'email si torna allo stato normale.
+  function fail(text: string) {
+    delete outro!.dataset.state;
+    void outro!.offsetWidth; // fa ripartire la vibrazione anche al secondo errore di fila
+    outro!.dataset.state = 'error';
+    say(text);
+  }
+  email.addEventListener('input', () => {
+    if (outro.dataset.state !== 'error') return;
+    delete outro.dataset.state;
+    email.removeAttribute('aria-invalid');
+    say(DEFAULT_NOTE);
+  });
+
   function finish() {
     outro!.dataset.state = 'done';
+    outro!.querySelector('.signup-done')?.removeAttribute('aria-hidden');
     say(MESSAGES.done);
   }
 }
