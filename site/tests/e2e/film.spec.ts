@@ -301,7 +301,7 @@ test('iscrizione: email non valida, invio riuscito, errore del servizio', async 
   const note = page.locator('.signup-note');
   await page.fill('#signup-email', 'non-una-email');
   await page.click('.signup button');
-  await expect(note).toHaveText(/valid email/);
+  await expect(note).toHaveText(/email valido/);
   // errore: bordo più spesso (ombra interna da 2,5 px) e nota in Forest pieno
   await expect(page.locator('.outro')).toHaveAttribute('data-state', 'error');
   await expect.poll(() => page.locator('.signup').evaluate((el) => getComputedStyle(el).boxShadow)).toContain('2.5px');
@@ -319,12 +319,12 @@ test('iscrizione: email non valida, invio riuscito, errore del servizio', async 
   await page.evaluate(() => (document.querySelector<HTMLFormElement>('.signup')!.dataset.endpoint = 'https://signup.test/f'));
   await page.fill('#signup-email', ' ciao@deploiable.com ');
   await page.click('.signup button');
-  await expect(note).toHaveText(/went wrong/);
+  await expect(note).toHaveText(/non ha funzionato/);
   status = 200;
   await page.click('.signup button');
   await expect(page.locator('.signup-done')).toBeVisible();
-  await expect(page.locator('.signup-done')).toHaveText(/on the list/);
-  await expect(note).toHaveText(/in touch before launch/);
+  await expect(page.locator('.signup-done')).toHaveText(/Sei in lista/);
+  await expect(note).toHaveText(/prima del lancio/);
   expect(body).toContain('ciao@deploiable.com');
   await expect(page.locator('.signup')).toBeHidden();
 });

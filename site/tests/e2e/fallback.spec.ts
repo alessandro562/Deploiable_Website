@@ -41,6 +41,6 @@ test('senza WebGL si usa la versione statica', async ({ browser }) => {
 test('versione statica: coming soon e modulo visibili', async ({ page }) => {
   await page.goto('/?mode=static');
   await expect(page.locator('.outro')).toBeVisible();
-  await expect(page.locator('.soon')).toHaveText(/Launching October 2026/i);
+  await expect(page.locator('.soon')).toHaveText(/Lancio · Novembre 2026/i);
   await expect(page.locator('#signup-email')).toBeVisible();
 });

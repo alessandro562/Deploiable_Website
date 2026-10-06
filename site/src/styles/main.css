@@ -153,6 +153,44 @@ p {
   will-change: transform;
 }
 
+/* ---------- Lingua: IT / EN, discreto in alto a destra ---------- */
+.lang {
+  position: fixed;
+  z-index: 20;
+  top: max(10px, env(safe-area-inset-top));
+  right: max(10px, env(safe-area-inset-right));
+  display: flex;
+  align-items: center;
+  font: 500 12px/1 var(--sans);
+  letter-spacing: 0.14em;
+  color: var(--ink-soft);
+}
+.lang button {
+  /* area di tocco 44×44 anche se la scritta è piccola */
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 6px;
+  border: 0;
+  background: none;
+  font: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+  cursor: pointer;
+  transition: color 0.16s ease;
+}
+.lang button[aria-pressed='true'] {
+  color: var(--ink-strong);
+  font-weight: 900;
+}
+@media (hover: hover) {
+  .lang button:hover {
+    color: var(--ink-strong);
+  }
+}
+.lang span {
+  opacity: 0.6;
+}
+
 /* ---------- Sottotitolo ---------- */
 /* Dice per chi e cosa si ottiene: il metodo in tre verbi. Più vicino alla frase che al blocco iscrizione. */
 .sub {

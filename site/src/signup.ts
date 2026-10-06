@@ -3,13 +3,7 @@
 // rispondono in JSON a "Accept: application/json". Senza indirizzo il modulo non finge di funzionare: lo dice.
 const ENDPOINT: string | undefined = import.meta.env.VITE_SIGNUP_ENDPOINT;
 
-const MESSAGES = {
-  invalid: 'Please enter a valid email address.',
-  sending: 'Saving your spot…',
-  done: 'We’ll be in touch before launch.',
-  error: 'Something went wrong. Please try again.',
-  closed: 'Sign-ups open very soon.',
-};
+import { onLangChange, t, type Key } from './i18n';
 
 export function initSignup() {
   const outro = document.querySelector<HTMLElement>('.outro');
@@ -18,8 +12,13 @@ export function initSignup() {
   if (!outro || !form || !note) return;
   const email = form.querySelector<HTMLInputElement>('input[type="email"]')!;
   const trap = form.querySelector<HTMLInputElement>('.hp')!;
-  const say = (text: string) => (note.textContent = text);
-  const DEFAULT_NOTE = note.textContent ?? '';
+  // la nota mostra un messaggio del dizionario: cambiando lingua si ritraduce quello corrente
+  let shown: Key = 'form.offer';
+  const say = (key: Key) => {
+    shown = key;
+    note.textContent = t(key);
+  };
+  onLangChange(() => say(shown));
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -27,7 +26,7 @@ export function initSignup() {
     email.value = email.value.trim();
     if (!email.checkValidity()) {
       email.setAttribute('aria-invalid', 'true');
-      fail(MESSAGES.invalid);
+      fail('msg.invalid');
       email.focus();
       return;
     }
@@ -37,38 +36,38 @@ export function initSignup() {
     if (trap.value) return finish();
 
     const endpoint = form.dataset.endpoint || ENDPOINT;
-    if (!endpoint) return say(MESSAGES.closed);
+    if (!endpoint) return say('msg.closed');
 
     form.setAttribute('aria-busy', 'true');
-    say(MESSAGES.sending);
+    say('msg.sending');
     try {
       const res = await fetch(endpoint, { method: 'POST', body: new FormData(form), headers: { Accept: 'application/json' } });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       finish();
     } catch {
-      fail(MESSAGES.error);
+      fail('msg.error');
     } finally {
       form.removeAttribute('aria-busy');
     }
   });
 
   // Errore: bordo più spesso e una vibrazione (CSS). Ritoccando l'email si torna allo stato normale.
-  function fail(text: string) {
+  function fail(key: Key) {
     delete outro!.dataset.state;
     void outro!.offsetWidth; // fa ripartire la vibrazione anche al secondo errore di fila
     outro!.dataset.state = 'error';
-    say(text);
+    say(key);
   }
   email.addEventListener('input', () => {
     if (outro.dataset.state !== 'error') return;
     delete outro.dataset.state;
     email.removeAttribute('aria-invalid');
-    say(DEFAULT_NOTE);
+    say('form.offer');
   });
 
   function finish() {
     outro!.dataset.state = 'done';
     outro!.querySelector('.signup-done')?.removeAttribute('aria-hidden');
-    say(MESSAGES.done);
+    say('msg.done');
   }
 }
