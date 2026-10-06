@@ -470,7 +470,7 @@ test('prova sociale: riga di credibilità e loghi dei clienti in loop sotto il m
   page.on('response', (r) => r.url().includes('/assets/clients/') && logoResponses.push(r.status()));
   await openFilm(page, '', 'high');
   await seek(page, END);
-  await expect(page.locator('.proof-line')).toHaveText('Dal 2021 al fianco di PMI, corporate e startup');
+  await expect(page.locator('.proof-line')).toHaveText('70+ clienti dal 2021');
   // quattro loghi con il loro nome (la seconda copia della traccia è nascosta ai lettori di schermo)
   const named = page.getByRole('img', { name: /Comtel|Braga Moro|Marchiani|Junker/ });
   await expect(named).toHaveCount(4);
@@ -487,7 +487,7 @@ test('prova sociale: riga di credibilità e loghi dei clienti in loop sotto il m
   expect(logoResponses.length).toBeGreaterThan(0);
   expect(logoResponses.every((s) => s === 200)).toBe(true);
   await page.click('[data-lang="en"]');
-  await expect(page.locator('.proof-line')).toHaveText('Since 2021, working with SMEs, corporates and startups');
+  await expect(page.locator('.proof-line')).toHaveText('70+ clients since 2021');
 });
 
 test('macchina da scrivere: "deployable." si cancella e si riscrive in ciclo, senza spostare la riga', async ({ page }) => {
