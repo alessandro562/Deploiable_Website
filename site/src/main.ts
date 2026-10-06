@@ -19,6 +19,9 @@ function startStatic(reason?: string) {
 }
 
 if (caps.mode === 'webgl') {
+  // l'intro parte sempre dall'alto: il browser non deve ripristinare lo scorrimento della visita precedente
+  if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+  if (!location.hash) scrollTo(0, 0);
   root.dataset.mode = 'webgl';
   root.classList.add('is-webgl'); // subito: il canvas Forest copre la pagina mentre il 3D si prepara
   import('./app')

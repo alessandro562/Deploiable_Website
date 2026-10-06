@@ -521,6 +521,21 @@ test('su telefono la supergrafica dietro ai testi non toglie contrasto (≥ 4,5:
   }
 });
 
+test('apertura: si parte dall\'alto e il vetro dell\'header non compare durante l\'intro', async ({ page }) => {
+  await openFilm(page, '', 'high');
+  await page.evaluate(() => scrollTo(0, 400));
+  await page.reload();
+  await page.waitForFunction(() => window.__DEPLOIABLE__?.ready === true);
+  expect(await page.evaluate(() => scrollY)).toBe(0);
+  // anche scorrendo durante l'intro il vetro resta spento
+  await seek(page, 2);
+  await page.evaluate(() => scrollTo(0, 400));
+  await page.waitForTimeout(400);
+  expect(await page.evaluate(() => getComputedStyle(document.querySelector('.top')!, '::before').opacity)).toBe('0');
+  await seek(page, END);
+  await expect.poll(() => page.evaluate(() => getComputedStyle(document.querySelector('.top')!, '::before').opacity)).toBe('1');
+});
+
 test('header fisso: in cima trasparente col logo 3D, scorrendo barra di vetro col logo SVG', async ({ page }) => {
   await openFilm(page, '', 'high');
   await seek(page, END);
