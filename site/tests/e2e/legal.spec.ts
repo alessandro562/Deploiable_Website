@@ -13,6 +13,9 @@ test('footer: dati societari WDA srl e link Privacy, nelle due lingue', async ({
   await expect(foot.locator('a')).toHaveAttribute('href', 'privacy.html');
   await page.click('[data-lang="en"]');
   await expect(foot).toContainText('Deploiable is a trademark of WDA srl');
+  await expect(foot).toContainText('Via Marsala 29/H, 00185 Rome (RM), Italy');
+  // ogni dato con la sua etichetta, niente più riga unica
+  await expect(foot.locator('dt')).toHaveText(['VAT no. & tax code', 'Certified email', 'Registered office']);
 });
 
 test('privacy.html: bozza bilingue nello stile della landing, lingua condivisa con la sessione', async ({ page }) => {
