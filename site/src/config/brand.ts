@@ -87,3 +87,19 @@ export const TONE_PALETTES: Record<PaletteName, Palette> = {
     cap: COLORS.moss,
   },
 };
+
+// Supergrafica su telefono, dietro ai testi: tono su tono leggerissimo. Le tinte sono scelte perché anche il testo
+// secondario più chiaro (#3F5A46) resti ≥ 4,5:1 sopra le parti più scure del simbolo (faccia 5,4:1, pareti ≥ 4,8:1).
+export const TONE_SOFT_LIME: Palette = {
+  background: COLORS.lime,
+  front: '#BDE94C',
+  top: '#BDE94C',
+  bottom: '#B4DF4D',
+  side: ['#B6E14D', '#B6E14D', 0],
+  back: ['#B6E14D', '#B6E14D', 0],
+  rim: COLORS.lime,
+  rimAmount: 0,
+  cap: COLORS.lime,
+  ambient: 0.98,
+  diffuse: 0.05,
+};

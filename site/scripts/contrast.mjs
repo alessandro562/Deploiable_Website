@@ -32,7 +32,7 @@ for (const path of pages) {
       return getComputedStyle(document.body).backgroundColor;
     };
     const out = [];
-    const sel = '.lang button, .sub, .soon, .signup-row input, .signup button, .consent-text, .consent a, .signup-note, .proof-line, .client-ph, .foot p, .foot a, .claim .line, .doc-body p, .doc-body h2, .doc-draft, .doc-updated, .doc-back a';
+    const sel = '.lang button, .sub, .soon, .signup-row input, .signup button, .consent-text, .consent a, .signup-note, .proof-line, .client-ph, .foot p, .foot dt, .foot dd, .foot a, .claim .line, .doc-body p, .doc-body h2, .doc-draft, .doc-updated, .doc-back a';
     for (const el of document.querySelectorAll(sel)) {
       const cs = getComputedStyle(el);
       const fg = cs.color;

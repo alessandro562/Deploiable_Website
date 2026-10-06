@@ -118,9 +118,11 @@ test('supergrafica: entra con la linea del finale e continua a muoversi, Lime De
   expect((await st()).bgIn).toEqual([0, 0, 0]);
   await seek(page, END);
   expect((await st()).bgIn.every((v) => v === 1)).toBe(true);
-  // dove non c'è spazio libero dai testi (telefono in verticale) la supergrafica non compare affatto
-  if (!(await page.evaluate(() => window.__DEPLOIABLE__!.backdrop!().visible))) {
-    expect(page.viewportSize()!.width).toBeLessThan(700);
+  // su telefono in verticale non c'è spazio libero dai testi: la supergrafica va dietro, in tinta leggerissima
+  const bd = await page.evaluate(() => window.__DEPLOIABLE__!.backdrop!());
+  expect(bd.visible).toBe(true);
+  if (bd.soft) {
+    expect(page.viewportSize()!.width).toBeLessThanOrEqual(820);
     return;
   }
   // il fondo contiene Lime Deep esatto (la faccia frontale della supergrafica) e Lime esatto
@@ -441,6 +443,13 @@ test('la supergrafica non tocca mai un testo, a nessuna larghezza', async ({ pag
     for (const t of [END, LOOP_START + LOOP_PERIOD / 2 + 0.7]) {
       await seek(page, t);
       const sg = await page.evaluate(() => window.__DEPLOIABLE__!.backdrop!());
+      // su schermi stretti va dietro ai testi in modalità soft (verificata dal test sul contrasto qui sotto)
+      if (sg.soft) {
+        expect(w <= 820 || h > w, `${w}x${h}: soft solo su schermi stretti`).toBe(true);
+        expect(sg.visible).toBe(true);
+        continue;
+      }
+      if (w >= 1024) expect(sg.visible, `${w}x${h}: visibile su desktop`).toBe(true);
       if (!sg.visible) continue;
       const texts = await page.evaluate(() =>
         Array.from(document.querySelectorAll<HTMLElement>('.lang, .claim .line, .sub, .soon, .offer, .signup, .signup-note, .proof-line, .clients'))
@@ -461,6 +470,47 @@ test('la supergrafica non tocca mai un testo, a nessuna larghezza', async ({ pag
             if (Math.abs(png.data[i] - LIME_DEEP[0]) <= 3 && Math.abs(png.data[i + 1] - LIME_DEEP[1]) <= 3 && Math.abs(png.data[i + 2] - LIME_DEEP[2]) <= 3) deep++;
           }
       expect(deep, `${w}x${h} t=${t}: pixel Lime Deep sotto i testi`).toBe(0);
+    }
+  }
+});
+
+test('su telefono la supergrafica dietro ai testi non toglie contrasto (≥ 4,5:1 sui pixel)', async ({ page }) => {
+  test.setTimeout(120_000);
+  await openFilm(page, '', 'high');
+  const lum = (c: number[]) => {
+    const f = (v: number) => ((v /= 255) <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4);
+    return 0.2126 * f(c[0]) + 0.7152 * f(c[1]) + 0.0722 * f(c[2]);
+  };
+  const ratio = (a: number[], b: number[]) => {
+    const [x, y] = [lum(a), lum(b)].sort((m, n) => n - m);
+    return (x + 0.05) / (y + 0.05);
+  };
+  for (const [w, h] of [[390, 844], [360, 740]]) {
+    await page.setViewportSize({ width: w, height: h });
+    await page.waitForTimeout(150);
+    for (const t of [END, LOOP_START + LOOP_PERIOD / 2 + 0.7]) {
+      await seek(page, t);
+      expect((await page.evaluate(() => window.__DEPLOIABLE__!.backdrop!())).soft, `${w}x${h}`).toBe(true);
+      // colore di ogni testo e suo riquadro, poi si nascondono i testi per leggere il fondo sotto
+      const texts = await page.evaluate(() =>
+        Array.from(document.querySelectorAll<HTMLElement>('.claim .line, .sub, .soon, .offer, .consent-text, .proof-line')).map((el) => {
+          const r = el.getBoundingClientRect();
+          const c = getComputedStyle(el).color.match(/\d+/g)!.slice(0, 3).map(Number);
+          return { sel: el.className, c, x0: r.left, y0: r.top, x1: r.right, y1: r.bottom };
+        }),
+      );
+      await page.addStyleTag({ content: '.page, .page *, .top, .lang { visibility: hidden !important; }' });
+      const png = PNG.sync.read(await page.screenshot());
+      await page.evaluate(() => document.querySelectorAll('style').forEach((s) => s.textContent?.includes('visibility: hidden !important') && s.remove()));
+      for (const r of texts) {
+        let worst = 21;
+        for (let y = Math.max(0, Math.floor(r.y0)); y < Math.min(png.height, Math.ceil(r.y1)); y += 2)
+          for (let x = Math.max(0, Math.floor(r.x0)); x < Math.min(png.width, Math.ceil(r.x1)); x += 2) {
+            const i = (y * png.width + x) * 4;
+            worst = Math.min(worst, ratio(r.c, [png.data[i], png.data[i + 1], png.data[i + 2]]));
+          }
+        expect(worst, `${w}x${h} t=${t} ${r.sel}`).toBeGreaterThanOrEqual(4.5);
+      }
     }
   }
 });

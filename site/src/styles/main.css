@@ -682,25 +682,51 @@ p {
 }
 
 /* ---------- Footer: dati societari e privacy, discreto ---------- */
+/* Footer: dati societari in colonne con etichetta, separati dalla pagina da un filo sottile */
 .foot {
   position: relative;
   z-index: 10;
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 8px 32px;
-  padding: 16px var(--pad-x) max(16px, env(safe-area-inset-bottom));
-  font-size: 11px;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: start;
+  gap: 20px 48px;
+  margin: 0 var(--pad-x);
+  padding: 24px 0 max(24px, env(safe-area-inset-bottom));
+  border-top: 1px solid color-mix(in srgb, var(--ink-strong) 16%, transparent);
+  font-size: 12px;
   font-weight: 500;
-  line-height: 1.55;
-  letter-spacing: 0.01em;
+  line-height: 1.5;
   color: var(--ink-soft);
 }
-.foot-legal {
-  max-width: 1000px;
+.foot p,
+.foot dl,
+.foot dd {
+  margin: 0;
+}
+.foot-mark,
+.foot dd {
+  color: var(--ink-strong);
+}
+.foot-copy {
+  margin-top: 2px;
+}
+.foot-data {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px 48px;
+}
+.foot dt {
+  margin-bottom: 2px;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.foot dd {
+  font-variant-numeric: tabular-nums;
 }
 .foot-link {
-  flex: none;
+  justify-self: end;
   color: var(--ink-soft);
   text-decoration: underline;
   text-decoration-color: color-mix(in srgb, currentColor 45%, transparent);
@@ -714,11 +740,28 @@ p {
     text-decoration-color: currentColor;
   }
 }
+@media (max-width: 980px) {
+  .foot {
+    grid-template-columns: 1fr auto;
+  }
+  .foot-data {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    justify-content: flex-start;
+  }
+}
 @media (max-width: 640px) {
   .foot {
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
+    gap: 18px 24px;
+    padding-top: 20px;
+  }
+  .foot-data {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 14px 32px;
+  }
+  .foot-addr {
+    grid-column: 1 / -1;
   }
 }
 
