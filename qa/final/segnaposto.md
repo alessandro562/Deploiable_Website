@@ -1,9 +1,9 @@
 # Segnaposto da compilare prima della pubblicazione
 
 ## Landing (`site/index.html`)
-- **Loghi clienti** `[CLIENTE_1]` … `[CLIENTE_5]`: salvare i file in `site/public/assets/clients/` (SVG o PNG trasparente)
-  e sostituire ogni `<span class="client-ph">` con `<img src="assets/clients/nome.svg" alt="Nome cliente" loading="lazy" />`.
-  Servono le autorizzazioni scritte all'uso del nome/logo.
+- **Loghi clienti**: online Comtel, Braga Moro, Marchiani, Junker (servono le autorizzazioni scritte all'uso).
+  **Green Stone** è pronto in `site/public/assets/clients/green-stone.svg` ma non pubblicato (NDA nel brief):
+  da aggiungere solo con autorizzazione (istruzioni nel commento sopra i loghi in `index.html`).
 
 ## Invio del modulo (configurazione, non testo)
 - **`SIGNUP_ENDPOINT`**: URL della web app Google Apps Script (istruzioni in `site/integrations/apps-script/README.md`).
@@ -26,5 +26,5 @@
 - Banner "BOZZA — da validare legalmente prima della pubblicazione": da togliere solo dopo la validazione.
 
 ## Costanti da tenere aggiornate
-- Mese di lancio: `LAUNCH` in `site/src/i18n.ts` (oggi Novembre 2026 / November 2026).
+- Etichetta di lancio: `LAUNCH` in `site/src/i18n.ts` (oggi "Coming soon", senza data).
 - Offerta "prime 20 aziende": chiave `form.offer` in `site/src/i18n.ts`.

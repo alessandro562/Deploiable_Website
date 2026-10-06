@@ -443,7 +443,7 @@ test('la supergrafica non tocca mai un testo, a nessuna larghezza', async ({ pag
       const sg = await page.evaluate(() => window.__DEPLOIABLE__!.backdrop!());
       if (!sg.visible) continue;
       const texts = await page.evaluate(() =>
-        Array.from(document.querySelectorAll<HTMLElement>('.lang, .claim .line, .sub, .soon, .signup, .signup-note, .proof-line, .client'))
+        Array.from(document.querySelectorAll<HTMLElement>('.lang, .claim .line, .sub, .soon, .offer, .signup, .signup-note, .proof-line, .clients'))
           .map((el) => el.getBoundingClientRect())
           .map((r) => ({ x0: r.left, y0: r.top + scrollY, x1: r.right, y1: r.bottom + scrollY })),
       );
@@ -465,15 +465,27 @@ test('la supergrafica non tocca mai un testo, a nessuna larghezza', async ({ pag
   }
 });
 
-test('prova sociale: riga di credibilità e cinque loghi sotto il modulo, nelle due lingue', async ({ page }) => {
+test('prova sociale: riga di credibilità e loghi dei clienti in loop sotto il modulo', async ({ page }) => {
+  const logoResponses: number[] = [];
+  page.on('response', (r) => r.url().includes('/assets/clients/') && logoResponses.push(r.status()));
   await openFilm(page, '', 'high');
   await seek(page, END);
   await expect(page.locator('.proof-line')).toHaveText('Dal 2021 al fianco di PMI, corporate e startup');
-  await expect(page.locator('.clients .client')).toHaveCount(5);
+  // quattro loghi con il loro nome (la seconda copia della traccia è nascosta ai lettori di schermo)
+  const named = page.getByRole('img', { name: /Comtel|Braga Moro|Marchiani|Junker/ });
+  await expect(named).toHaveCount(4);
+  await expect(page.locator('.clients')).not.toContainText('[CLIENTE_');
+  await expect(page.locator('.clients')).not.toContainText(/green ?stone/i);
   const form = (await page.locator('.signup').boundingBox())!;
   const proof = (await page.locator('.proof').boundingBox())!;
   expect(proof.y).toBeGreaterThan(form.y + form.height);
-  expect(await page.locator('.proof').evaluate((el) => getComputedStyle(el).opacity)).toBe('1');
+  // la traccia scorre
+  const x = () => page.locator('.clients-track').first().evaluate((el) => el.getBoundingClientRect().x);
+  const x0 = await x();
+  await page.waitForTimeout(600);
+  expect(Math.abs((await x()) - x0)).toBeGreaterThan(5);
+  expect(logoResponses.length).toBeGreaterThan(0);
+  expect(logoResponses.every((s) => s === 200)).toBe(true);
   await page.click('[data-lang="en"]');
   await expect(page.locator('.proof-line')).toHaveText('Since 2021, working with SMEs, corporates and startups');
 });
@@ -482,8 +494,8 @@ test('macchina da scrivere: "deployable." si cancella e si riscrive in ciclo, se
   await openFilm(page, '', 'high');
   const st = () => page.evaluate(() => window.__DEPLOIABLE__!.state!());
   const visible = () => page.locator('.tw .ch:not(.off)').count();
-  // il titolo resta "Make AI deployable." per i lettori di schermo, qualunque cosa mostri la macchina da scrivere
-  await expect(page.getByRole('heading', { level: 1 })).toHaveAccessibleName(/Make AI\s*deployable\./);
+  // il titolo resta "We make AI deployable." per i lettori di schermo, qualunque cosa mostri la macchina da scrivere
+  await expect(page.getByRole('heading', { level: 1 })).toHaveAccessibleName(/We make AI\s*deployable\./);
   await seek(page, END);
   expect(await visible()).toBe(11);
   const full = (await page.locator('.tw').boundingBox())!;

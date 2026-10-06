@@ -3,12 +3,12 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <title>Deploiable · Make AI deployable.</title>
-    <meta name="description" content="Make AI deployable. Troviamo dove l’AI ripaga, costruiamo il prodotto e misuriamo il risultato. Lancio a novembre 2026." data-i18n-attr="content:meta.description" />
+    <title>Deploiable · We make AI deployable.</title>
+    <meta name="description" content="We make AI deployable. Troviamo dove l’AI ripaga, costruiamo il prodotto e misuriamo il risultato. Coming soon." data-i18n-attr="content:meta.description" />
     <meta name="theme-color" content="#10261B" />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="Deploiable · Make AI deployable." data-i18n-attr="content:meta.title" />
-    <meta property="og:description" content="Troviamo dove l’AI ripaga, costruiamo il prodotto e misuriamo il risultato. Lancio a novembre 2026." data-i18n-attr="content:og.description" />
+    <meta property="og:title" content="Deploiable · We make AI deployable." data-i18n-attr="content:meta.title" />
+    <meta property="og:description" content="Troviamo dove l’AI ripaga, costruiamo il prodotto e misuriamo il risultato. Coming soon." data-i18n-attr="content:og.description" />
     <meta property="og:locale" content="it_IT" />
     <meta property="og:locale:alternate" content="en_GB" />
     <meta property="og:image" content="%VITE_SITE_URL%og.jpg" />
@@ -43,12 +43,12 @@
     <main class="page">
       <section class="hero">
         <h1 class="claim">
-          <span class="mask"><span class="line line--light" lang="en">Make AI</span></span>
+          <span class="mask"><span class="line line--light" lang="en">We make AI</span></span>
           <span class="mask"><span class="line line--black" lang="en">deployable.</span></span>
         </h1>
         <p class="sub" data-i18n="sub">Troviamo dove l’AI ripaga, costruiamo il prodotto e misuriamo il risultato.</p>
         <div class="outro">
-          <p class="soon"><i class="soon-dot" aria-hidden="true"></i><span data-i18n="launch">Lancio · Novembre 2026</span></p>
+          <p class="soon"><i class="soon-dot" aria-hidden="true"></i><span data-i18n="launch" lang="en">Coming soon</span></p>
           <p class="offer" data-i18n="form.offer">Le prime 20 aziende ricevono una AI process review gratuita.</p>
           <form class="signup" novalidate>
             <div class="signup-row">
@@ -71,18 +71,27 @@
           <!-- messaggi del modulo (errori, avvisi, conferma): vuoto finché non serve -->
           <p class="signup-note" role="status" aria-live="polite"></p>
         </div>
-        <!-- Prova sociale. Per mettere un logo vero: salvare il file in public/assets/clients/ (SVG o PNG, su fondo
-             trasparente) e sostituire lo <span> segnaposto con
-             <img src="assets/clients/nome.svg" alt="Nome cliente" loading="lazy" />. Il colore lo uniforma il CSS. -->
+        <!-- Prova sociale: loghi dei clienti in scorrimento continuo, monocromi nel verde del brand (il file fa da
+             maschera, il colore lo dà il CSS: va bene qualsiasi logo su fondo trasparente, anche bianco).
+             Per aggiungerne uno: file in public/assets/clients/, poi un <li> in entrambe le copie della traccia con
+             mask-image (url del file, nello stile in linea: così il percorso è relativo alla pagina), --ar
+             (larghezza/altezza) e --h (altezza ottica in px). -->
         <div class="proof">
           <p class="proof-line" data-i18n="proof.line">Dal 2021 al fianco di PMI, corporate e startup</p>
-          <ul class="clients">
-            <li class="client"><span class="client-ph">[CLIENTE_1]</span></li>
-            <li class="client"><span class="client-ph">[CLIENTE_2]</span></li>
-            <li class="client"><span class="client-ph">[CLIENTE_3]</span></li>
-            <li class="client"><span class="client-ph">[CLIENTE_4]</span></li>
-            <li class="client"><span class="client-ph">[CLIENTE_5]</span></li>
-          </ul>
+          <div class="clients">
+            <ul class="clients-track">
+              <li class="client"><span class="client-logo" role="img" aria-label="Comtel" style="-webkit-mask-image: url('assets/clients/comtel.svg'); mask-image: url('assets/clients/comtel.svg'); --ar: 4.0; --h: 22px"></span></li>
+              <li class="client"><span class="client-logo" role="img" aria-label="Braga Moro" style="-webkit-mask-image: url('assets/clients/braga-moro.png'); mask-image: url('assets/clients/braga-moro.png'); --ar: 5.556; --h: 17px"></span></li>
+              <li class="client"><span class="client-logo" role="img" aria-label="Marchiani" style="-webkit-mask-image: url('assets/clients/marchiani.png'); mask-image: url('assets/clients/marchiani.png'); --ar: 12.167; --h: 13px"></span></li>
+              <li class="client"><span class="client-logo" role="img" aria-label="Junker" style="-webkit-mask-image: url('assets/clients/junker.png'); mask-image: url('assets/clients/junker.png'); --ar: 3.476; --h: 25px"></span></li>
+            </ul>
+            <ul class="clients-track" aria-hidden="true">
+              <li class="client"><span class="client-logo" style="-webkit-mask-image: url('assets/clients/comtel.svg'); mask-image: url('assets/clients/comtel.svg'); --ar: 4.0; --h: 22px"></span></li>
+              <li class="client"><span class="client-logo" style="-webkit-mask-image: url('assets/clients/braga-moro.png'); mask-image: url('assets/clients/braga-moro.png'); --ar: 5.556; --h: 17px"></span></li>
+              <li class="client"><span class="client-logo" style="-webkit-mask-image: url('assets/clients/marchiani.png'); mask-image: url('assets/clients/marchiani.png'); --ar: 12.167; --h: 13px"></span></li>
+              <li class="client"><span class="client-logo" style="-webkit-mask-image: url('assets/clients/junker.png'); mask-image: url('assets/clients/junker.png'); --ar: 3.476; --h: 25px"></span></li>
+            </ul>
+          </div>
         </div>
       </section>
     </main>
