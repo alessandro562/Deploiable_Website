@@ -50,13 +50,23 @@
         <div class="outro">
           <p class="soon"><i class="soon-dot" aria-hidden="true"></i><span data-i18n="launch">Lancio · Novembre 2026</span></p>
           <form class="signup" novalidate>
-            <label class="sr-only" for="signup-email" data-i18n="form.email.label">Email</label>
-            <input id="signup-email" name="email" type="email" required autocomplete="email" inputmode="email" enterkeyhint="send" spellcheck="false" placeholder="nome@azienda.it" data-i18n-attr="placeholder:form.email.placeholder" />
+            <div class="signup-row">
+              <label class="sr-only" for="signup-email" data-i18n="form.email.label">Email aziendale</label>
+              <input id="signup-email" name="email" type="email" required autocomplete="email" inputmode="email" enterkeyhint="next" spellcheck="false" placeholder="nome@azienda.it" data-i18n-attr="placeholder:form.email.placeholder" />
+              <i class="signup-divider" aria-hidden="true"></i>
+              <label class="sr-only" for="signup-company" data-i18n="form.company.label">Azienda</label>
+              <input id="signup-company" name="company" type="text" required autocomplete="organization" enterkeyhint="send" placeholder="Azienda" data-i18n-attr="placeholder:form.company.placeholder" />
+              <button type="submit"><span data-i18n="form.submit">Prenota la tua AI process review</span><svg class="arrow" viewBox="0 0 12 12" aria-hidden="true"><path d="M1 6h9M6.5 2.5 10 6l-3.5 3.5" /></svg></button>
+            </div>
+            <label class="consent">
+              <input id="signup-consent" name="consent" type="checkbox" value="si" required />
+              <span class="consent-box" aria-hidden="true"><svg viewBox="0 0 12 12"><path d="M2 6.3 4.8 9 10 3" /></svg></span>
+              <span class="consent-text"><span data-i18n="form.consent.pre">Ho letto l’</span><a href="privacy.html" data-i18n="form.consent.link">informativa privacy</a><span data-i18n="form.consent.post"> e acconsento al trattamento dei dati per essere ricontattato.</span></span>
+            </label>
             <!-- trappola per i bot: invisibile alle persone -->
             <input class="hp" name="_gotcha" type="text" tabindex="-1" autocomplete="off" aria-hidden="true" />
-            <button type="submit"><span data-i18n="form.submit">Riserva il tuo posto</span><svg class="arrow" viewBox="0 0 12 12" aria-hidden="true"><path d="M1 6h9M6.5 2.5 10 6l-3.5 3.5" /></svg></button>
           </form>
-          <p class="signup-done" aria-hidden="true"><svg class="check" viewBox="0 0 12 12"><path d="M2 6.3 4.8 9 10 3" /></svg><span data-i18n="form.done">Sei in lista</span></p>
+          <p class="signup-done" aria-hidden="true"><svg class="check" viewBox="0 0 12 12"><path d="M2 6.3 4.8 9 10 3" /></svg><span data-i18n="form.done">Richiesta ricevuta.</span></p>
           <p class="signup-note" role="status" aria-live="polite" data-i18n="form.offer">Le prime 20 aziende ricevono una AI process review gratuita.</p>
         </div>
         <!-- Prova sociale. Per mettere un logo vero: salvare il file in public/assets/clients/ (SVG o PNG, su fondo

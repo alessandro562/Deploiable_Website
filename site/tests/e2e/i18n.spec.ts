@@ -49,7 +49,7 @@ test('i messaggi del modulo seguono la lingua', async ({ page }) => {
   await page.goto('/');
   await page.waitForFunction(() => window.__DEPLOIABLE__?.ready === true);
   await page.fill('#signup-email', 'sbagliata');
-  await page.click('.signup button');
+  await page.click('.signup button[type="submit"]');
   await expect(page.locator('.signup-note')).toHaveText(/email valido/);
   await page.click('[data-lang="en"]');
   await expect(page.locator('.signup-note')).toHaveText(/valid email/);

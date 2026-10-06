@@ -118,6 +118,11 @@ test('supergrafica: entra con la linea del finale e continua a muoversi, Lime De
   expect((await st()).bgIn).toEqual([0, 0, 0]);
   await seek(page, END);
   expect((await st()).bgIn.every((v) => v === 1)).toBe(true);
+  // dove non c'è spazio libero dai testi (telefono in verticale) la supergrafica non compare affatto
+  if (!(await page.evaluate(() => window.__DEPLOIABLE__!.backdrop!().visible))) {
+    expect(page.viewportSize()!.width).toBeLessThan(700);
+    return;
+  }
   // il fondo contiene Lime Deep esatto (la faccia frontale della supergrafica) e Lime esatto
   const vp = page.viewportSize()!;
   const png = PNG.sync.read(await page.screenshot());
@@ -298,38 +303,87 @@ test('coming soon e modulo: compaiono per ultimi, dentro lo schermo, sotto la fr
   expect(box.x + box.width).toBeLessThanOrEqual(vp.width);
 });
 
-test('iscrizione: email non valida, invio riuscito, errore del servizio', async ({ page }) => {
+test('richiesta review: validazione, avviso email personale, invio ad Apps Script, conferma', async ({ page }) => {
   await openFilm(page);
   await seek(page, END);
   const note = page.locator('.signup-note');
-  await page.fill('#signup-email', 'non-una-email');
-  await page.click('.signup button');
-  await expect(note).toHaveText(/email valido/);
-  // errore: bordo più spesso (ombra interna da 2,5 px) e nota in Forest pieno
-  await expect(page.locator('.outro')).toHaveAttribute('data-state', 'error');
-  await expect.poll(() => page.locator('.signup').evaluate((el) => getComputedStyle(el).boxShadow)).toContain('2.5px');
-  expect(await note.evaluate((el) => getComputedStyle(el).color)).toBe('rgb(16, 38, 27)');
-  // ritoccando l'email l'errore si spegne
-  await page.type('#signup-email', 'x');
-  await expect(page.locator('.outro')).not.toHaveAttribute('data-state', 'error');
+  const submit = () => page.click('.signup button[type="submit"]');
 
-  let status = 500;
+  // email non valida → errore sul campo email, con focus
+  await page.fill('#signup-email', 'non-una-email');
+  await submit();
+  await expect(note).toHaveText(/email valido/);
+  await expect(page.locator('.outro')).toHaveAttribute('data-state', 'error');
+  await expect(page.locator('#signup-email')).toHaveAttribute('aria-invalid', 'true');
+  await expect(page.locator('#signup-email')).toBeFocused();
+  // il bordo spesso è sulla capsula (desktop) o sul campo stesso (telefono, campi in colonna)
+  const errSel = page.viewportSize()!.width <= 640 ? '#signup-email' : '.signup-row';
+  await expect.poll(() => page.locator(errSel).evaluate((el) => getComputedStyle(el).boxShadow)).toContain('2.5px');
+  expect(await note.evaluate((el) => getComputedStyle(el).color)).toBe('rgb(16, 38, 27)');
+
+  // email personale → avviso morbido, non bloccante
+  await page.fill('#signup-email', 'mario.rossi@gmail.com');
+  await page.locator('#signup-email').blur();
+  await expect(note).toHaveText(/email aziendale/);
+  await expect(page.locator('.outro')).toHaveAttribute('data-state', 'warn');
+
+  // azienda mancante, poi consenso mancante
+  await submit();
+  await expect(note).toHaveText(/nome della tua azienda/);
+  await expect(page.locator('#signup-company')).toBeFocused();
+  await page.fill('#signup-company', 'Acme Srl');
+  await submit();
+  await expect(note).toHaveText(/informativa privacy/);
+  await expect(page.locator('#signup-consent')).toHaveAttribute('aria-invalid', 'true');
+  // la casella non è pre-spuntata e si spunta cliccando il testo
+  await page.click('.consent-text span >> nth=0');
+  await expect(page.locator('#signup-consent')).toBeChecked();
+
+  // invio: prima la rete fallisce, poi va
   let body = '';
-  await page.route('https://signup.test/**', (route) => {
+  let fail = true;
+  await page.route('https://script.test/**', (route) => {
+    if (fail) return route.abort();
     body = route.request().postData() ?? '';
-    return route.fulfill({ status, contentType: 'application/json', body: '{}' });
+    return route.fulfill({ status: 200, body: 'ok' });
   });
-  await page.evaluate(() => (document.querySelector<HTMLFormElement>('.signup')!.dataset.endpoint = 'https://signup.test/f'));
-  await page.fill('#signup-email', ' ciao@deploiable.com ');
-  await page.click('.signup button');
-  await expect(note).toHaveText(/non ha funzionato/);
-  status = 200;
-  await page.click('.signup button');
+  await page.evaluate(() => (document.querySelector<HTMLFormElement>('.signup')!.dataset.endpoint = 'https://script.test/exec'));
+  await page.fill('#signup-email', 'mario.rossi@acme.it');
+  await submit();
+  await expect(note).toHaveText(/Invio non riuscito/);
+  fail = false;
+  await submit();
   await expect(page.locator('.signup-done')).toBeVisible();
-  await expect(page.locator('.signup-done')).toHaveText(/Sei in lista/);
-  await expect(note).toHaveText(/prima del lancio/);
-  expect(body).toContain('ciao@deploiable.com');
+  await expect(page.locator('.signup-done')).toHaveText(/Richiesta ricevuta/);
+  await expect(note).toHaveText('Ti contattiamo entro 3 giorni lavorativi per fissare la review.');
   await expect(page.locator('.signup')).toBeHidden();
+  const sent = new URLSearchParams(body);
+  expect(sent.get('email')).toBe('mario.rossi@acme.it');
+  expect(sent.get('company')).toBe('Acme Srl');
+  expect(sent.get('consent')).toBe('si');
+  expect(sent.get('lang')).toBe('it');
+});
+
+test('modulo: link all\'informativa, casella non spuntata, su telefono in colonna con bersagli ≥ 44 px', async ({ page }) => {
+  await openFilm(page);
+  await seek(page, END);
+  await expect(page.locator('.consent a')).toHaveAttribute('href', 'privacy.html');
+  await expect(page.locator('#signup-consent')).not.toBeChecked();
+  await expect(page.locator('label[for="signup-email"]')).toHaveText('Email aziendale');
+  await expect(page.locator('label[for="signup-company"]')).toHaveText('Azienda');
+  const vp = page.viewportSize()!;
+  if (vp.width <= 640) {
+    const e = (await page.locator('#signup-email').boundingBox())!;
+    const c = (await page.locator('#signup-company').boundingBox())!;
+    const b = (await page.locator('.signup button[type="submit"]').boundingBox())!;
+    expect(c.y).toBeGreaterThan(e.y + e.height - 1); // in colonna
+    expect(b.y).toBeGreaterThan(c.y + c.height - 1);
+    for (const r of [e, c, b]) expect(r.height).toBeGreaterThanOrEqual(44);
+    expect(b.width).toBeGreaterThan(vp.width - 2 * 48); // a tutta larghezza
+  }
+  await page.click('[data-lang="en"]');
+  await expect(page.locator('.signup button[type="submit"]')).toHaveText(/Book your AI process review/);
+  await expect(page.locator('#signup-email')).toHaveAttribute('placeholder', 'name@company.com');
 });
 
 test('dettagli: testo secondario in Moss pieno, un solo carattere (Satoshi)', async ({ page }) => {
