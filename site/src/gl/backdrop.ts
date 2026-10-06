@@ -40,6 +40,13 @@ export class Backdrop {
     for (const b of this.bars) setPalette(b.mat, p);
   }
 
+  /** Luce da studio e spessore pieno (prova ?story=1): la supergrafica diventa un oggetto, non una texture. */
+  private depth = 0.42;
+  setLit(v: number) {
+    for (const b of this.bars) b.mat.uniforms.uLit.value = v;
+    this.depth = v > 0 ? 1.1 : 0.42;
+  }
+
   /** Per il disegno di riscaldamento: compila lo shader anche se la supergrafica non è ancora entrata. */
   forceVisible() {
     for (const b of this.bars) b.mesh.visible = true;
@@ -111,7 +118,7 @@ export class Backdrop {
     this.group.position.set((cx - width / 2) * k, (height / 2 - cy) * k, 0);
     this.group.rotation.set(s.bgRx, s.bgRy, 0);
     // più sottile del logo: in grande lo spessore pieno diventerebbe un muro, qui deve restare una texture
-    this.group.scale.set(g || 1e-4, g || 1e-4, 0.42 * (g || 1e-4));
+    this.group.scale.set(g || 1e-4, g || 1e-4, this.depth * (g || 1e-4));
 
     // Le barre entrano dal bordo destro lungo l'inclinazione di 8°; nel ciclo scivolano in avanti e tornano.
     const away = (width * k * 1.2) / (g || 1) + SYMBOL_W;

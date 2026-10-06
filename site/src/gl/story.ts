@@ -1,17 +1,34 @@
-import { Color, Group, Mesh, PerspectiveCamera, Scene, type ShaderMaterial, type WebGLRenderer } from 'three';
+import {
+  DoubleSide,
+  Group,
+  Mesh,
+  PerspectiveCamera,
+  PlaneGeometry,
+  Scene,
+  ShaderMaterial,
+  type WebGLRenderer,
+} from 'three';
 import { PALETTES } from '../config/brand';
 import { t, type Key } from '../i18n';
 import { BarGeometry } from './symbol/barGeometry';
 import { createBarMaterial, setPalette } from './symbol/barMaterial';
 import { PIVOT, REST, SYMBOL_H, SYMBOL_W } from './symbol/symbolSpec';
 
-// Prova (?story=1): il racconto a scorrimento. Sotto l'hero una fascia Forest alta cinque schermate; il 3D
-// resta fermo al centro e segue lo scorrimento, avanti e indietro. Tre atti, tre barre, le frasi del
-// sottotitolo: ogni barra entra con il suo atto (dal basso, come nell'intro), al terzo il simbolo è completo;
-// in chiusura si gira di fronte, accanto a "We make AI deployable." e al pulsante per la review.
+// Prova (?story=1): il racconto a scorrimento sotto l'hero. Il 3D resta fermo nello schermo e segue lo
+// scorrimento, avanti e indietro. Cinque tappe:
+//   0  il problema: i tre pezzi sono sparsi e fluttuano, non si incastrano (l'AI che resta una demo)
+//   1–3 il metodo: trovare, costruire, misurare; ogni tappa porta una barra al suo posto (dal basso)
+//   4  la chiusura: simbolo completo e di fronte, "We make AI deployable." e il pulsante per la review
+// Profondità: barre spesse con luce da studio, un pavimento a griglia in prospettiva che riflette il simbolo.
 
-const ORDER = [2, 1, 0]; // barra che entra in ogni atto: bassa, centrale, alta
-const ACTS = 4; // tre atti più la chiusura
+const ORDER = [2, 1, 0]; // barra che arriva nelle tappe 1, 2, 3: bassa, centrale, alta
+const STEPS = 5;
+// dove fluttuano i pezzi nella tappa del problema (posizione e rotazione di ognuno)
+const SCATTER = [
+  { p: [3.2, 1.6, -4], r: [0.9, -1.1, 0.5] },
+  { p: [-4.2, 0.4, -1.5], r: [-0.6, 0.9, -0.35] },
+  { p: [2.4, -2.2, 2], r: [0.5, 0.6, 0.8] },
+];
 
 const smooth = (a: number, b: number, x: number) => {
   const k = Math.min(1, Math.max(0, (x - a) / (b - a)));
@@ -20,17 +37,17 @@ const smooth = (a: number, b: number, x: number) => {
 
 export class Story {
   private readonly scene = new Scene();
-  private readonly camera = new PerspectiveCamera(30, 1, 1, 400);
-  private readonly group = new Group(); // ruota attorno al centro dei pezzi arrivati
-  private readonly inner = new Group(); // sposta i pezzi arrivati sul centro
-  private readonly bars: { mesh: Mesh; mat: ShaderMaterial; center: [number, number] }[] = [];
+  private readonly floorScene = new Scene();
+  private readonly camera = new PerspectiveCamera(30, 1, 1, 600);
+  private readonly group = new Group();
+  private readonly inner = new Group();
+  private readonly bars: { mesh: Mesh; mat: ShaderMaterial }[] = [];
+  private readonly floor: ShaderMaterial;
+  private readonly floorY = -SYMBOL_H * 0.95;
   private readonly section: HTMLElement;
-  private readonly acts: HTMLElement[];
-  private readonly forest = new Color(PALETTES.forest.background);
-  private readonly clear = new Color();
-  private rect = { top: 0, bottom: 0, height: 1 };
+  private readonly steps: HTMLElement[];
+  private readonly rail: HTMLElement;
   private visible = false;
-  /** Avanzamento del racconto: 0 primo atto a schermo, 3 chiusura; negativo mentre la fascia entra. */
   progress = -1;
 
   constructor() {
@@ -40,19 +57,51 @@ export class Story {
       const mat = createBarMaterial();
       setPalette(mat, PALETTES.forest); // Lime su Forest
       mat.uniforms.uLit.value = 1;
+      mat.side = DoubleSide; // il riflesso è il simbolo capovolto
       const mesh = new Mesh(geo.geometry, mat);
       mesh.frustumCulled = false;
       this.inner.add(mesh);
-      // centro visivo della barra (la mesh è centrata sul perno, non sul suo centro)
-      geo.geometry.computeBoundingBox();
-      const bb = geo.geometry.boundingBox!;
-      const center: [number, number] = [PIVOT[i][0] + (bb.min.x + bb.max.x) / 2, PIVOT[i][1] + (bb.min.y + bb.max.y) / 2];
-      this.bars.push({ mesh, mat, center });
+      this.bars.push({ mesh, mat });
     }
+    this.inner.scale.z = 2.1; // barre spesse: il volume si legge anche di fronte
     this.group.add(this.inner);
     this.scene.add(this.group);
 
-    // il testo: un'etichetta, tre atti e la chiusura (le chiavi seguono il cambio di lingua)
+    // Pavimento: Forest quasi opaco (il riflesso traspare appena sotto il simbolo e si spegne in lontananza)
+    // con una griglia sottile, nitida, che si dissolve verso l'orizzonte.
+    this.floor = new ShaderMaterial({
+      transparent: true,
+      depthTest: false,
+      depthWrite: false,
+      vertexShader: /* glsl */ `
+        varying vec3 vW;
+        void main() { vec4 w = modelMatrix * vec4(position, 1.0); vW = w.xyz; gl_Position = projectionMatrix * viewMatrix * w; }
+      `,
+      fragmentShader: /* glsl */ `
+        varying vec3 vW;
+        void main() {
+          vec2 g = vW.xz / 2.4;
+          vec2 a = abs(fract(g - 0.5) - 0.5) / fwidth(g);
+          float line = 1.0 - min(min(a.x, a.y), 1.0);
+          float r = length(vW.xz * vec2(1.0, 1.5));
+          float near = 1.0 - smoothstep(4.0, 46.0, r);
+          vec3 forest = vec3(0.0052, 0.0194, 0.0103);
+          vec3 pine = vec3(0.0116, 0.0423, 0.0232);
+          vec3 lime = vec3(0.578, 0.888, 0.102);
+          vec3 col = forest + (pine * 2.2 + lime * 0.05) * line * near;
+          float alpha = mix(1.0, 0.8, smoothstep(26.0, 3.0, r));
+          gl_FragColor = vec4(col, alpha);
+          #include <colorspace_fragment>
+        }
+      `,
+    });
+    const plane = new Mesh(new PlaneGeometry(220, 220), this.floor);
+    plane.rotation.x = -Math.PI / 2;
+    plane.position.y = this.floorY;
+    plane.frustumCulled = false;
+    this.floorScene.add(plane);
+
+    // il testo: cinque tappe (titolo e riga di spiegazione) e una barra di avanzamento
     const el = (tag: string, cls: string, key?: Key, text?: string) => {
       const e = document.createElement(tag);
       e.className = cls;
@@ -66,15 +115,22 @@ export class Story {
     this.section.setAttribute('aria-label', t('story.label'));
     this.section.dataset.i18nAttr = 'aria-label:story.label';
     const pin = el('div', 'story-pin');
-    this.acts = (['story.1', 'story.2', 'story.3'] as Key[]).map((key, i) => {
+    const copy: [Key, Key, string][] = [
+      ['story.0', 'story.0s', ''],
+      ['story.1', 'story.1s', '01'],
+      ['story.2', 'story.2s', '02'],
+      ['story.3', 'story.3s', '03'],
+    ];
+    this.steps = copy.map(([title, sub, num]) => {
       const a = el('article', 'act');
-      a.append(el('p', 'act-num', undefined, `0${i + 1} / 03`), el('h2', 'act-title', key));
+      a.append(num ? el('p', 'act-num', undefined, `${num} / 03`) : el('p', 'act-num', 'story.label'));
+      a.append(el('h2', 'act-title', title), el('p', 'act-sub', sub));
       return a;
     });
     const end = el('article', 'act act--end');
     const claim = el('p', 'act-claim');
-    claim.append(el('span', '', undefined, 'We make AI '), el('strong', '', undefined, 'deployable.'));
     claim.lang = 'en';
+    claim.append(el('span', '', undefined, 'We make AI '), el('strong', '', undefined, 'deployable.'));
     const cta = el('a', 'act-cta', 'form.submit') as HTMLAnchorElement;
     cta.href = '#signup-email';
     cta.addEventListener('click', (e) => {
@@ -83,88 +139,88 @@ export class Story {
       setTimeout(() => document.querySelector<HTMLInputElement>('#signup-email')?.focus({ preventScroll: true }), 700);
     });
     end.append(claim, cta);
-    this.acts.push(end);
-    pin.append(...this.acts);
+    this.steps.push(end);
+    this.rail = el('div', 'story-rail');
+    this.rail.setAttribute('aria-hidden', 'true');
+    for (let i = 0; i < STEPS; i++) this.rail.append(el('i', ''));
+    pin.append(this.rail, ...this.steps);
     this.section.append(pin);
     document.querySelector('.hero')!.after(this.section);
   }
 
-  /** Misura la fascia e calcola la posa del simbolo per l'istante (time per il respiro lento). */
   update(time: number, width: number, height: number) {
     const r = this.section.getBoundingClientRect();
-    this.rect = { top: r.top, bottom: r.bottom, height: r.height };
     this.visible = r.bottom > 0 && r.top < height;
-    const s = (-r.top / Math.max(1, r.height - height)) * (ACTS - 1);
+    const s = (-r.top / Math.max(1, r.height - height)) * (STEPS - 1);
     this.progress = s;
 
-    // testi: ogni atto entra salendo e se ne va salendo; la chiusura resta
-    this.acts.forEach((a, i) => {
+    this.steps.forEach((a, i) => {
       const inn = smooth(i - 0.45, i - 0.05, s);
-      const out = i < ACTS - 1 ? smooth(i + 0.55, i + 0.9, s) : 0;
+      const out = i < STEPS - 1 ? smooth(i + 0.55, i + 0.9, s) : 0;
       const o = inn * (1 - out);
       a.style.opacity = o.toFixed(3);
-      a.style.transform = `translate3d(0, ${((1 - inn) * 28 - out * 28).toFixed(1)}px, 0)`;
+      a.style.transform = `translate3d(0, ${((1 - inn) * 36 - out * 36).toFixed(1)}px, 0)`;
       a.style.visibility = o > 0.01 ? 'visible' : 'hidden';
     });
+    this.rail.style.setProperty('--p', Math.min(1, Math.max(0, s / (STEPS - 1))).toFixed(4));
+    this.rail.style.opacity = String(smooth(-0.4, 0, s) * (1 - smooth(STEPS - 0.6, STEPS - 0.1, s)));
+    Array.from(this.rail.children).forEach((c, i) => c.classList.toggle('on', s > i - 0.5));
     if (!this.visible) return;
 
-    // barre: ognuna arriva da destra e dal fondo, avvitandosi, durante il suo atto
-    let wx = 0, wy = 0, ws = 0;
-    ORDER.forEach((b, act) => {
-      const k = smooth(act - 0.8, act - 0.05, s);
-      const m = this.bars[b].mesh;
-      m.visible = k > 0.001;
+    // pezzi: sparsi e fluttuanti nella tappa del problema, poi ognuno al suo posto nella sua tappa
+    ORDER.forEach((b, i) => {
+      const k = smooth(i + 0.2, i + 0.95, s);
       const away = 1 - k;
-      m.position.set(PIVOT[b][0] + away * 16, PIVOT[b][1] - away * 3, -away * 14);
-      m.rotation.set(away * 0.9, away * -1.4, away * 0.5);
-      wx += this.bars[b].center[0] * k;
-      wy += this.bars[b].center[1] * k;
-      ws += k;
+      const sc = SCATTER[b];
+      const f = time * 0.6 + b * 2.1;
+      const m = this.bars[b].mesh;
+      m.position.set(
+        PIVOT[b][0] + away * (sc.p[0] + Math.sin(f) * 0.5),
+        PIVOT[b][1] + away * (sc.p[1] + Math.cos(f * 0.8) * 0.5),
+        away * (sc.p[2] + Math.sin(f * 0.7) * 0.6),
+      );
+      m.rotation.set(away * (sc.r[0] + Math.sin(f * 0.5) * 0.15), away * sc.r[1], away * sc.r[2]);
     });
-    // la camera inquadra i pezzi già arrivati; a simbolo completo, il centro del simbolo
-    const cx = ws > 0 ? wx / ws : 0;
-    const cy = ws > 0 ? wy / ws : 0;
-    const front = smooth(2.2, 3.1, s);
-    const breathe = Math.sin(time * 0.5) * 0.06 * (1 - front * 0.6);
-    this.inner.position.set(-cx, -cy, 0);
-    this.group.rotation.set(0.22 * (1 - front) + breathe * 0.5, -0.62 * (1 - front) + breathe, 0);
+    const front = smooth(3.2, 4, s);
+    const breathe = Math.sin(time * 0.45) * 0.08 * (1 - front * 0.7);
+    // il simbolo ruota piano mentre si costruisce, poi si gira di fronte
+    this.group.rotation.set(0.18 * (1 - front), -0.75 + 0.35 * smooth(0, 3, s) + 0.4 * front + breathe, 0);
 
-    // inquadratura: simbolo alto metà schermo; su desktop a destra del testo, su telefono sopra
     const narrow = width < 760;
     const aspect = width / height;
     const tan = Math.tan((this.camera.fov * Math.PI) / 360);
-    const fitH = SYMBOL_H / (0.5 * 2 * tan);
-    const fitW = SYMBOL_W / ((narrow ? 0.5 : 0.4) * 2 * tan * aspect);
-    const zoom = 1 + 0.25 * (1 - smooth(-0.6, 0.3, s)) - 0.08 * smooth(2.4, 3.2, s);
-    this.camera.position.set(0, 0, Math.max(fitH, fitW) * zoom);
-    this.camera.lookAt(0, 0, 0);
+    const spread = 1.4 - 0.4 * smooth(0.3, 3, s); // i pezzi sparsi occupano più spazio
+    const fitH = (SYMBOL_H * spread) / ((narrow ? 0.36 : 0.56) * 2 * tan);
+    const fitW = (SYMBOL_W * spread) / ((narrow ? 0.7 : 0.42) * 2 * tan * aspect);
+    const d = Math.max(fitH, fitW) * (1 - 0.06 * front);
+    // la camera guarda leggermente dall'alto: si vedono il pavimento e il riflesso
+    this.camera.position.set(0, d * 0.16, d);
+    this.camera.lookAt(0, -SYMBOL_H * 0.12, 0);
     this.camera.aspect = aspect;
-    const shiftX = narrow ? 0 : -width * 0.17;
-    const shiftY = narrow ? height * 0.17 : 0;
-    this.camera.setViewOffset(width, height, shiftX, shiftY, width, height);
+    this.camera.setViewOffset(width, height, narrow ? 0 : -width * 0.18, narrow ? height * 0.14 : 0, width, height);
     this.camera.updateMatrixWorld();
     for (const { mat } of this.bars) mat.uniforms.uCam.value.copy(this.camera.position);
   }
 
-  /** Disegna la fascia Forest e il simbolo, solo dentro la parte visibile della sezione. */
-  render(renderer: WebGLRenderer, width: number, height: number) {
+  /** Riflesso (il simbolo capovolto sotto il pavimento), pavimento, poi il simbolo. */
+  render(renderer: WebGLRenderer) {
     if (!this.visible) return;
-    const top = Math.max(0, this.rect.top);
-    const bottom = Math.min(height, this.rect.bottom);
-    if (bottom <= top) return;
-    renderer.getClearColor(this.clear);
-    const alpha = renderer.getClearAlpha();
-    renderer.setScissorTest(true);
-    renderer.setScissor(0, height - bottom, width, bottom - top);
-    renderer.setClearColor(this.forest, 1);
-    renderer.clear(true, true, false);
+    renderer.clearDepth();
+    const g = this.group;
+    g.position.y = 2 * this.floorY;
+    g.scale.y = -1;
+    g.updateMatrixWorld();
     renderer.render(this.scene, this.camera);
-    renderer.setScissorTest(false);
-    renderer.setClearColor(this.clear, alpha);
+    g.position.y = 0;
+    g.scale.y = 1;
+    g.updateMatrixWorld();
+    renderer.render(this.floorScene, this.camera);
+    renderer.clearDepth();
+    renderer.render(this.scene, this.camera);
   }
 
-  /** La fascia copre l'header (per il vetro scuro). */
   under(y: number) {
-    return this.rect.top <= y && this.rect.bottom > y;
+    const r = this.section.getBoundingClientRect();
+    return r.top <= y && r.bottom > y;
   }
 }

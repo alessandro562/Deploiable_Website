@@ -8,10 +8,10 @@ const FPS = 30, dir = `artifacts/sf-${W}`;
 rmSync(dir, { recursive: true, force: true }); mkdirSync(dir, { recursive: true });
 const b = await chromium.launch({ args: ['--use-angle=swiftshader', '--use-gl=angle', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
 const p = await b.newPage({ viewport: { width: W, height: H } });
-await p.goto('http://localhost:4173/?__test=1&tier=high&story=1');
+await p.goto('http://localhost:4173/?__test=1&tier=high&story=1' + (process.env.EXTRA ?? ''));
 await p.waitForFunction(() => window.__DEPLOIABLE__?.ready === true);
 const heroH = await p.evaluate(() => document.querySelector('.hero').offsetHeight);
-const end = heroH + 4 * H; // fine della fascia
+const end = heroH + 5 * H; // fine della fascia
 let f = 0;
 const shot = async (t, y) => {
   await p.evaluate(([t, y]) => { scrollTo(0, y); window.__DEPLOIABLE__.seek(t); }, [t, y]);
@@ -19,7 +19,7 @@ const shot = async (t, y) => {
   await p.screenshot({ path: `${dir}/${String(f++).padStart(5, '0')}.png` });
 };
 for (let i = 0; i < 7.5 * FPS; i++) await shot(i / FPS, 0);
-const N = 11 * FPS;
+const N = 13 * FPS;
 const ease = (x) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
 for (let i = 0; i <= N; i++) await shot(7.5 + i / FPS, ease(i / N) * end);
 for (let i = 0; i < FPS; i++) await shot(7.5 + (N + i) / FPS, end);

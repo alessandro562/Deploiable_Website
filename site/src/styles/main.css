@@ -849,11 +849,10 @@ p {
 
 /* La linea del finale: stessa inclinazione di 8° delle barre, alla quota del centro del simbolo.
    La testa e la coda si regolano con clip-path (src/app.ts). Sulle barre Lime non si vede: le attraversa. */
-/* Prova "racconto" (?story=1): fascia Forest disegnata dal canvas, testi a sinistra, 3D a destra (src/gl/story.ts) */
+/* Prova "racconto" (?story=1): testi a sinistra, 3D a destra (src/gl/story.ts); il fondo è lo spazio del canvas */
 .story {
   position: relative;
-  height: 500svh;
-  color: var(--lime);
+  height: 600svh;
 }
 .story-pin {
   position: sticky;
@@ -863,70 +862,113 @@ p {
 }
 .act {
   position: absolute;
-  left: var(--pad-x);
+  left: calc(var(--pad-x) + 40px);
   top: 50%;
-  max-width: min(40vw, 560px);
-  margin-top: -2.2em;
+  max-width: min(42vw, 600px);
+  transform: translateY(-50%);
   visibility: hidden;
 }
 .act-num {
-  margin: 0 0 18px;
-  font: 500 13px/1 var(--sans);
+  margin: 0 0 20px;
+  font: 500 12px/1 var(--sans);
   letter-spacing: 0.24em;
-  color: var(--sage);
+  text-transform: uppercase;
+  color: var(--lime);
 }
 .act-title {
   margin: 0;
-  font: 700 clamp(34px, 4.6vw, 68px)/1.04 var(--sans);
+  font: 700 clamp(34px, 4.4vw, 66px)/1.04 var(--sans);
   letter-spacing: -0.03em;
   text-wrap: balance;
+  color: var(--mist);
+}
+.act-sub {
+  margin: 22px 0 0;
+  max-width: 30em;
+  font: 400 clamp(16px, 1.25vw, 19px)/1.5 var(--sans);
+  color: var(--sage);
+  text-wrap: pretty;
 }
 .act-claim {
-  margin: 0 0 28px;
-  font: 300 clamp(34px, 4.6vw, 68px)/1.04 var(--sans);
+  margin: 0 0 30px;
+  font: 300 clamp(36px, 4.8vw, 72px)/1.02 var(--sans);
   letter-spacing: -0.03em;
+  color: var(--mist);
 }
 .act-claim strong {
   display: block;
   font-weight: 900;
+  color: var(--lime);
 }
 .act-cta {
   display: inline-flex;
   align-items: center;
-  height: 52px;
-  padding: 0 26px;
+  height: 54px;
+  padding: 0 28px;
   border-radius: 999px;
   background: var(--lime);
   color: var(--forest);
   font: 700 15px/1 var(--sans);
   letter-spacing: 0.01em;
   text-decoration: none;
+  box-shadow: 0 0 0 1px rgb(200 242 90 / 0.4), 0 12px 40px -12px rgb(200 242 90 / 0.5);
 }
 .act-cta::after {
   content: '→';
   margin-left: 10px;
 }
+/* avanzamento: una linea verticale con cinque tacche, si riempie di Lime scorrendo */
+.story-rail {
+  position: absolute;
+  left: var(--pad-x);
+  top: 50%;
+  height: 220px;
+  margin-top: -110px;
+  width: 2px;
+  background: linear-gradient(var(--lime) calc(var(--p, 0) * 100%), rgb(143 165 150 / 0.25) 0);
+  border-radius: 2px;
+}
+.story-rail i {
+  position: absolute;
+  left: -3px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--forest);
+  border: 1.5px solid rgb(143 165 150 / 0.5);
+  transition: background 0.2s, border-color 0.2s;
+}
+.story-rail i:nth-child(1) { top: -4px; }
+.story-rail i:nth-child(2) { top: calc(25% - 4px); }
+.story-rail i:nth-child(3) { top: calc(50% - 4px); }
+.story-rail i:nth-child(4) { top: calc(75% - 4px); }
+.story-rail i:nth-child(5) { top: calc(100% - 4px); }
+.story-rail i.on {
+  background: var(--lime);
+  border-color: var(--lime);
+}
 @media (max-width: 759px) {
   .act {
-    top: auto;
-    bottom: 12svh;
+    left: var(--pad-x);
     right: var(--pad-x);
+    top: auto;
+    bottom: 9svh;
     max-width: none;
-    margin-top: 0;
+    transform: none;
+  }
+  .act-sub {
+    margin-top: 14px;
+  }
+  .story-rail {
+    display: none;
   }
 }
-/* sopra la fascia scura l'header diventa vetro scuro, logo e lingua in Lime */
+/* sul fondo scuro l'header è vetro scuro */
+html[data-palette='forest'] .top::before,
 .is-dark-under .top::before {
-  background: linear-gradient(180deg, rgb(16 38 27 / 0.55), rgb(16 38 27 / 0.35));
-  border-bottom-color: rgb(200 242 90 / 0.18);
-}
-.is-dark-under .logo-slot,
-.is-dark-under .lang,
-.is-dark-under .lang [aria-pressed='true'] {
-  color: var(--lime);
-}
-.is-dark-under .lang [aria-pressed='false'] {
-  color: var(--sage);
+  background: linear-gradient(180deg, rgb(16 38 27 / 0.6), rgb(16 38 27 / 0.38));
+  border-bottom-color: rgb(200 242 90 / 0.14);
+  box-shadow: none;
 }
 
 /* Prova "terminale" (?term=1): il comando di deploy sul Forest dell'apertura (src/terminal.ts) */
