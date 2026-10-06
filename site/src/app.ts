@@ -7,6 +7,7 @@ import { DURATION, LOCK, createState, stateAt } from './gl/choreography';
 import { PALETTES, type PaletteName } from './config/brand';
 import { Color } from 'three';
 import { Backdrop } from './gl/backdrop';
+import { onLangChange } from './i18n';
 
 // Tre livelli, come nella skill web3d-integration-patterns (Pattern 1):
 //  · 3D      Three.js: renderer, barre, scintille (src/gl)
@@ -45,9 +46,21 @@ export async function start(caps: Capabilities) {
   let playing = true;
   let paused = false;
 
+  // I testi che la supergrafica non deve mai toccare (in coordinate della pagina, non della finestra).
+  const textSel = '.lang, .claim .line, .sub, .soon, .signup, .signup-done, .signup-note, .proof, .clients, .foot';
+  let scrollY = window.scrollY;
   const measureSlot = () => {
+    scrollY = window.scrollY;
     const r = slotEl.getBoundingClientRect();
     stage.setSlot({ cx: r.left + r.width / 2, cy: r.top + r.height / 2, w: r.width });
+  };
+  const measureTexts = () => {
+    const y = window.scrollY;
+    const rects = Array.from(document.querySelectorAll<HTMLElement>(textSel))
+      .map((el) => el.getBoundingClientRect())
+      .filter((r) => r.width > 0 && r.height > 0)
+      .map((r) => ({ x0: r.left, y0: r.top + y, x1: r.right, y1: r.bottom + y }));
+    backdrop.layout(rects, engine.width, engine.height);
   };
 
   // Palette: "forest" (barre Lime su Forest), "lime" (barre Forest su Lime) oppure "flip" (Forest fino al clic
@@ -74,7 +87,7 @@ export async function start(caps: Capabilities) {
     stateAt(time, state);
     applyPalette(paletteAt(time));
     stage.apply(state, engine.camera, engine.width, engine.height);
-    backdrop.apply(state, engine.bgCamera, engine.width, engine.height);
+    backdrop.apply(state, engine.bgCamera, engine.width, engine.height, scrollY);
     claim.forEach((el, i) => {
       const p = Math.min(1, Math.max(0, state.claim * 1.25 - i * 0.25));
       el.style.transform = `translate3d(0, ${((1 - p) * 150).toFixed(2)}%, 0)`;
@@ -96,10 +109,12 @@ export async function start(caps: Capabilities) {
   };
 
   measureSlot();
+  measureTexts();
   // Stato iniziale: testo nascosto prima del primo disegno, poi si attende font e shader.
   stateAt(0, state);
   claim.forEach((el) => (el.style.transform = 'translate3d(0, 150%, 0)'));
   await document.fonts.ready;
+  measureTexts(); // con i font veri le righe hanno la loro larghezza definitiva
   // Riscaldamento: shader e geometrie vengono compilati e caricati sulla GPU ora, con la pagina ancora
   // nel Forest iniziale, così nessun scatto arriva all'incastro (9,2 s) o al lampo (10,2 s).
   stage.forceVisible();
@@ -118,8 +133,20 @@ export async function start(caps: Capabilities) {
   window.addEventListener('resize', () => {
     engine.resize();
     measureSlot();
+    measureTexts();
     draw();
   });
+  // Lo scorrimento porta via con sé il logo dell'header e la supergrafica dell'hero: il 3D li segue.
+  window.addEventListener(
+    'scroll',
+    () => {
+      measureSlot();
+      draw();
+    },
+    { passive: true },
+  );
+  // Cambiando lingua le righe cambiano larghezza: la supergrafica si ricalcola.
+  onLangChange(() => requestAnimationFrame(() => (measureTexts(), draw())));
   document.addEventListener('visibilitychange', () => {
     paused = document.hidden;
     if (paused) gsap.ticker.sleep();
@@ -135,6 +162,7 @@ export async function start(caps: Capabilities) {
   hooks.play = () => {
     playing = true;
   };
+  hooks.backdrop = () => ({ ...backdrop.box });
   hooks.state = () => ({ t: state.t, roll: [...state.roll], bgIn: [...state.bgIn], bgSlide: [...state.bgSlide], sweep: [state.sweepHead, state.sweepTail], letters: [...state.letters] });
   hooks.ready = true;
 }

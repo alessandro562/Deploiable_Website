@@ -28,34 +28,38 @@
     <canvas class="gl" aria-hidden="true"></canvas>
     <i class="sweep" aria-hidden="true"></i>
     <!-- supergrafica della versione statica (in quella 3D la disegna il canvas) -->
-    <!-- symbol:supergraphic -->
+    <div class="sg-frame" aria-hidden="true"><!-- symbol:supergraphic --></div>
     <!-- lingua: italiano predefinito, inglese a scelta (src/i18n.ts) -->
     <div class="lang" role="group" aria-label="Lingua" data-i18n-attr="aria-label:lang.group">
       <button type="button" data-lang="it" aria-pressed="true" lang="it">IT</button>
       <span aria-hidden="true">/</span>
       <button type="button" data-lang="en" aria-pressed="false" lang="en">EN</button>
     </div>
-    <main class="stack">
-      <!-- Il segnaposto del logo: nella versione 3D la camera finale lo inquadra esattamente qui;
-           nella versione statica è il logo ufficiale. -->
+    <!-- header: il logo piccolo in alto a sinistra. Nella versione 3D la camera finale lo inquadra esattamente
+         qui (il logo 3D "atterra" nel segnaposto); nella versione statica è il logo ufficiale. -->
+    <header class="top">
       <div class="logo-slot"><!-- logo:static-logo --></div>
-      <h1 class="claim">
-        <span class="mask"><span class="line line--light" lang="en">Make AI</span></span>
-        <span class="mask"><span class="line line--black" lang="en">deployable.</span></span>
-      </h1>
-      <p class="sub" data-i18n="sub">Troviamo dove l’AI ripaga, costruiamo il prodotto e misuriamo il risultato.</p>
-      <div class="outro">
-        <p class="soon"><i class="soon-dot" aria-hidden="true"></i><span data-i18n="launch">Lancio · Novembre 2026</span></p>
-        <form class="signup" novalidate>
-          <label class="sr-only" for="signup-email" data-i18n="form.email.label">Email</label>
-          <input id="signup-email" name="email" type="email" required autocomplete="email" inputmode="email" enterkeyhint="send" spellcheck="false" placeholder="nome@azienda.it" data-i18n-attr="placeholder:form.email.placeholder" />
-          <!-- trappola per i bot: invisibile alle persone -->
-          <input class="hp" name="_gotcha" type="text" tabindex="-1" autocomplete="off" aria-hidden="true" />
-          <button type="submit"><span data-i18n="form.submit">Riserva il tuo posto</span><svg class="arrow" viewBox="0 0 12 12" aria-hidden="true"><path d="M1 6h9M6.5 2.5 10 6l-3.5 3.5" /></svg></button>
-        </form>
-        <p class="signup-done" aria-hidden="true"><svg class="check" viewBox="0 0 12 12"><path d="M2 6.3 4.8 9 10 3" /></svg><span data-i18n="form.done">Sei in lista</span></p>
-        <p class="signup-note" role="status" aria-live="polite" data-i18n="form.offer">Le prime 20 aziende ricevono una AI process review gratuita.</p>
-      </div>
+    </header>
+    <main class="page">
+      <section class="hero">
+        <h1 class="claim">
+          <span class="mask"><span class="line line--light" lang="en">Make AI</span></span>
+          <span class="mask"><span class="line line--black" lang="en">deployable.</span></span>
+        </h1>
+        <p class="sub" data-i18n="sub">Troviamo dove l’AI ripaga, costruiamo il prodotto e misuriamo il risultato.</p>
+        <div class="outro">
+          <p class="soon"><i class="soon-dot" aria-hidden="true"></i><span data-i18n="launch">Lancio · Novembre 2026</span></p>
+          <form class="signup" novalidate>
+            <label class="sr-only" for="signup-email" data-i18n="form.email.label">Email</label>
+            <input id="signup-email" name="email" type="email" required autocomplete="email" inputmode="email" enterkeyhint="send" spellcheck="false" placeholder="nome@azienda.it" data-i18n-attr="placeholder:form.email.placeholder" />
+            <!-- trappola per i bot: invisibile alle persone -->
+            <input class="hp" name="_gotcha" type="text" tabindex="-1" autocomplete="off" aria-hidden="true" />
+            <button type="submit"><span data-i18n="form.submit">Riserva il tuo posto</span><svg class="arrow" viewBox="0 0 12 12" aria-hidden="true"><path d="M1 6h9M6.5 2.5 10 6l-3.5 3.5" /></svg></button>
+          </form>
+          <p class="signup-done" aria-hidden="true"><svg class="check" viewBox="0 0 12 12"><path d="M2 6.3 4.8 9 10 3" /></svg><span data-i18n="form.done">Sei in lista</span></p>
+          <p class="signup-note" role="status" aria-live="polite" data-i18n="form.offer">Le prime 20 aziende ricevono una AI process review gratuita.</p>
+        </div>
+      </section>
     </main>
 
     <script type="module" src="/src/main.ts"></script>

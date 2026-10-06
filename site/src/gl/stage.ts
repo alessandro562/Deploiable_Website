@@ -88,9 +88,10 @@ export class Stage {
     camera.lookAt(px, py, 0);
     camera.fov = s.fov;
     camera.aspect = aspect;
-    // lo spostamento verticale non cambia la prospettiva: porta il centro del logo dove la pagina lo vuole
-    const shift = (height / 2 - this.slot.cy) * e;
-    camera.setViewOffset(width, height, 0, MathUtils.clamp(shift, -height, height), width, height);
+    // lo spostamento (orizzontale e verticale) non cambia la prospettiva: porta il centro del logo dove la pagina lo vuole
+    const shiftY = (height / 2 - this.slot.cy) * e;
+    const shiftX = (width / 2 - this.slot.cx) * e;
+    camera.setViewOffset(width, height, MathUtils.clamp(shiftX, -width, width), MathUtils.clamp(shiftY, -height, height), width, height);
     camera.updateMatrixWorld();
 
     for (let i = 0; i < 3; i++) {

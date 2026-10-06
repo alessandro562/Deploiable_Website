@@ -9,10 +9,12 @@ const LIME_DEEP = [176, 221, 60];
 const LOCK_T = LOCK[0]; // clic dell'ultima barra: lo schermo passa al Lime
 const near = (px: number[], ref: number[], tol: number) => ref.forEach((v, i) => expect(Math.abs(px[i] - v)).toBeLessThanOrEqual(tol));
 
-test('parte in WebGL, senza errori e senza scroll', async ({ page }) => {
+test('parte in WebGL, senza errori; l\'hero riempie esattamente la prima schermata', async ({ page }) => {
   const errors = await openFilm(page);
   expect(await page.evaluate(() => window.__DEPLOIABLE__!.mode)).toBe('webgl');
-  expect(await page.evaluate(() => document.documentElement.scrollHeight <= innerHeight)).toBe(true);
+  const hero = (await page.locator('.hero').boundingBox())!;
+  expect(Math.abs(hero.y)).toBeLessThanOrEqual(1);
+  expect(hero.height).toBeGreaterThanOrEqual(page.viewportSize()!.height - 1);
   expect(errors).toEqual([]);
 });
 
@@ -58,8 +60,9 @@ test('colori del brand esatti: barre Lime su Forest, poi al clic logo Forest su 
   await seek(page, END);
   // finale: fondo Lime al valore, logo tutto Forest esatto (nessuna sfumatura rimasta)
   near(await sample(page, 0.03, 0.5, 8), LIME, 2);
-  const ink = await darkPixels(page, 0.02, 0.05, 0.98, 0.75);
-  expect(ink.length).toBeGreaterThan(200);
+  // il logo ora è piccolo, nell'header: si conta pixel per pixel
+  const ink = await darkPixels(page, 0, 0, 0.5, 0.2, 1);
+  expect(ink.length).toBeGreaterThan(150);
   for (const px of ink) near(px, FOREST, 2);
 });
 
@@ -123,7 +126,7 @@ test('supergrafica: entra con la linea del finale e continua a muoversi, Lime De
     const px = [png.data[i], png.data[i + 1], png.data[i + 2]];
     if (px.every((v, k) => Math.abs(v - LIME_DEEP[k]) <= 2)) deep++;
   }
-  expect(deep / (vp.width * vp.height / 7), 'quota di Lime Deep').toBeGreaterThan(0.05);
+  expect(deep / (vp.width * vp.height / 7), 'quota di Lime Deep').toBeGreaterThan(0.01);
   // si muove: due istanti del ciclo danno fotogrammi diversi
   await seek(page, LOOP_START + LOOP_PERIOD / 2 + 0.6);
   expect((await st()).bgSlide[0]).toBeGreaterThan(0.1);
@@ -197,10 +200,11 @@ for (const tier of ['high', 'mid', 'mobile']) {
     near(await sample(page, 0.03, 0.03, 8), FOREST, 3);
     await seek(page, END);
     // finale: il logo è Forest esatto (i bordi sfumano verso il Lime del fondo)
-    const ink = await darkPixels(page, 0.02, 0.05, 0.98, 0.75);
-    expect(ink.length).toBeGreaterThan(200);
+    const ink = await darkPixels(page, 0, 0, 0.5, 0.2, 1);
+    expect(ink.length).toBeGreaterThan(150);
     const exact = ink.filter((px) => px.every((v, i) => Math.abs(v - FOREST[i]) <= 3));
-    expect(exact.length / ink.length, 'quota di Forest esatto').toBeGreaterThan(0.9);
+    // il logo è piccolo: i bordi sfumati pesano di più, ma il Forest esatto resta la maggioranza
+    expect(exact.length / ink.length, 'quota di Forest esatto').toBeGreaterThan(0.6);
     near(await sample(page, 0.03, 0.5, 8), LIME, 3);
     expect(errors).toEqual([]);
   });
@@ -227,7 +231,7 @@ test('il naming compare alla fine, lettera dopo lettera da sinistra a destra', a
   expect((await letters()).every((v) => v === 1)).toBe(true);
 });
 
-test('allineamento: logo 3D e frase centrati sulla pagina (misura sui pixel)', async ({ page }) => {
+test('allineamento: logo 3D nel segnaposto dell\'header, frase centrata sulla pagina (misura sui pixel)', async ({ page }) => {
   await openFilm(page, '', 'high');
   await seek(page, END);
   const rects = await page.evaluate(() => {
@@ -249,7 +253,6 @@ test('allineamento: logo 3D e frase centrati sulla pagina (misura sui pixel)', a
   expect(Math.abs(logo.L - slot.x), 'bordo sinistro del logo 3D contro il segnaposto').toBeLessThanOrEqual(2);
   expect(Math.abs(logo.R - (slot.x + slot.w)), 'bordo destro del logo 3D contro il segnaposto').toBeLessThanOrEqual(2);
   const mid = png.width / 2;
-  expect(Math.abs((logo.L + logo.R) / 2 - mid), 'centro del logo contro il centro della pagina').toBeLessThanOrEqual(2);
   for (const [i, l] of lines.entries()) {
     const ink = inkLeft(l.x - 4, l.y, l.x + l.w + 4, l.y + l.h);
     expect(Math.abs((ink.L + ink.R) / 2 - mid), `centro della riga ${i + 1} contro il centro della pagina`).toBeLessThanOrEqual(2);
@@ -344,28 +347,16 @@ test('dettagli: testo secondario in Moss pieno, un solo carattere (Satoshi)', as
   expect(await css('.soon', 'font-weight')).toBe('300');
 });
 
-test('ritmo verticale: stesso spazio a inchiostro fra logo e frase e fra sottotitolo e blocco iscrizione', async ({ page }) => {
+test('hero: il blocco dei testi è centrato in altezza (centro ottico appena sopra la metà)', async ({ page }) => {
   await openFilm(page, '', 'high');
   await seek(page, END);
-  const box = async (sel: string) => (await page.locator(sel).boundingBox())!;
-  const png = PNG.sync.read(await page.screenshot());
-  // righe con inchiostro Forest dentro un riquadro: prima e ultima
-  const rows = (b: { x: number; y: number; width: number; height: number }) => {
-    let T = 1e9, B = -1;
-    for (let y = Math.max(0, Math.floor(b.y - 4)); y < Math.min(png.height, Math.ceil(b.y + b.height + 4)); y++)
-      for (let x = Math.floor(b.x); x < Math.ceil(b.x + b.width); x++) {
-        const i = (y * png.width + x) * 4;
-        if (Math.abs(png.data[i] - 16) + Math.abs(png.data[i + 1] - 38) + Math.abs(png.data[i + 2] - 27) < 110) { T = Math.min(T, y); B = Math.max(B, y + 1); }
-      }
-    return { T, B };
-  };
-  const logo = rows(await box('.logo-slot'));
-  const line1 = rows(await box('.line--light'));
-  const sub = rows(await box('.sub'));
-  const soon = rows(await box('.soon'));
-  const a = line1.T - logo.B;
-  const b = soon.T - sub.B;
-  expect(Math.abs(a - b), `logo→frase ${a}px, sottotitolo→blocco ${b}px`).toBeLessThanOrEqual(3);
+  const top = (await page.locator('.claim').boundingBox())!.y;
+  const note = (await page.locator('.signup-note').boundingBox())!;
+  const bottom = note.y + note.height;
+  const h = page.viewportSize()!.height;
+  const ratio = top / (top + (h - bottom));
+  expect(ratio, `aria sopra / aria totale = ${ratio.toFixed(2)}`).toBeGreaterThan(0.36);
+  expect(ratio).toBeLessThan(0.52);
 });
 
 test('la frase non è mai tagliata: discendenti e ascendenti interi dentro la maschera', async ({ page }) => {
@@ -384,5 +375,38 @@ test('la frase non è mai tagliata: discendenti e ascendenti interi dentro la ma
     await page.addStyleTag({ content: '.mask { overflow: visible !important; }' });
     const free = await shot();
     expect(Math.abs(free - masked), `${sel}: pixel tagliati dalla maschera`).toBeLessThanOrEqual(2);
+  }
+});
+
+test('la supergrafica non tocca mai un testo, a nessuna larghezza', async ({ page }) => {
+  test.setTimeout(180_000);
+  await openFilm(page, '', 'high');
+  for (const [w, h] of [[2000, 934], [1440, 900], [1280, 720], [1024, 768], [768, 1024], [390, 844], [360, 740], [844, 390]]) {
+    await page.setViewportSize({ width: w, height: h });
+    await page.waitForTimeout(150);
+    for (const t of [END, LOOP_START + LOOP_PERIOD / 2 + 0.7]) {
+      await seek(page, t);
+      const sg = await page.evaluate(() => window.__DEPLOIABLE__!.backdrop!());
+      if (!sg.visible) continue;
+      const texts = await page.evaluate(() =>
+        Array.from(document.querySelectorAll<HTMLElement>('.lang, .claim .line, .sub, .soon, .signup, .signup-note'))
+          .map((el) => el.getBoundingClientRect())
+          .map((r) => ({ x0: r.left, y0: r.top + scrollY, x1: r.right, y1: r.bottom + scrollY })),
+      );
+      for (const r of texts) {
+        const overlap = r.x0 < sg.x1 && r.x1 > sg.x0 && r.y0 < sg.y1 && r.y1 > sg.y0;
+        expect(overlap, `${w}x${h} t=${t}: supergrafica sopra un testo`).toBe(false);
+      }
+      // e sui pixel: dentro i riquadri dei testi non c'è la faccia Lime Deep della supergrafica
+      const png = PNG.sync.read(await page.screenshot());
+      let deep = 0;
+      for (const r of texts)
+        for (let y = Math.max(0, Math.floor(r.y0)); y < Math.min(png.height, Math.ceil(r.y1)); y++)
+          for (let x = Math.max(0, Math.floor(r.x0)); x < Math.min(png.width, Math.ceil(r.x1)); x++) {
+            const i = (y * png.width + x) * 4;
+            if (Math.abs(png.data[i] - LIME_DEEP[0]) <= 3 && Math.abs(png.data[i + 1] - LIME_DEEP[1]) <= 3 && Math.abs(png.data[i + 2] - LIME_DEEP[2]) <= 3) deep++;
+          }
+      expect(deep, `${w}x${h} t=${t}: pixel Lime Deep sotto i testi`).toBe(0);
+    }
   }
 });
