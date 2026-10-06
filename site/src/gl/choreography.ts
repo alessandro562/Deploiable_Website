@@ -13,7 +13,7 @@ import { WORDMARK_COUNT } from './wordmark';
 //   4.6 – 6.6  Il logo      una linea a 8° attraversa lo schermo, la camera si ritira sul logo completo,
 //                           le lettere del naming si aprono una dopo l'altra, compare la frase, poi il modulo
 
-import { DURATION, LOCK, LOOP_PERIOD, LOOP_START, SILENZIO_A } from './timeline';
+import { DURATION, LOCK, LOOP_PERIOD, LOOP_START, SILENZIO_A, TW_EMPTY, TW_ERASE, TW_HOLD, TW_START, TW_TYPE } from './timeline';
 
 export { DURATION, LOCK, LOOP_PERIOD, LOOP_START, TIMES } from './timeline';
 
@@ -162,12 +162,15 @@ const loopPhase = (t: number) => (t < LOOP_START ? -1 : (t - LOOP_START) % LOOP_
 
 // Il logo: ogni ciclo le tre barre fanno un giro completo su se stesse (come nell'intro), sfalsate di 120 ms.
 // Il logo è piatto: ogni barra si chiude in una linea e si riapre. Fra un giro e l'altro è fermo e allineato.
-const ROLL_DUR = 0.9;
-const roll = (t: number, b: number) => {
-  const u = loopPhase(t);
-  if (u < 0) return 0;
+export const ROLL_DUR = 0.9;
+/** Il giro di una barra a partire dal suo inizio (u in secondi, b = barra: 120 ms di sfasamento). */
+export const rollAt = (u: number, b: number) => {
   const v = (u - 0.12 * b) / ROLL_DUR;
   return v > 0 && v < 1 ? -Math.PI * 2 * inOutCubic(v) : 0;
+};
+const roll = (t: number, b: number) => {
+  const u = loopPhase(t);
+  return u < 0 ? 0 : rollAt(u, b);
 };
 
 // La supergrafica: a metà ciclo le barre scivolano in avanti lungo gli 8° e tornano, sfalsate.
@@ -215,4 +218,25 @@ export function stateAt(t: number, s: SceneState): SceneState {
   s.bgRy = k * 0.2 * Math.sin((2 * Math.PI * w) / 11);
   s.bgRx = k * 0.1 * Math.sin((2 * Math.PI * w) / 7.3);
   return s;
+}
+
+/**
+ * Macchina da scrivere: quante lettere di `length` sono visibili al tempo t, e se il cursore è acceso.
+ * Prima di TW_START la parola è intera e senza cursore. Poi, in ciclo: ferma (cursore che lampeggia),
+ * cancellata da destra, pausa a vuoto, riscritta da sinistra.
+ */
+export function typewriter(t: number, length: number): { shown: number; caret: boolean } {
+  if (t < TW_START) return { shown: length, caret: false };
+  const erase = length * TW_ERASE;
+  const type = length * TW_TYPE;
+  const period = TW_HOLD + erase + TW_EMPTY + type;
+  const u = (t - TW_START) % period;
+  const blink = (x: number) => x % 1.06 < 0.53; // lampeggio del cursore, ~1 s
+  if (u < TW_HOLD) return { shown: length, caret: u > 0.4 && blink(u) };
+  let w = u - TW_HOLD;
+  if (w < erase) return { shown: length - Math.floor(w / TW_ERASE) - 1, caret: true };
+  w -= erase;
+  if (w < TW_EMPTY) return { shown: 0, caret: blink(w + 0.53) };
+  w -= TW_EMPTY;
+  return { shown: Math.min(length, Math.floor(w / TW_TYPE) + 1), caret: true };
 }

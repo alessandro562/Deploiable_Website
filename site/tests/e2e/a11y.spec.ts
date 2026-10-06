@@ -28,7 +28,7 @@ test('tastiera: ordine di tabulazione logico e focus sempre visibile', async ({ 
   await page.waitForFunction(() => window.__DEPLOIABLE__?.ready === true);
   await page.waitForTimeout(2500);
   const seen: string[] = [];
-  for (let i = 0; i < 8; i++) {
+  for (let i = 0; i < 9; i++) {
     await page.keyboard.press('Tab');
     await page.waitForTimeout(250); // il contorno del modulo compare con una transizione di 0,16 s
     const info = await page.evaluate(() => {
@@ -42,7 +42,7 @@ test('tastiera: ordine di tabulazione logico e focus sempre visibile', async ({ 
     seen.push(info.id);
     expect(info.visible, `focus non visibile su ${info.id}`).toBe(true);
   }
-  expect(seen).toEqual(['lang-it', 'lang-en', 'signup-email', 'signup-company', 'button', 'signup-consent', 'a-consent', 'foot-link']);
+  expect(seen).toEqual(['a', 'lang-it', 'lang-en', 'signup-email', 'signup-company', 'button', 'signup-consent', 'a-consent', 'foot-link']);
 });
 
 test('movimento ridotto: niente 3D, niente animazioni in loop', async ({ page }) => {

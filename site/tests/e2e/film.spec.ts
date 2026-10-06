@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { PNG } from 'pngjs';
-import { DURATION as END, LOCK, LOOP_PERIOD, LOOP_START, SILENZIO_A, TIMES } from '../../src/gl/timeline';
+import { DURATION as END, LOCK, LOOP_PERIOD, LOOP_START, SILENZIO_A, TIMES, TW_ERASE, TW_HOLD, TW_START } from '../../src/gl/timeline';
 import { brightPixels, brightness, canvasHash, darkPixels, maxChannels, openFilm, peakColumn, sample, seek } from './helpers';
 
 const LIME = [200, 242, 90];
@@ -476,4 +476,38 @@ test('prova sociale: riga di credibilità e cinque loghi sotto il modulo, nelle 
   expect(await page.locator('.proof').evaluate((el) => getComputedStyle(el).opacity)).toBe('1');
   await page.click('[data-lang="en"]');
   await expect(page.locator('.proof-line')).toHaveText('Since 2021, working with SMEs, corporates and startups');
+});
+
+test('macchina da scrivere: "deployable." si cancella e si riscrive in ciclo, senza spostare la riga', async ({ page }) => {
+  await openFilm(page, '', 'high');
+  const st = () => page.evaluate(() => window.__DEPLOIABLE__!.state!());
+  const visible = () => page.locator('.tw .ch:not(.off)').count();
+  // il titolo resta "Make AI deployable." per i lettori di schermo, qualunque cosa mostri la macchina da scrivere
+  await expect(page.getByRole('heading', { level: 1 })).toHaveAccessibleName(/Make AI\s*deployable\./);
+  await seek(page, END);
+  expect(await visible()).toBe(11);
+  const full = (await page.locator('.tw').boundingBox())!;
+  await seek(page, TW_START + TW_HOLD + TW_ERASE * 4.5);
+  expect((await st()).tw).toBe(6);
+  expect((await st()).caret).toBe(true);
+  expect(await visible()).toBe(6);
+  await expect(page.locator('.tw-caret')).toHaveClass(/on/);
+  // la parola non si ricentra mentre si cancella
+  const mid = (await page.locator('.tw').boundingBox())!;
+  expect(Math.abs(mid.x - full.x)).toBeLessThanOrEqual(0.5);
+  await seek(page, TW_START + TW_HOLD + TW_ERASE * 11 + 0.2);
+  expect((await st()).tw).toBe(0);
+  // e torna intera
+  await seek(page, TW_START + 20 * 3);
+  const back = await st();
+  expect(back.tw).toBeGreaterThanOrEqual(0);
+});
+
+test('il simbolo nell\'header gira quando ci si passa sopra col mouse', async ({ page }) => {
+  await openFilm(page, '', 'high');
+  await seek(page, LOOP_START + 2); // a metà ciclo: nessun giro automatico in corso
+  expect((await page.evaluate(() => window.__DEPLOIABLE__!.state!().roll)).every((v) => v === 0)).toBe(true);
+  await page.evaluate(() => window.__DEPLOIABLE__!.play!());
+  await page.hover('.logo-slot');
+  await expect.poll(async () => (await page.evaluate(() => window.__DEPLOIABLE__!.state!().roll)).some((v) => v !== 0), { timeout: 3000 }).toBe(true);
 });

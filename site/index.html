@@ -29,17 +29,17 @@
     <i class="sweep" aria-hidden="true"></i>
     <!-- supergrafica della versione statica (in quella 3D la disegna il canvas) -->
     <div class="sg-frame" aria-hidden="true"><!-- symbol:supergraphic --></div>
+    <!-- header: il logo piccolo in alto a sinistra. Nella versione 3D la camera finale lo inquadra esattamente
+         qui (il logo 3D "atterra" nel segnaposto); nella versione statica è il logo ufficiale. -->
+    <header class="top">
+      <a class="logo-slot" href="./" aria-label="Deploiable"><!-- logo:static-logo --></a>
+    </header>
     <!-- lingua: italiano predefinito, inglese a scelta (src/i18n.ts) -->
     <div class="lang" role="group" aria-label="Lingua" data-i18n-attr="aria-label:lang.group">
       <button type="button" data-lang="it" aria-pressed="true" lang="it">IT</button>
       <span aria-hidden="true">/</span>
       <button type="button" data-lang="en" aria-pressed="false" lang="en">EN</button>
     </div>
-    <!-- header: il logo piccolo in alto a sinistra. Nella versione 3D la camera finale lo inquadra esattamente
-         qui (il logo 3D "atterra" nel segnaposto); nella versione statica è il logo ufficiale. -->
-    <header class="top">
-      <div class="logo-slot"><!-- logo:static-logo --></div>
-    </header>
     <main class="page">
       <section class="hero">
         <h1 class="claim">
@@ -49,6 +49,7 @@
         <p class="sub" data-i18n="sub">Troviamo dove l’AI ripaga, costruiamo il prodotto e misuriamo il risultato.</p>
         <div class="outro">
           <p class="soon"><i class="soon-dot" aria-hidden="true"></i><span data-i18n="launch">Lancio · Novembre 2026</span></p>
+          <p class="offer" data-i18n="form.offer">Le prime 20 aziende ricevono una AI process review gratuita.</p>
           <form class="signup" novalidate>
             <div class="signup-row">
               <label class="sr-only" for="signup-email" data-i18n="form.email.label">Email aziendale</label>
@@ -67,7 +68,8 @@
             <input class="hp" name="_gotcha" type="text" tabindex="-1" autocomplete="off" aria-hidden="true" />
           </form>
           <p class="signup-done" aria-hidden="true"><svg class="check" viewBox="0 0 12 12"><path d="M2 6.3 4.8 9 10 3" /></svg><span data-i18n="form.done">Richiesta ricevuta.</span></p>
-          <p class="signup-note" role="status" aria-live="polite" data-i18n="form.offer">Le prime 20 aziende ricevono una AI process review gratuita.</p>
+          <!-- messaggi del modulo (errori, avvisi, conferma): vuoto finché non serve -->
+          <p class="signup-note" role="status" aria-live="polite"></p>
         </div>
         <!-- Prova sociale. Per mettere un logo vero: salvare il file in public/assets/clients/ (SVG o PNG, su fondo
              trasparente) e sostituire lo <span> segnaposto con
@@ -85,7 +87,8 @@
       </section>
     </main>
     <footer class="foot">
-      <p><span data-i18n="foot.legal">Deploiable è un marchio di WDA srl (Partita IVA: 15274611001 - Codice Fiscale: 15274611001, Via Marsala 29/H, 00185 Roma (RM), PEC: wdasrl@legalmail.it)</span> · <a href="privacy.html" data-i18n="foot.privacy">Privacy</a></p>
+      <p class="foot-legal" data-i18n="foot.legal">Deploiable è un marchio di WDA srl (Partita IVA: 15274611001 - Codice Fiscale: 15274611001, Via Marsala 29/H, 00185 Roma (RM), PEC: wdasrl@legalmail.it)</p>
+      <a class="foot-link" href="privacy.html" data-i18n="foot.privacy">Privacy</a>
     </footer>
 
     <script type="module" src="/src/main.ts"></script>

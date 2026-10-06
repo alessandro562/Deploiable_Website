@@ -84,12 +84,14 @@ p {
 
 .top {
   position: absolute;
-  z-index: 10;
+  z-index: 15; /* sopra l'hero (che parte da y = 0): il logo deve ricevere passaggio del mouse e clic */
   top: 0;
   left: 0;
   padding: max(var(--pad-top), env(safe-area-inset-top)) var(--pad-x) 0;
 }
 .logo-slot {
+  display: block;
+  border-radius: 4px;
   width: var(--logo-w);
   aspect-ratio: 514.158 / 97.3;
   color: var(--ink-strong);
@@ -160,6 +162,30 @@ p {
 .line {
   display: block;
   will-change: transform;
+}
+
+/* Macchina da scrivere su "deployable." (src/app.ts): le lettere cancellate tengono il loro posto, il cursore è
+   una barra sottile alta quanto le ascendenti, che scorre a scatti di lettera in lettera. */
+.tw {
+  position: relative;
+  display: inline-block;
+}
+.ch.off {
+  visibility: hidden;
+}
+.tw-caret {
+  position: absolute;
+  left: 0;
+  top: 0.12em;
+  width: 0.055em;
+  height: 0.74em;
+  margin-left: 0.05em;
+  border-radius: 0.03em;
+  background: currentColor;
+  opacity: 0;
+}
+.tw-caret.on {
+  opacity: 1;
 }
 
 /* ---------- Lingua: IT / EN, discreto in alto a destra ---------- */
@@ -238,13 +264,22 @@ p {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 18px;
+  margin-bottom: 12px;
   font: 300 13px/1 var(--sans);
   letter-spacing: 0.24em;
   text-transform: uppercase;
   /* la spaziatura aggiunge aria anche dopo l'ultima lettera: la si compensa per restare centrati */
   margin-right: -0.24em;
   color: var(--ink-strong);
+}
+.offer {
+  margin-bottom: 18px;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  text-align: center;
+  text-wrap: balance;
+  color: var(--ink-light);
 }
 .soon-dot {
   width: 6px;
@@ -346,8 +381,10 @@ p {
   display: flex;
   align-items: flex-start;
   gap: 10px;
-  max-width: 560px;
-  font-size: 13px;
+  /* allineato all'inizio del testo del primo campo, dentro la capsula */
+  align-self: stretch;
+  padding: 0 24px 0 25px;
+  font-size: 12.5px;
   font-weight: 500;
   line-height: 1.45;
   text-align: left;
@@ -357,7 +394,7 @@ p {
 .consent input {
   position: absolute;
   top: 0;
-  left: 0;
+  left: 25px;
   width: 20px;
   height: 20px;
   margin: 0;
@@ -432,6 +469,12 @@ p {
   .signup-divider {
     display: none;
   }
+  .consent {
+    padding: 0 4px;
+  }
+  .consent input {
+    left: 4px;
+  }
   .signup button {
     width: 100%;
     height: 52px;
@@ -502,7 +545,8 @@ p {
 }
 
 .signup-note {
-  margin-top: 14px;
+  min-height: 1.45em; /* lo spazio del messaggio è già riservato: il layout non salta quando compare */
+  margin-top: 10px;
   font: 500 13px/1.45 var(--sans);
   letter-spacing: 0.005em;
   text-align: center;
@@ -601,27 +645,45 @@ p {
   }
 }
 
-/* ---------- Footer: dati societari e privacy ---------- */
+/* ---------- Footer: dati societari e privacy, discreto ---------- */
 .foot {
   position: relative;
   z-index: 10;
-  padding: 28px var(--pad-x) max(28px, env(safe-area-inset-bottom));
-  border-top: 1px solid color-mix(in srgb, var(--ink-strong) 18%, transparent);
-  font-size: 12px;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px 32px;
+  padding: 16px var(--pad-x) max(16px, env(safe-area-inset-bottom));
+  font-size: 11px;
   font-weight: 500;
-  line-height: 1.6;
-  text-align: center;
+  line-height: 1.55;
+  letter-spacing: 0.01em;
   color: var(--ink-soft);
 }
-.foot p {
-  max-width: 880px;
-  margin: 0 auto;
+.foot-legal {
+  max-width: 1000px;
 }
-.foot a {
-  color: var(--ink-strong);
+.foot-link {
+  flex: none;
+  color: var(--ink-soft);
   text-decoration: underline;
-  text-underline-offset: 2px;
+  text-decoration-color: color-mix(in srgb, currentColor 45%, transparent);
+  text-underline-offset: 3px;
   text-decoration-thickness: 1px;
+  transition: color 0.16s ease, text-decoration-color 0.16s ease;
+}
+@media (hover: hover) {
+  .foot-link:hover {
+    color: var(--ink-strong);
+    text-decoration-color: currentColor;
+  }
+}
+@media (max-width: 640px) {
+  .foot {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
 }
 
 .hp,
@@ -765,12 +827,31 @@ p {
   animation: fade-up 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both;
 }
 .is-static .outro > :nth-child(1) { animation-delay: 1.5s; }
-.is-static .outro > :nth-child(2),
-.is-static .outro > :nth-child(3) { animation-delay: 1.58s; }
-.is-static .outro > :nth-child(4) { animation-delay: 1.66s; }
+.is-static .outro > :nth-child(2) { animation-delay: 1.56s; }
+.is-static .outro > :nth-child(3),
+.is-static .outro > :nth-child(4) { animation-delay: 1.62s; }
+.is-static .outro > :nth-child(5) { animation-delay: 1.68s; }
 @keyframes fade-up {
   from { opacity: 0; transform: translateY(0.6em); }
   to { opacity: 1; transform: none; }
+}
+/* Senza 3D: passando sul logo le tre barre fanno un piccolo salto in sequenza (120 ms, come la motion ufficiale). */
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .is-static .logo-slot:hover .bar,
+  .is-static .logo-slot:focus-visible .bar {
+    animation: bar-hop 0.5s cubic-bezier(0.3, 0.7, 0.3, 1) both;
+  }
+  .is-static .logo-slot:hover .bar-2,
+  .is-static .logo-slot:focus-visible .bar-2 {
+    animation-delay: 0.12s;
+  }
+  .is-static .logo-slot:hover .bar-3,
+  .is-static .logo-slot:focus-visible .bar-3 {
+    animation-delay: 0.24s;
+  }
+}
+@keyframes bar-hop {
+  40% { transform: translateY(-14%); }
 }
 @keyframes bar-in {
   from { transform: translateY(-40%); opacity: 0; }

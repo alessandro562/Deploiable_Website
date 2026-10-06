@@ -54,6 +54,9 @@ Parametri URL: `?tier=high|mid|mobile|minimal` (cambia solo nitidezza: densità 
 - **Modulo** (`src/signup.ts`): email aziendale, azienda, consenso privacy obbligatorio. Invio a Google Apps Script →
   Google Sheet (`integrations/apps-script/`), URL nella variabile di repository `SIGNUP_ENDPOINT`.
 - **Privacy**: `privacy.html` (bozza ex art. 13 GDPR, bilingue, da validare). Footer con i dati di WDA srl.
+- **Dettagli animati**: il simbolo nell'header gira su se stesso al passaggio del mouse (o al focus da tastiera;
+  nella versione statica le barre fanno un piccolo salto). "deployable." ha un effetto macchina da scrivere in
+  ciclo (tempi in `src/gl/timeline.ts`, `TW_*`), con la parola intera sempre disponibile ai lettori di schermo.
 - **QA**: `scripts/qa-shots.mjs` (screenshot a pagina intera, `PAGE=privacy.html` per l'informativa),
   `scripts/contrast.mjs` (contrasto WCAG di ogni testo). Screenshot e report in `qa/` alla radice del repo.
 

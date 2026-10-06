@@ -26,10 +26,10 @@ export function initSignup() {
   const trap = form.querySelector<HTMLInputElement>('.hp')!;
 
   // la nota mostra un messaggio del dizionario: cambiando lingua si ritraduce quello corrente
-  let shown: Key = 'form.offer';
-  const say = (key: Key) => {
+  let shown: Key | null = null;
+  const say = (key: Key | null) => {
     shown = key;
-    note.textContent = t(key);
+    note.textContent = key ? t(key) : '';
   };
   onLangChange(() => say(shown));
 
@@ -57,7 +57,7 @@ export function initSignup() {
       say('msg.personal');
     } else if (outro.dataset.state === 'warn') {
       setState();
-      say('form.offer');
+      say(null);
     }
   };
   email.addEventListener('blur', () => {
@@ -71,7 +71,7 @@ export function initSignup() {
       if (f.getAttribute('aria-invalid') !== 'true') return;
       f.removeAttribute('aria-invalid');
       setState();
-      say('form.offer');
+      say(null);
     });
   }
 

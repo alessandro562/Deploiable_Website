@@ -11,14 +11,14 @@
     <link rel="apple-touch-icon" href="apple-touch-icon.png" />
   </head>
   <body>
+    <header class="top">
+      <a class="logo-slot" href="./" aria-label="Deploiable"><!-- logo:static-logo --></a>
+    </header>
     <div class="lang" role="group" aria-label="Lingua" data-i18n-attr="aria-label:lang.group">
       <button type="button" data-lang="it" aria-pressed="true" lang="it">IT</button>
       <span aria-hidden="true">/</span>
       <button type="button" data-lang="en" aria-pressed="false" lang="en">EN</button>
     </div>
-    <header class="top">
-      <a class="logo-slot" href="./" aria-label="Deploiable"><!-- logo:static-logo --></a>
-    </header>
 
     <main class="doc-main">
       <p class="doc-draft" role="note">BOZZA — da validare legalmente prima della pubblicazione</p>
@@ -135,7 +135,8 @@
     </main>
 
     <footer class="foot">
-      <p><span data-i18n="foot.legal">Deploiable è un marchio di WDA srl (Partita IVA: 15274611001 - Codice Fiscale: 15274611001, Via Marsala 29/H, 00185 Roma (RM), PEC: wdasrl@legalmail.it)</span> · <a href="privacy.html" data-i18n="foot.privacy" aria-current="page">Privacy</a></p>
+      <p class="foot-legal" data-i18n="foot.legal">Deploiable è un marchio di WDA srl (Partita IVA: 15274611001 - Codice Fiscale: 15274611001, Via Marsala 29/H, 00185 Roma (RM), PEC: wdasrl@legalmail.it)</p>
+      <a class="foot-link" href="privacy.html" data-i18n="foot.privacy" aria-current="page">Privacy</a>
     </footer>
 
     <script type="module" src="/src/privacy.ts"></script>
