@@ -36,6 +36,7 @@ const DICT = {
     'msg.done': 'Ti contatteremo prima del lancio.',
     'msg.error': 'Qualcosa non ha funzionato. Riprova.',
     'msg.closed': 'Le iscrizioni aprono a brevissimo.',
+    'proof.line': 'Dal 2021 al fianco di PMI, corporate e startup',
   },
   en: {
     'meta.title': `Deploiable · ${TAGLINE}`,
@@ -54,6 +55,7 @@ const DICT = {
     'msg.done': 'We’ll be in touch before launch.',
     'msg.error': 'Something went wrong. Please try again.',
     'msg.closed': 'Sign-ups open very soon.',
+    'proof.line': 'Since 2021, working with SMEs, corporates and startups',
   },
 } satisfies Record<Lang, Record<string, string>>;
 

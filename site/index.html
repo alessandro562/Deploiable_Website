@@ -19,7 +19,7 @@
     <noscript>
       <style>
         .line { transform: none !important; }
-        .sub, .outro > * { opacity: 1 !important; }
+        .sub, .outro > *, .proof { opacity: 1 !important; }
         .outro { visibility: visible !important; }
       </style>
     </noscript>
@@ -58,6 +58,19 @@
           </form>
           <p class="signup-done" aria-hidden="true"><svg class="check" viewBox="0 0 12 12"><path d="M2 6.3 4.8 9 10 3" /></svg><span data-i18n="form.done">Sei in lista</span></p>
           <p class="signup-note" role="status" aria-live="polite" data-i18n="form.offer">Le prime 20 aziende ricevono una AI process review gratuita.</p>
+        </div>
+        <!-- Prova sociale. Per mettere un logo vero: salvare il file in public/assets/clients/ (SVG o PNG, su fondo
+             trasparente) e sostituire lo <span> segnaposto con
+             <img src="assets/clients/nome.svg" alt="Nome cliente" loading="lazy" />. Il colore lo uniforma il CSS. -->
+        <div class="proof">
+          <p class="proof-line" data-i18n="proof.line">Dal 2021 al fianco di PMI, corporate e startup</p>
+          <ul class="clients">
+            <li class="client"><span class="client-ph">[CLIENTE_1]</span></li>
+            <li class="client"><span class="client-ph">[CLIENTE_2]</span></li>
+            <li class="client"><span class="client-ph">[CLIENTE_3]</span></li>
+            <li class="client"><span class="client-ph">[CLIENTE_4]</span></li>
+            <li class="client"><span class="client-ph">[CLIENTE_5]</span></li>
+          </ul>
         </div>
       </section>
     </main>

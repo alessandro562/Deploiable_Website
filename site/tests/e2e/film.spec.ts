@@ -351,8 +351,8 @@ test('hero: il blocco dei testi è centrato in altezza (centro ottico appena sop
   await openFilm(page, '', 'high');
   await seek(page, END);
   const top = (await page.locator('.claim').boundingBox())!.y;
-  const note = (await page.locator('.signup-note').boundingBox())!;
-  const bottom = note.y + note.height;
+  const proof = (await page.locator('.proof').boundingBox())!;
+  const bottom = proof.y + proof.height;
   const h = page.viewportSize()!.height;
   const ratio = top / (top + (h - bottom));
   expect(ratio, `aria sopra / aria totale = ${ratio.toFixed(2)}`).toBeGreaterThan(0.36);
@@ -389,7 +389,7 @@ test('la supergrafica non tocca mai un testo, a nessuna larghezza', async ({ pag
       const sg = await page.evaluate(() => window.__DEPLOIABLE__!.backdrop!());
       if (!sg.visible) continue;
       const texts = await page.evaluate(() =>
-        Array.from(document.querySelectorAll<HTMLElement>('.lang, .claim .line, .sub, .soon, .signup, .signup-note'))
+        Array.from(document.querySelectorAll<HTMLElement>('.lang, .claim .line, .sub, .soon, .signup, .signup-note, .proof-line, .client'))
           .map((el) => el.getBoundingClientRect())
           .map((r) => ({ x0: r.left, y0: r.top + scrollY, x1: r.right, y1: r.bottom + scrollY })),
       );
@@ -409,4 +409,17 @@ test('la supergrafica non tocca mai un testo, a nessuna larghezza', async ({ pag
       expect(deep, `${w}x${h} t=${t}: pixel Lime Deep sotto i testi`).toBe(0);
     }
   }
+});
+
+test('prova sociale: riga di credibilità e cinque loghi sotto il modulo, nelle due lingue', async ({ page }) => {
+  await openFilm(page, '', 'high');
+  await seek(page, END);
+  await expect(page.locator('.proof-line')).toHaveText('Dal 2021 al fianco di PMI, corporate e startup');
+  await expect(page.locator('.clients .client')).toHaveCount(5);
+  const form = (await page.locator('.signup').boundingBox())!;
+  const proof = (await page.locator('.proof').boundingBox())!;
+  expect(proof.y).toBeGreaterThan(form.y + form.height);
+  expect(await page.locator('.proof').evaluate((el) => getComputedStyle(el).opacity)).toBe('1');
+  await page.click('[data-lang="en"]');
+  await expect(page.locator('.proof-line')).toHaveText('Since 2021, working with SMEs, corporates and startups');
 });
