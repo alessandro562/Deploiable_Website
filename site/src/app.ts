@@ -77,7 +77,7 @@ export async function start(caps: Capabilities) {
     backdrop.apply(state, engine.bgCamera, engine.width, engine.height);
     claim.forEach((el, i) => {
       const p = Math.min(1, Math.max(0, state.claim * 1.25 - i * 0.25));
-      el.style.transform = `translate3d(0, ${((1 - p) * 110).toFixed(2)}%, 0)`;
+      el.style.transform = `translate3d(0, ${((1 - p) * 150).toFixed(2)}%, 0)`;
     });
     // "Coming soon", modulo e nota: entrano uno dopo l'altro (80 ms), salendo di poco; finché sono invisibili
     // non si possono raggiungere col tab
@@ -98,7 +98,7 @@ export async function start(caps: Capabilities) {
   measureSlot();
   // Stato iniziale: testo nascosto prima del primo disegno, poi si attende font e shader.
   stateAt(0, state);
-  claim.forEach((el) => (el.style.transform = 'translate3d(0, 110%, 0)'));
+  claim.forEach((el) => (el.style.transform = 'translate3d(0, 150%, 0)'));
   await document.fonts.ready;
   // Riscaldamento: shader e geometrie vengono compilati e caricati sulla GPU ora, con la pagina ancora
   // nel Forest iniziale, così nessun scatto arriva all'incastro (9,2 s) o al lampo (10,2 s).

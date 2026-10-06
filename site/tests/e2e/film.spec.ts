@@ -18,11 +18,11 @@ test('parte in WebGL, senza errori e senza scroll', async ({ page }) => {
 
 test('suspense: nessun testo finché le barre non scattano al loro posto', async ({ page }) => {
   await openFilm(page);
-  // il browser normalizza lo stile in "translate3d(0px, 110%, 0px)": si legge la percentuale verticale
+  // il browser normalizza lo stile in "translate3d(0px, 150%, 0px)": si legge la percentuale verticale
   const offset = () =>
     page.evaluate(() => Array.from(document.querySelectorAll<HTMLElement>('.line')).map((l) => parseFloat(/,\s*(-?[\d.]+)%/.exec(l.style.transform)?.[1] ?? 'NaN')));
   const subHidden = () => page.locator('.sub').evaluate((el) => getComputedStyle(el).opacity === '0');
-  const hidden = async () => (await offset()).every((v) => v === 110) && (await subHidden());
+  const hidden = async () => (await offset()).every((v) => v === 150) && (await subHidden());
   for (const t of [0.8, TIMES.segreto, TIMES.deploy, TIMES.silenzio, SILENZIO_A + 0.4]) {
     await seek(page, t);
     expect(await hidden(), `t=${t}`).toBe(true);
@@ -366,4 +366,23 @@ test('ritmo verticale: stesso spazio a inchiostro fra logo e frase e fra sottoti
   const a = line1.T - logo.B;
   const b = soon.T - sub.B;
   expect(Math.abs(a - b), `logo→frase ${a}px, sottotitolo→blocco ${b}px`).toBeLessThanOrEqual(3);
+});
+
+test('la frase non è mai tagliata: discendenti e ascendenti interi dentro la maschera', async ({ page }) => {
+  await openFilm(page, '', 'high');
+  await seek(page, END);
+  for (const sel of ['.line--light', '.line--black']) {
+    // l'inchiostro della riga, misurato senza maschera, deve coincidere con quello visibile
+    const shot = async () => {
+      const b = (await page.locator(sel).boundingBox())!;
+      const png = PNG.sync.read(await page.screenshot({ clip: { x: b.x - 20, y: b.y - 40, width: b.width + 40, height: b.height + 80 } }));
+      let n = 0;
+      for (let i = 0; i < png.data.length; i += 4) if (png.data[i] + png.data[i + 1] + png.data[i + 2] < 160) n++;
+      return n;
+    };
+    const masked = await shot();
+    await page.addStyleTag({ content: '.mask { overflow: visible !important; }' });
+    const free = await shot();
+    expect(Math.abs(free - masked), `${sel}: pixel tagliati dalla maschera`).toBeLessThanOrEqual(2);
+  }
 });
