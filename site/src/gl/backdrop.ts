@@ -3,7 +3,7 @@ import type { SceneState } from './choreography';
 import { BarGeometry } from './symbol/barGeometry';
 import { createBarMaterial, setPalette } from './symbol/barMaterial';
 import { PIVOT, SYMBOL_H, SYMBOL_W, TAN8 } from './symbol/symbolSpec';
-import { TONE_PALETTES, type PaletteName } from '../config/brand';
+import { TONE_PALETTES, TONE_SOFT_LIME, type PaletteName } from '../config/brand';
 
 // La supergrafica (brand book, 05 · Elementi grafici): il simbolo ingrandito e tagliato dal bordo, tono su tono,
 // a tutto campo e anche dietro al testo. In 3D: faccia frontale nel colore pieno, pareti appena in rilievo.
@@ -29,7 +29,15 @@ export class Backdrop {
   setPalette(name: PaletteName) {
     if (name === this.palette) return;
     this.palette = name;
-    for (const b of this.bars) setPalette(b.mat, TONE_PALETTES[name]);
+    this.paint();
+  }
+
+  /** Telefono: niente spazio libero dai testi, la supergrafica va dietro in tono leggerissimo. */
+  private soft = false;
+  private paint() {
+    if (!this.palette) return;
+    const p = this.soft && this.palette === 'lime' ? TONE_SOFT_LIME : TONE_PALETTES[this.palette];
+    for (const b of this.bars) setPalette(b.mat, p);
   }
 
   /** Per il disegno di riscaldamento: compila lo shader anche se la supergrafica non è ancora entrata. */
@@ -38,7 +46,8 @@ export class Backdrop {
   }
 
   /** Riquadro (pixel CSS, coordinate della pagina) occupato dalla supergrafica visibile: per i test. */
-  box = { x0: 0, y0: 0, x1: 0, y1: 0, visible: false };
+  box = { x0: 0, y0: 0, x1: 0, y1: 0, visible: false, soft: false };
+  private offsetY = 0;
 
   /**
    * La supergrafica sta nell'angolo in basso a destra dell'hero, tagliata dal bordo destro, e non tocca mai un testo:
@@ -66,8 +75,19 @@ export class Backdrop {
       if (hits(mid)) hi = mid;
       else lo = mid;
     }
-    this.sizePx = lo >= Math.max(90, height * 0.14) ? lo : 0;
-    this.box = { ...boxFor(this.sizePx), visible: this.sizePx > 0 };
+    const fits = lo >= Math.max(90, height * 0.14);
+    const soft = !fits && (width <= 820 || height > width);
+    this.sizePx = fits ? lo : soft ? Math.min(height * 0.7, (width * 0.6) / BLEED_IN / ratio) : 0;
+    // in modalità soft il simbolo si centra in altezza sull'area dei testi dell'hero
+    const heroTexts = texts.filter((r) => r.y0 < height);
+    const mid = heroTexts.length ? (Math.min(...heroTexts.map((r) => r.y0)) + Math.max(...heroTexts.map((r) => r.y1))) / 2 : height / 2;
+    this.offsetY = soft ? Math.min(0, mid + this.sizePx / 2 - height) : 0;
+    if (soft !== this.soft) {
+      this.soft = soft;
+      this.paint();
+    }
+    const b = boxFor(this.sizePx);
+    this.box = { x0: b.x0, y0: b.y0 + this.offsetY, x1: b.x1, y1: b.y1 + this.offsetY, visible: this.sizePx > 0, soft };
   }
 
   private sizePx = 0;
@@ -87,7 +107,7 @@ export class Backdrop {
     const w = h * (SYMBOL_W / SYMBOL_H);
     const g = (h * k) / SYMBOL_H; // scala del simbolo
     const cx = width - w * BLEED_IN + w / 2;
-    const cy = height - h / 2 - scrollY;
+    const cy = height - h / 2 + this.offsetY - scrollY;
     this.group.position.set((cx - width / 2) * k, (height / 2 - cy) * k, 0);
     this.group.rotation.set(s.bgRx, s.bgRy, 0);
     // più sottile del logo: in grande lo spessore pieno diventerebbe un muro, qui deve restare una texture

@@ -11,7 +11,7 @@ interface DeploiableHooks {
   play?: () => void;
   /** Stato corrente dell'animazione (solo per i test). */
   /** Riquadro (pixel CSS, coordinate della pagina) della supergrafica visibile. */
-  backdrop?: () => { x0: number; y0: number; x1: number; y1: number; visible: boolean };
+  backdrop?: () => { x0: number; y0: number; x1: number; y1: number; visible: boolean; soft: boolean };
   state?: () => { tw: number; caret: boolean; t: number; roll: number[]; bgIn: number[]; bgSlide: number[]; sweep: number[]; letters: number[] };
 }
 
