@@ -598,6 +598,12 @@ p {
   margin-top: calc(var(--gap) * 0.6);
   opacity: 0; /* entra per ultima, con il blocco iscrizione (src/app.ts) */
 }
+.proof-num {
+  /* il numero è la prova: Black, nel verde del testo principale */
+  font-weight: 900;
+  letter-spacing: -0.01em;
+  color: var(--ink-strong);
+}
 .proof-line {
   font-size: 13px;
   font-weight: 500;
