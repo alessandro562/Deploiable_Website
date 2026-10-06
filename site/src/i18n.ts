@@ -9,10 +9,10 @@
 
 export type Lang = 'it' | 'en';
 
-/** Mese di lancio: l'unico punto da cambiare se la data si sposta. */
-export const LAUNCH: Record<Lang, string> = { it: 'Novembre 2026', en: 'November 2026' };
+/** Etichetta del lancio: niente data per ora, solo "Coming soon" (in maiuscolo dal CSS), uguale nelle due lingue. */
+export const LAUNCH = 'Coming soon';
 
-const TAGLINE = 'Make AI deployable.'; // resta in inglese in entrambe le lingue: il gioco di parole vive solo così
+const TAGLINE = 'We make AI deployable.'; // resta in inglese in entrambe le lingue: il gioco di parole vive solo così
 const SUB = {
   it: 'Troviamo dove l’AI ripaga, costruiamo il prodotto e misuriamo il risultato.',
   en: 'We find where AI pays off, build the product, and measure the result.',
@@ -21,11 +21,11 @@ const SUB = {
 const DICT = {
   it: {
     'meta.title': `Deploiable · ${TAGLINE}`,
-    'meta.description': `${TAGLINE} ${SUB.it} Lancio a ${LAUNCH.it.toLowerCase()}.`,
-    'og.description': `${SUB.it} Lancio a ${LAUNCH.it.toLowerCase()}.`,
+    'meta.description': `${TAGLINE} ${SUB.it} Coming soon.`,
+    'og.description': `${SUB.it} Coming soon.`,
     'lang.group': 'Lingua',
     sub: SUB.it,
-    launch: `Lancio · ${LAUNCH.it}`,
+    launch: LAUNCH,
     'form.email.label': 'Email aziendale',
     'form.email.placeholder': 'nome@azienda.it',
     'form.company.label': 'Azienda',
@@ -53,11 +53,11 @@ const DICT = {
   },
   en: {
     'meta.title': `Deploiable · ${TAGLINE}`,
-    'meta.description': `${TAGLINE} ${SUB.en} Launching ${LAUNCH.en}.`,
-    'og.description': `${SUB.en} Launching ${LAUNCH.en}.`,
+    'meta.description': `${TAGLINE} ${SUB.en} Coming soon.`,
+    'og.description': `${SUB.en} Coming soon.`,
     'lang.group': 'Language',
     sub: SUB.en,
-    launch: `Launching ${LAUNCH.en}`,
+    launch: LAUNCH,
     'form.email.label': 'Work email',
     'form.email.placeholder': 'name@company.com',
     'form.company.label': 'Company',

@@ -2,7 +2,7 @@
 
 Landing pre-lancio: una sola schermata, nessuno scroll, nessuna interazione. Le tre barre del simbolo
 giocano da sole in 3D finché non scattano al loro posto; poi compare la frase.
-Titolo: **Make AI deployable.** (in inglese): il nome è la promessa. Sottotitolo: "We find where AI pays off,
+Titolo: **We make AI deployable.** (in inglese): il nome è la promessa. Sottotitolo: "We find where AI pays off,
 build the product, and measure the result." Sotto, il blocco pre-lancio: "Launching October 2026", modulo email
 ("Claim your spot") e l'offerta "The first 20 companies get a free AI process review."
 
@@ -49,8 +49,8 @@ Parametri URL: `?tier=high|mid|mobile|minimal` (cambia solo nitidezza: densità 
 ## Lingue, modulo, privacy
 
 - **Bilingue**: italiano predefinito, inglese col selettore IT / EN (`src/i18n.ts`: dizionario, attributi `data-i18n`,
-  scelta salvata per la sessione; `?lang=en` per forzarla). L'headline "Make AI deployable." resta in inglese.
-  Il mese di lancio è la costante `LAUNCH`.
+  scelta salvata per la sessione; `?lang=en` per forzarla). L'headline "We make AI deployable." resta in inglese.
+  L'etichetta del lancio è la costante `LAUNCH` (oggi solo "Coming soon", senza data).
 - **Modulo** (`src/signup.ts`): email aziendale, azienda, consenso privacy obbligatorio. Invio a Google Apps Script →
   Google Sheet (`integrations/apps-script/`), URL nella variabile di repository `SIGNUP_ENDPOINT`.
 - **Privacy**: `privacy.html` (bozza ex art. 13 GDPR, bilingue, da validare). Footer con i dati di WDA srl.
