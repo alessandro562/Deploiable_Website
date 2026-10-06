@@ -32,6 +32,7 @@ export class Stage {
   private readonly letterMat: ShaderMaterial;
   private slot: LogoSlot = { cx: 0, cy: 0, w: 1 };
   private palette: PaletteName | null = null;
+  private hidden = false;
 
   constructor(scene: Scene) {
     for (let i = 0; i < 3; i++) {
@@ -61,6 +62,11 @@ export class Stage {
   /** Il segnaposto del logo cambia con le dimensioni della finestra: la camera finale si adatta. */
   setSlot(slot: LogoSlot) {
     this.slot = slot;
+  }
+
+  /** A pagina scorsa il logo dell'header lo mostra l'SVG sopra la barra di vetro: il 3D si nasconde. */
+  setHidden(hidden: boolean) {
+    this.hidden = hidden;
   }
 
   /** Rende visibili tutti gli oggetti: serve al disegno di riscaldamento, per compilare ogni shader in anticipo. */
@@ -112,6 +118,7 @@ export class Stage {
       l.mesh.position.set(l.center[0], l.center[1], 0);
     });
     this.letterMat.uniforms.uCam.value.copy(camera.position);
+    this.group.visible = !this.hidden;
     this.group.scale.z = Math.max(s.flatten, 0.001);
     this.group.updateMatrixWorld();
   }

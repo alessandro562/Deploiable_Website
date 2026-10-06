@@ -34,6 +34,12 @@ test('privacy.html: bozza bilingue nello stile della landing, lingua condivisa c
   // sfondo Lime, testo Forest come la landing
   expect(await page.evaluate(() => getComputedStyle(document.body).backgroundColor)).toBe('rgb(200, 242, 90)');
 
+  // header fisso: scorrendo diventa una barra di vetro
+  await page.evaluate(() => scrollTo(0, 600));
+  await expect(page.locator('html')).toHaveClass(/is-scrolled/);
+  expect((await page.locator('.top').boundingBox())!.y).toBe(0);
+  await page.evaluate(() => scrollTo(0, 0));
+
   await page.click('[data-lang="en"]');
   await expect(page.locator('.doc-body[lang="en"] h1')).toHaveText('Privacy notice');
   await expect(page).toHaveTitle('Privacy notice · Deploiable');

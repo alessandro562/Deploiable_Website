@@ -6,3 +6,8 @@ import './styles/doc.css';
 import { initI18n } from './i18n';
 
 initI18n();
+
+// header fisso: scorrendo diventa una barra di vetro, come sulla landing
+const onScroll = () => document.documentElement.classList.toggle('is-scrolled', window.scrollY > 2);
+window.addEventListener('scroll', onScroll, { passive: true });
+onScroll();

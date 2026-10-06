@@ -410,6 +410,12 @@ test('hero: il blocco dei testi è centrato in altezza (centro ottico appena sop
   const proof = (await page.locator('.proof').boundingBox())!;
   const bottom = proof.y + proof.height;
   const h = page.viewportSize()!.height;
+  // su telefono i testi sono più alti dello schermo: conta l'aria fra l'header e la frase, non il centro
+  if (page.viewportSize()!.width <= 640) {
+    const logo = (await page.locator('.logo-slot').boundingBox())!;
+    expect(top - (logo.y + logo.height), 'aria fra header e frase').toBeGreaterThan(56);
+    return;
+  }
   const ratio = top / (top + (h - bottom));
   expect(ratio, `aria sopra / aria totale = ${ratio.toFixed(2)}`).toBeGreaterThan(0.36);
   expect(ratio).toBeLessThan(0.52);
@@ -513,6 +519,30 @@ test('su telefono la supergrafica dietro ai testi non toglie contrasto (≥ 4,5:
       }
     }
   }
+});
+
+test('header fisso: in cima trasparente col logo 3D, scorrendo barra di vetro col logo SVG', async ({ page }) => {
+  await openFilm(page, '', 'high');
+  await seek(page, END);
+  const root = page.locator('html');
+  const svgOpacity = () => page.evaluate(() => getComputedStyle(document.querySelector('.logo-slot svg')!).opacity);
+  const glass = () => page.evaluate(() => getComputedStyle(document.querySelector('.top')!, '::before').opacity);
+  await expect(root).not.toHaveClass(/is-scrolled/);
+  expect(await svgOpacity()).toBe('0');
+  await page.evaluate(() => scrollTo(0, 400));
+  await expect(root).toHaveClass(/is-scrolled/);
+  await expect(root).toHaveClass(/is-docked/);
+  expect((await page.locator('.top').boundingBox())!.y).toBe(0);
+  expect(await page.evaluate(() => getComputedStyle(document.querySelector('.top')!, '::before').backdropFilter)).toContain('blur');
+  expect(await svgOpacity()).toBe('1');
+  await expect.poll(glass).toBe('1');
+  // IT / EN sta dentro la barra
+  const bar = (await page.locator('.top').boundingBox())!;
+  const lang = (await page.locator('.lang').boundingBox())!;
+  expect(lang.y + lang.height).toBeLessThanOrEqual(bar.y + bar.height);
+  await page.evaluate(() => scrollTo(0, 0));
+  await expect(root).not.toHaveClass(/is-docked/);
+  expect(await svgOpacity()).toBe('0');
 });
 
 test('prova sociale: riga di credibilità e loghi dei clienti in loop sotto il modulo', async ({ page }) => {
