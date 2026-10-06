@@ -46,6 +46,20 @@ node scripts/make-posters.mjs                                     # public/og.jp
 
 Parametri URL: `?tier=high|mid|mobile|minimal` (cambia solo nitidezza: densità di pixel e antialiasing), `?mode=static`, `?palette=forest|lime|flip` (barre Lime su Forest, barre Forest su Lime, oppure Forest che passa a Lime al clic dell'ultima barra; predefinito: `flip`, impostato in `src/app.ts`), `?__test=1` (hook per i test).
 
+## Lingue, modulo, privacy
+
+- **Bilingue**: italiano predefinito, inglese col selettore IT / EN (`src/i18n.ts`: dizionario, attributi `data-i18n`,
+  scelta salvata per la sessione; `?lang=en` per forzarla). L'headline "Make AI deployable." resta in inglese.
+  Il mese di lancio è la costante `LAUNCH`.
+- **Modulo** (`src/signup.ts`): email aziendale, azienda, consenso privacy obbligatorio. Invio a Google Apps Script →
+  Google Sheet (`integrations/apps-script/`), URL nella variabile di repository `SIGNUP_ENDPOINT`.
+- **Privacy**: `privacy.html` (bozza ex art. 13 GDPR, bilingue, da validare). Footer con i dati di WDA srl.
+- **Dettagli animati**: il simbolo nell'header gira su se stesso al passaggio del mouse (o al focus da tastiera;
+  nella versione statica le barre fanno un piccolo salto). "deployable." ha un effetto macchina da scrivere in
+  ciclo (tempi in `src/gl/timeline.ts`, `TW_*`), con la parola intera sempre disponibile ai lettori di schermo.
+- **QA**: `scripts/qa-shots.mjs` (screenshot a pagina intera, `PAGE=privacy.html` per l'informativa),
+  `scripts/contrast.mjs` (contrasto WCAG di ogni testo). Screenshot e report in `qa/` alla radice del repo.
+
 ## Struttura
 
 - `src/gl/symbol/symbolSpec.ts` · il simbolo, dal generatore del brand book (`geo()`): identico all'SVG ufficiale.

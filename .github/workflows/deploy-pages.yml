@@ -33,7 +33,7 @@ jobs:
       - run: npm run build
         env:
           BASE_PATH: /${{ github.event.repository.name }}/
-          # indirizzo del modulo d'iscrizione (es. Formspree): Settings → Secrets and variables → Actions → Variables
+          # URL della web app Google Apps Script che riceve le richieste (site/integrations/apps-script/README.md)
           VITE_SIGNUP_ENDPOINT: ${{ vars.SIGNUP_ENDPOINT }}
       - uses: actions/upload-pages-artifact@v3
         with:

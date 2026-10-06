@@ -8,7 +8,7 @@ const gz = (f) => gzipSync(readFileSync(new URL(f, dir))).length / 1024;
 const sum = (re) => files.filter((f) => re.test(f)).reduce((s, f) => s + gz(f), 0);
 
 const checks = [
-  ['JS di ingresso', sum(/^index-.*\.js$/), 60],
+  ['JS delle pagine (landing, privacy, comune)', sum(/^(main|privacy|i18n)-.*\.js$/), 60],
   ['JS animazione (three + gsap)', sum(/^app-.*\.js$/), 190],
   ['CSS', sum(/\.css$/), 20],
 ];

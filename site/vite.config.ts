@@ -25,6 +25,12 @@ function brandHtml(): Plugin {
 export default defineConfig({
   base: process.env.BASE_PATH ?? '/',
   plugins: [brandHtml()],
-  build: { target: 'es2022', assetsInlineLimit: 0, chunkSizeWarningLimit: 900 },
+  build: {
+    target: 'es2022',
+    assetsInlineLimit: 0,
+    chunkSizeWarningLimit: 900,
+    // due pagine: la landing e l'informativa privacy
+    rollupOptions: { input: { main: 'index.html', privacy: 'privacy.html' } },
+  },
   server: { host: true },
 });

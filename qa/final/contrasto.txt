@@ -1,0 +1,59 @@
+# Contrasto WCAG — prima (Moss #4F6A55) e dopo (Moss scurito #3F5A46)
+
+## Prima
+
+== index.html
+✓  12.4:1  button.button                12px   900  rgb(16, 38, 27) su rgb(200, 242, 90)
+✓  4.63:1  button.button                12px   500  rgb(79, 106, 85) su rgb(200, 242, 90)
+✓  12.4:1  span.line                    121.5px 300  rgb(16, 38, 27) su rgb(200, 242, 90)
+✓  12.4:1  p.sub                        20.655px 500  rgb(16, 38, 27) su rgb(200, 242, 90)
+✓  12.4:1  p.soon                       13px   300  rgb(16, 38, 27) su rgb(200, 242, 90)
+✓  12.4:1  input.input                  16px   500  rgb(16, 38, 27) su rgb(200, 242, 90)
+✓  4.63:1  input::placeholder           16px   500  rgb(79, 106, 85) su rgb(200, 242, 90)
+✓  12.4:1  button.button                14px   900  rgb(200, 242, 90) su rgb(16, 38, 27)
+✓  4.63:1  span.consent-text            13px   500  rgb(79, 106, 85) su rgb(200, 242, 90)
+✓  12.4:1  a.a                          13px   500  rgb(16, 38, 27) su rgb(200, 242, 90)
+✓  4.63:1  p.signup-note                13px   500  rgb(79, 106, 85) su rgb(200, 242, 90)
+✓  4.63:1  p.proof-line                 13px   500  rgb(79, 106, 85) su rgb(200, 242, 90)
+✓  4.63:1  span.client-ph               12px   500  rgb(79, 106, 85) su rgb(200, 242, 90)
+✓  4.63:1  p.p                          12px   500  rgb(79, 106, 85) su rgb(200, 242, 90)
+
+== privacy.html
+✓  12.4:1  button.button                12px   900  rgb(16, 38, 27) su rgb(200, 242, 90)
+✓  4.63:1  button.button                12px   500  rgb(79, 106, 85) su rgb(200, 242, 90)
+✓  12.4:1  p.doc-draft                  13px   900  rgb(200, 242, 90) su rgb(16, 38, 27)
+✓  12.4:1  p.doc-lead                   18px   300  rgb(16, 38, 27) su rgb(200, 242, 90)
+✓  12.4:1  h2.h2                        18px   900  rgb(16, 38, 27) su rgb(200, 242, 90)
+✓  12.4:1  p.p                          16px   500  rgb(16, 38, 27) su rgb(200, 242, 90)
+✓  4.63:1  p.doc-updated                14px   500  rgb(79, 106, 85) su rgb(200, 242, 90)
+✓  12.4:1  a.a                          15px   500  rgb(16, 38, 27) su rgb(200, 242, 90)
+✓  4.63:1  p.p                          12px   500  rgb(79, 106, 85) su rgb(200, 242, 90)
+
+## Dopo
+
+== index.html
+✓  12.4:1  button.button                12px   900  rgb(16, 38, 27) su rgb(200, 242, 90)
+✓   5.9:1  button.button                12px   500  rgb(63, 90, 70) su rgb(200, 242, 90)
+✓  12.4:1  span.line                    121.5px 300  rgb(16, 38, 27) su rgb(200, 242, 90)
+✓  12.4:1  p.sub                        20.655px 500  rgb(16, 38, 27) su rgb(200, 242, 90)
+✓  12.4:1  p.soon                       13px   300  rgb(16, 38, 27) su rgb(200, 242, 90)
+✓  12.4:1  input.input                  16px   500  rgb(16, 38, 27) su rgb(200, 242, 90)
+✓   5.9:1  input::placeholder           16px   500  rgb(63, 90, 70) su rgb(200, 242, 90)
+✓  12.4:1  button.button                14px   900  rgb(200, 242, 90) su rgb(16, 38, 27)
+✓   5.9:1  span.consent-text            13px   500  rgb(63, 90, 70) su rgb(200, 242, 90)
+✓  12.4:1  a.a                          13px   500  rgb(16, 38, 27) su rgb(200, 242, 90)
+✓   5.9:1  p.signup-note                13px   500  rgb(63, 90, 70) su rgb(200, 242, 90)
+✓   5.9:1  p.proof-line                 13px   500  rgb(63, 90, 70) su rgb(200, 242, 90)
+✓   5.9:1  span.client-ph               12px   500  rgb(63, 90, 70) su rgb(200, 242, 90)
+✓   5.9:1  p.p                          12px   500  rgb(63, 90, 70) su rgb(200, 242, 90)
+
+== privacy.html
+✓  12.4:1  button.button                12px   900  rgb(16, 38, 27) su rgb(200, 242, 90)
+✓   5.9:1  button.button                12px   500  rgb(63, 90, 70) su rgb(200, 242, 90)
+✓  12.4:1  p.doc-draft                  13px   900  rgb(200, 242, 90) su rgb(16, 38, 27)
+✓  12.4:1  p.doc-lead                   18px   300  rgb(16, 38, 27) su rgb(200, 242, 90)
+✓  12.4:1  h2.h2                        18px   900  rgb(16, 38, 27) su rgb(200, 242, 90)
+✓  12.4:1  p.p                          16px   500  rgb(16, 38, 27) su rgb(200, 242, 90)
+✓   5.9:1  p.doc-updated                14px   500  rgb(63, 90, 70) su rgb(200, 242, 90)
+✓  12.4:1  a.a                          15px   500  rgb(16, 38, 27) su rgb(200, 242, 90)
+✓   5.9:1  p.p                          12px   500  rgb(63, 90, 70) su rgb(200, 242, 90)

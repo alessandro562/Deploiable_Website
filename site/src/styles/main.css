@@ -6,6 +6,8 @@
   --pine: #1c3a2a;
   --moss: #4f6a55;
   --sage: #8fa596;
+  /* Moss scurito per il testo piccolo su Lime: stessa tinta del brand, contrasto 5,9:1 invece di 4,63:1 */
+  --moss-ink: #3f5a46;
   /* colori della pagina: cambiano con la palette (html[data-palette]) */
   --bg: var(--forest);
   --ink-light: var(--mist);
@@ -15,15 +17,15 @@
   --ink-hover: var(--lime-deep);
   --sans: 'Satoshi', 'Helvetica Neue', Arial, sans-serif;
 
-  /* Composizione del finale: il logo orizzontale in alto, la frase sotto, tutto centrato sulla pagina.
-     La larghezza del logo è l'unica misura: la camera 3D inquadra il segnaposto .logo-slot (src/gl/stage.ts). */
-  /* la larghezza dipende anche dall'altezza: il blocco intero (logo, frase, sottotitolo, modulo) occupa al massimo
-     circa due terzi dello schermo, così su finestre larghe e basse resta centrato con aria sopra e sotto */
-  --logo-w: min(88vw, max(52vw, 360px), calc(110svh - 260px));
-  /* corpo della frase: 1/9 del logo (1/7 su schermi verticali) */
-  --claim-fs: calc(var(--logo-w) / 9);
-  /* spazio fra logo, frase e blocco iscrizione */
-  --gap: calc(var(--logo-w) / 14);
+  /* Il protagonista è la frase "Make AI deployable.": il suo corpo è la misura di tutto il resto.
+     Dipende da larghezza e altezza, così l'hero sta sempre in una schermata con aria sopra e sotto. */
+  --claim-fs: clamp(44px, min(15vw, 13.5svh), 144px);
+  /* spazio fra frase, sottotitolo e blocco iscrizione */
+  --gap: calc(var(--claim-fs) * 0.42);
+  /* il logo nell'header: piccolo, in alto a sinistra (la camera 3D finale lo inquadra qui, src/gl/stage.ts) */
+  --logo-w: clamp(116px, 10vw, 156px);
+  --pad-x: clamp(16px, 4vw, 48px);
+  --pad-top: clamp(18px, 3.2vw, 32px);
   color-scheme: dark;
 }
 
@@ -33,7 +35,7 @@ html[data-palette='lime'] {
   --ink-light: var(--forest);
   --ink-strong: var(--forest);
   --sweep-color: var(--forest);
-  --ink-soft: var(--moss); /* testo secondario su fondo chiaro (brand: Moss, AA) */
+  --ink-soft: var(--moss-ink); /* testo secondario su fondo chiaro: Moss scurito (AA con margine) */
   --ink-hover: var(--pine);
   color-scheme: light;
 }
@@ -47,8 +49,6 @@ html[data-palette='lime'] {
 html,
 body {
   margin: 0;
-  height: 100%;
-  overflow: hidden;
   background: var(--bg);
   overscroll-behavior: none;
   -webkit-text-size-adjust: 100%;
@@ -80,25 +80,19 @@ p {
   margin: 0;
 }
 
-/* ---------- La pila: logo, frase, CTA ---------- */
+/* ---------- Header: il logo piccolo in alto a sinistra ---------- */
 
-.stack {
-  position: fixed;
-  z-index: 10;
+.top {
+  position: absolute;
+  z-index: 15; /* sopra l'hero (che parte da y = 0): il logo deve ricevere passaggio del mouse e clic */
   top: 0;
-  bottom: 0;
-  left: calc((100vw - var(--logo-w)) / 2);
-  width: var(--logo-w);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: var(--gap);
-  /* il centro ottico sta un po' sopra il centro geometrico */
-  padding-bottom: 3svh;
+  left: 0;
+  padding: max(var(--pad-top), env(safe-area-inset-top)) var(--pad-x) 0;
 }
-
 .logo-slot {
-  width: 100%;
+  display: block;
+  border-radius: 4px;
+  width: var(--logo-w);
   aspect-ratio: 514.158 / 97.3;
   color: var(--ink-strong);
 }
@@ -112,7 +106,24 @@ p {
   opacity: 0;
 }
 
-/* Titoli a sinistra, due pesi di Satoshi (300 + 900): la parte leggera introduce, quella pesante dice la cosa. */
+/* ---------- Hero: una schermata, la frase protagonista ---------- */
+
+.page {
+  position: relative;
+  z-index: 10;
+}
+.hero {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--gap);
+  /* sopra lo spazio dell'header; sotto un po' di più: il centro ottico sta sopra il centro geometrico */
+  padding: calc(var(--pad-top) + var(--logo-w) * 0.19 + 24px) var(--pad-x) calc(var(--pad-top) + var(--logo-w) * 0.19 + 24px + 4svh);
+}
+
+/* La frase, due pesi di Satoshi (300 + 900): la parte leggera introduce, quella pesante dice la cosa. */
 .claim {
   display: flex;
   flex-direction: column;
@@ -122,7 +133,7 @@ p {
   letter-spacing: -0.045em;
   font-weight: 300;
   white-space: nowrap;
-  /* la frase è centrata sulla pagina (e quindi sul logo, che è centrato anche lui) */
+  /* la frase è centrata sulla pagina */
   text-align: center;
 }
 .line--light {
@@ -153,12 +164,75 @@ p {
   will-change: transform;
 }
 
+/* Macchina da scrivere su "deployable." (src/app.ts): le lettere cancellate tengono il loro posto, il cursore è
+   una barra sottile alta quanto le ascendenti, che scorre a scatti di lettera in lettera. */
+.tw {
+  position: relative;
+  display: inline-block;
+}
+.ch.off {
+  visibility: hidden;
+}
+.tw-caret {
+  position: absolute;
+  left: 0;
+  top: 0.12em;
+  width: 0.055em;
+  height: 0.74em;
+  margin-left: 0.05em;
+  border-radius: 0.03em;
+  background: currentColor;
+  opacity: 0;
+}
+.tw-caret.on {
+  opacity: 1;
+}
+
+/* ---------- Lingua: IT / EN, discreto in alto a destra ---------- */
+.lang {
+  position: fixed;
+  z-index: 20;
+  /* allineato in verticale al logo dell'header (alto circa 0,19 × la sua larghezza) */
+  top: max(calc(var(--pad-top) + var(--logo-w) * 0.095 - 22px), env(safe-area-inset-top));
+  right: max(calc(var(--pad-x) - 8px), env(safe-area-inset-right));
+  display: flex;
+  align-items: center;
+  font: 500 12px/1 var(--sans);
+  letter-spacing: 0.14em;
+  color: var(--ink-soft);
+}
+.lang button {
+  /* area di tocco 44×44 anche se la scritta è piccola */
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 6px;
+  border: 0;
+  background: none;
+  font: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+  cursor: pointer;
+  transition: color 0.16s ease;
+}
+.lang button[aria-pressed='true'] {
+  color: var(--ink-strong);
+  font-weight: 900;
+}
+@media (hover: hover) {
+  .lang button:hover {
+    color: var(--ink-strong);
+  }
+}
+.lang span {
+  opacity: 0.6;
+}
+
 /* ---------- Sottotitolo ---------- */
 /* Dice per chi e cosa si ottiene: il metodo in tre verbi. Più vicino alla frase che al blocco iscrizione. */
 .sub {
   margin: calc(var(--gap) * -0.55) auto 0;
   max-width: min(100%, 36em);
-  font-size: clamp(15px, calc(var(--claim-fs) * 0.25), 21px);
+  font-size: clamp(16px, calc(var(--claim-fs) * 0.17), 22px);
   font-weight: 500;
   line-height: 1.4;
   letter-spacing: -0.01em;
@@ -190,13 +264,22 @@ p {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 18px;
+  margin-bottom: 12px;
   font: 300 13px/1 var(--sans);
   letter-spacing: 0.24em;
   text-transform: uppercase;
   /* la spaziatura aggiunge aria anche dopo l'ultima lettera: la si compensa per restare centrati */
   margin-right: -0.24em;
   color: var(--ink-strong);
+}
+.offer {
+  margin-bottom: 18px;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  text-align: center;
+  text-wrap: balance;
+  color: var(--ink-light);
 }
 .soon-dot {
   width: 6px;
@@ -212,11 +295,19 @@ p {
 }
 
 .signup {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  width: min(100%, 760px);
+}
+/* Desktop: una capsula sola con i due campi e il pulsante. */
+.signup-row {
   position: relative;
   display: flex;
   align-items: center;
-  width: min(100%, 420px);
-  height: 52px;
+  width: 100%;
+  height: 56px;
   padding: 5px;
   border-radius: 999px;
   /* il bordo è un'ombra: quando diventa più spesso (errore) il layout non si muove di un pixel */
@@ -225,14 +316,14 @@ p {
   outline-offset: 3px;
   transition: box-shadow 0.16s var(--ease), outline-color 0.16s var(--ease);
 }
-.signup:focus-within {
+.signup-row:focus-within {
   outline-color: var(--ink-strong);
 }
-.signup input[type='email'] {
-  flex: 1;
+.signup-row input {
+  flex: 1 1 0;
   min-width: 0;
   height: 100%;
-  padding: 0 12px 0 17px;
+  padding: 0 14px 0 20px;
   border: 0;
   border-radius: 999px;
   background: transparent;
@@ -242,9 +333,18 @@ p {
   letter-spacing: -0.005em;
   outline: none;
 }
-.signup input[type='email']::placeholder {
+.signup-row input[name='email'] {
+  flex-grow: 1.35;
+}
+.signup-row input::placeholder {
   color: var(--ink-soft);
   opacity: 1;
+}
+.signup-divider {
+  flex: none;
+  width: 1px;
+  height: 22px;
+  background: var(--ink-soft);
 }
 /* autocompilazione del browser: niente fondo azzurro o giallo, testo Forest */
 .signup input:-webkit-autofill,
@@ -256,15 +356,17 @@ p {
   flex: none;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
   height: 100%;
-  padding: 0 18px 0 20px;
+  padding: 0 20px 0 22px;
   border: 0;
   border-radius: 999px;
   background: var(--ink-strong);
   color: var(--bg);
   font: 900 14px/1 var(--sans);
   letter-spacing: -0.01em;
+  white-space: nowrap;
   cursor: pointer;
   transition: background-color 0.16s var(--ease), transform 0.16s var(--ease);
 }
@@ -272,6 +374,113 @@ p {
   outline: 2px solid var(--bg);
   outline-offset: -5px;
 }
+
+/* Consenso privacy: casella personalizzata, la casella vera resta accessibile (sotto, invisibile). */
+.consent {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  /* allineato all'inizio del testo del primo campo, dentro la capsula */
+  align-self: stretch;
+  padding: 0 24px 0 25px;
+  font-size: 12.5px;
+  font-weight: 500;
+  line-height: 1.45;
+  text-align: left;
+  color: var(--ink-soft);
+  cursor: pointer;
+}
+.consent input {
+  position: absolute;
+  top: 0;
+  left: 25px;
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.consent-box {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  margin-top: -1px;
+  border-radius: 5px;
+  box-shadow: inset 0 0 0 1.5px var(--ink-strong);
+  transition: background-color 0.16s var(--ease);
+}
+.consent-box svg {
+  width: 12px;
+  height: 12px;
+  fill: none;
+  stroke: var(--bg);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0;
+}
+.consent input:checked + .consent-box {
+  background: var(--ink-strong);
+}
+.consent input:checked + .consent-box svg {
+  opacity: 1;
+}
+.consent input:focus-visible + .consent-box {
+  outline: 2px solid var(--ink-strong);
+  outline-offset: 3px;
+}
+.consent input[aria-invalid='true'] + .consent-box {
+  box-shadow: inset 0 0 0 2.5px var(--ink-strong);
+}
+.consent a {
+  color: var(--ink-strong);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-decoration-thickness: 1px;
+}
+
+/* Telefono: i campi in colonna, pulsante a tutta larghezza, ogni bersaglio di tocco almeno 44 px. */
+@media (max-width: 640px) {
+  .signup-row {
+    flex-direction: column;
+    gap: 10px;
+    height: auto;
+    padding: 0;
+    border-radius: 0;
+    box-shadow: none;
+    outline: none;
+  }
+  .signup-row input {
+    flex: none;
+    width: 100%;
+    height: 52px;
+    border-radius: 999px;
+    box-shadow: inset 0 0 0 1.5px var(--ink-strong);
+    outline: 2px solid transparent;
+    outline-offset: 3px;
+    transition: box-shadow 0.16s var(--ease), outline-color 0.16s var(--ease);
+  }
+  .signup-row input:focus {
+    outline-color: var(--ink-strong);
+  }
+  .signup-divider {
+    display: none;
+  }
+  .consent {
+    padding: 0 4px;
+  }
+  .consent input {
+    left: 4px;
+  }
+  .signup button {
+    width: 100%;
+    height: 52px;
+  }
+}
+
 .arrow,
 .check {
   width: 12px;
@@ -306,9 +515,22 @@ p {
   to { transform: translateX(3px); }
 }
 
-/* Errore: bordo più spesso e una breve vibrazione orizzontale. */
-.outro[data-state='error'] .signup {
+/* Errore: bordo più spesso e una breve vibrazione orizzontale sul campo da correggere. */
+.outro[data-state='error'] .signup-row:has([aria-invalid='true']) {
   box-shadow: inset 0 0 0 2.5px var(--ink-strong);
+  animation: shake 0.36s var(--ease);
+}
+@media (max-width: 640px) {
+  .outro[data-state='error'] .signup-row:has([aria-invalid='true']) {
+    box-shadow: none;
+    animation: none;
+  }
+  .outro[data-state='error'] .signup-row input[aria-invalid='true'] {
+    box-shadow: inset 0 0 0 2.5px var(--ink-strong);
+    animation: shake 0.36s var(--ease);
+  }
+}
+.outro[data-state='error'] .consent:has([aria-invalid='true']) {
   animation: shake 0.36s var(--ease);
 }
 @keyframes shake {
@@ -317,12 +539,14 @@ p {
   60% { transform: translateX(-3px); }
   80% { transform: translateX(2px); }
 }
-.outro[data-state='error'] .signup-note {
+.outro[data-state='error'] .signup-note,
+.outro[data-state='warn'] .signup-note {
   color: var(--ink-strong);
 }
 
 .signup-note {
-  margin-top: 14px;
+  min-height: 1.45em; /* lo spazio del messaggio è già riservato: il layout non salta quando compare */
+  margin-top: 10px;
   font: 500 13px/1.45 var(--sans);
   letter-spacing: 0.005em;
   text-align: center;
@@ -363,6 +587,105 @@ p {
   to { stroke-dashoffset: 0; }
 }
 
+/* ---------- Prova sociale: una riga e cinque loghi, sotto il modulo ---------- */
+.proof {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  width: min(100%, 720px);
+  margin-top: calc(var(--gap) * 0.6);
+  opacity: 0; /* entra per ultima, con il blocco iscrizione (src/app.ts) */
+}
+.proof-line {
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.005em;
+  text-align: center;
+  color: var(--ink-soft);
+}
+.clients {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 14px 36px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.client {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+}
+/* loghi veri: in scala di grigi, scuriti verso il verde del brand, opacità ridotta; altezza uniforme */
+.client img {
+  display: block;
+  height: 26px;
+  width: auto;
+  max-width: 120px;
+  object-fit: contain;
+  filter: grayscale(1) brightness(0.35);
+  mix-blend-mode: multiply;
+  opacity: 0.7;
+}
+/* segnaposto finché non arrivano i loghi */
+.client-ph {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  /* Moss pieno, non opacità: resta leggibile (AA) anche se è solo un segnaposto */
+  color: var(--ink-soft);
+}
+@media (max-width: 480px) {
+  .clients {
+    gap: 10px 22px;
+  }
+}
+
+/* ---------- Footer: dati societari e privacy, discreto ---------- */
+.foot {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px 32px;
+  padding: 16px var(--pad-x) max(16px, env(safe-area-inset-bottom));
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.55;
+  letter-spacing: 0.01em;
+  color: var(--ink-soft);
+}
+.foot-legal {
+  max-width: 1000px;
+}
+.foot-link {
+  flex: none;
+  color: var(--ink-soft);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, currentColor 45%, transparent);
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+  transition: color 0.16s ease, text-decoration-color 0.16s ease;
+}
+@media (hover: hover) {
+  .foot-link:hover {
+    color: var(--ink-strong);
+    text-decoration-color: currentColor;
+  }
+}
+@media (max-width: 640px) {
+  .foot {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+}
+
 .hp,
 .sr-only {
   position: absolute;
@@ -374,17 +697,13 @@ p {
 }
 
 /* Schermi bassi (telefono in orizzontale): logo più piccolo, così logo, frase e modulo stanno tutti dentro. */
-@media (max-height: 520px) {
-  :root {
-    --logo-w: min(88vw, 72svh);
-  }
-  .stack {
-    padding-bottom: 0;
-  }
-  .signup,
+@media (max-height: 520px) and (min-width: 641px) {
+  .signup-row,
   .signup-done {
-    height: 44px;
+    height: 48px;
   }
+}
+@media (max-height: 520px) {
   .soon {
     margin-bottom: 10px;
   }
@@ -393,16 +712,10 @@ p {
   }
 }
 
-/* Su schermi verticali (telefono) il logo occupa quasi tutta la larghezza e sotto c'è molto spazio:
-   la frase è più grande, in proporzione. */
 @media (max-aspect-ratio: 1/1) {
-  /* in verticale c'è molta altezza libera: frase più grande e più respiro fra i blocchi */
+  /* in verticale c'è molta altezza libera: più respiro fra i blocchi */
   :root {
-    --claim-fs: calc(var(--logo-w) / 6.2);
-    --gap: calc(var(--logo-w) / 9.5);
-  }
-  .sub {
-    font-size: 16px;
+    --gap: calc(var(--claim-fs) * 0.55);
   }
 }
 
@@ -447,22 +760,32 @@ p {
 .supergraphic {
   display: none;
 }
-.is-static .supergraphic {
-  display: block;
-  position: fixed;
+.sg-frame {
+  /* cornice grande quanto l'hero: taglia la supergrafica al bordo senza allargare la pagina */
+  position: absolute;
   z-index: 0;
-  right: -12vw;
-  bottom: -38svh;
-  height: 140svh;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100svh;
+  overflow: hidden;
+  pointer-events: none;
+}
+.is-static .supergraphic {
+  /* nell'angolo in basso a destra dell'hero, tagliato dal bordo destro, lontano dai testi */
+  --sg-h: min(58svh, 30vw);
+  display: block;
+  position: absolute;
+  top: calc(100svh - var(--sg-h));
+  right: calc(var(--sg-h) * -0.2);
+  height: var(--sg-h);
   width: auto;
   color: var(--lime-deep);
   pointer-events: none;
 }
 @media (max-aspect-ratio: 1/1) {
   .is-static .supergraphic {
-    right: -60vw;
-    bottom: -30svh;
-    height: 95svh;
+    --sg-h: min(20svh, 40vw);
   }
 }
 
@@ -491,6 +814,10 @@ p {
 .is-static .outro {
   visibility: visible;
 }
+.is-static .proof {
+  opacity: 1;
+  animation: fade-up 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) 1.74s both;
+}
 .is-static .sub {
   opacity: 1;
   animation: fade-up 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) 1.35s both;
@@ -500,12 +827,31 @@ p {
   animation: fade-up 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both;
 }
 .is-static .outro > :nth-child(1) { animation-delay: 1.5s; }
-.is-static .outro > :nth-child(2),
-.is-static .outro > :nth-child(3) { animation-delay: 1.58s; }
-.is-static .outro > :nth-child(4) { animation-delay: 1.66s; }
+.is-static .outro > :nth-child(2) { animation-delay: 1.56s; }
+.is-static .outro > :nth-child(3),
+.is-static .outro > :nth-child(4) { animation-delay: 1.62s; }
+.is-static .outro > :nth-child(5) { animation-delay: 1.68s; }
 @keyframes fade-up {
   from { opacity: 0; transform: translateY(0.6em); }
   to { opacity: 1; transform: none; }
+}
+/* Senza 3D: passando sul logo le tre barre fanno un piccolo salto in sequenza (120 ms, come la motion ufficiale). */
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .is-static .logo-slot:hover .bar,
+  .is-static .logo-slot:focus-visible .bar {
+    animation: bar-hop 0.5s cubic-bezier(0.3, 0.7, 0.3, 1) both;
+  }
+  .is-static .logo-slot:hover .bar-2,
+  .is-static .logo-slot:focus-visible .bar-2 {
+    animation-delay: 0.12s;
+  }
+  .is-static .logo-slot:hover .bar-3,
+  .is-static .logo-slot:focus-visible .bar-3 {
+    animation-delay: 0.24s;
+  }
+}
+@keyframes bar-hop {
+  40% { transform: translateY(-14%); }
 }
 @keyframes bar-in {
   from { transform: translateY(-40%); opacity: 0; }
@@ -522,6 +868,7 @@ p {
   .is-static .line,
   .is-static .outro > *,
   .is-static .sub,
+  .is-static .proof,
   .outro[data-state] .signup,
   .outro[data-state] .signup-done,
   .soon-dot {

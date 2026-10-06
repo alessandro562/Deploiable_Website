@@ -23,3 +23,11 @@ export const TIMES = {
 /** Dopo la fine, tutto continua a muoversi in un ciclo di LOOP_PERIOD secondi che parte a LOOP_START. */
 export const LOOP_PERIOD = 5;
 export const LOOP_START = DURATION + 1.2;
+
+/** Macchina da scrivere su "deployable.": dopo TW_START, in ciclo. Ferma per TW_HOLD a parola intera, poi
+ *  si cancella lettera per lettera, una pausa a vuoto, si riscrive lettera per lettera. */
+export const TW_START = DURATION + 3;
+export const TW_HOLD = 5.2;
+export const TW_ERASE = 0.065; // secondi per lettera cancellata (più veloce: si cancella di getto)
+export const TW_EMPTY = 0.55; // pausa con la riga vuota (solo il cursore)
+export const TW_TYPE = 0.115; // secondi per lettera scritta

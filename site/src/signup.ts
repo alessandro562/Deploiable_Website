@@ -1,14 +1,18 @@
-// Iscrizione alla lista per il lancio. Il modulo invia l'email con una POST (FormData) all'indirizzo in
-// VITE_SIGNUP_ENDPOINT, impostato al momento della build: funziona così con Formspree e servizi simili, che
-// rispondono in JSON a "Accept: application/json". Senza indirizzo il modulo non finge di funzionare: lo dice.
+// Richiesta della AI process review: email aziendale, nome azienda, consenso privacy.
+//
+// Invio: Google Apps Script pubblicato come web app (vedi integrations/apps-script/README.md). L'URL arriva al
+// momento della build da VITE_SIGNUP_ENDPOINT (variabile di repository SIGNUP_ENDPOINT nel workflow di deploy).
+// Apps Script non permette di leggere la risposta da un altro dominio: la richiesta parte in modalità "no-cors" e
+// la conferma si mostra quando l'invio non dà errori di rete. Senza URL il modulo non finge di funzionare: lo dice.
+import { onLangChange, t, type Key } from './i18n';
+
 const ENDPOINT: string | undefined = import.meta.env.VITE_SIGNUP_ENDPOINT;
 
-const MESSAGES = {
-  invalid: 'Please enter a valid email address.',
-  sending: 'Saving your spot…',
-  done: 'We’ll be in touch before launch.',
-  error: 'Something went wrong. Please try again.',
-  closed: 'Sign-ups open very soon.',
+/** Provider di posta personale: non bloccano l'invio, ma suggeriscono di usare l'email aziendale. */
+const PERSONAL = ['gmail', 'googlemail', 'hotmail', 'libero', 'yahoo', 'outlook', 'live', 'icloud', 'me'];
+export const isPersonalEmail = (email: string) => {
+  const domain = email.split('@')[1]?.toLowerCase() ?? '';
+  return PERSONAL.some((p) => domain === `${p}.com` || domain === `${p}.it` || domain.startsWith(`${p}.`));
 };
 
 export function initSignup() {
@@ -16,59 +20,102 @@ export function initSignup() {
   const form = document.querySelector<HTMLFormElement>('.signup');
   const note = document.querySelector<HTMLElement>('.signup-note');
   if (!outro || !form || !note) return;
-  const email = form.querySelector<HTMLInputElement>('input[type="email"]')!;
+  const email = form.querySelector<HTMLInputElement>('[name="email"]')!;
+  const company = form.querySelector<HTMLInputElement>('[name="company"]')!;
+  const consent = form.querySelector<HTMLInputElement>('[name="consent"]')!;
   const trap = form.querySelector<HTMLInputElement>('.hp')!;
-  const say = (text: string) => (note.textContent = text);
-  const DEFAULT_NOTE = note.textContent ?? '';
+
+  // la nota mostra un messaggio del dizionario: cambiando lingua si ritraduce quello corrente
+  let shown: Key | null = null;
+  const say = (key: Key | null) => {
+    shown = key;
+    note.textContent = key ? t(key) : '';
+  };
+  onLangChange(() => say(shown));
+
+  const setState = (state?: 'error' | 'warn' | 'done') => {
+    if (state) outro.dataset.state = state;
+    else delete outro.dataset.state;
+  };
+
+  // Errore: bordo più spesso e una vibrazione (CSS) sul campo da correggere, che riceve il focus.
+  function fail(key: Key, field: HTMLInputElement) {
+    for (const f of [email, company, consent]) f.toggleAttribute('aria-invalid', f === field);
+    field.setAttribute('aria-invalid', 'true');
+    setState();
+    void outro!.offsetWidth; // fa ripartire la vibrazione anche al secondo errore di fila
+    setState('error');
+    say(key);
+    field.focus();
+  }
+
+  // Avviso morbido: email personale. Non blocca nulla.
+  const warnIfPersonal = () => {
+    if (outro.dataset.state === 'error' || !email.checkValidity() || !email.value) return;
+    if (isPersonalEmail(email.value)) {
+      setState('warn');
+      say('msg.personal');
+    } else if (outro.dataset.state === 'warn') {
+      setState();
+      say(null);
+    }
+  };
+  email.addEventListener('blur', () => {
+    email.value = email.value.trim();
+    warnIfPersonal();
+  });
+
+  // Ritoccando un campo in errore si torna allo stato normale.
+  for (const f of [email, company, consent]) {
+    f.addEventListener(f === consent ? 'change' : 'input', () => {
+      if (f.getAttribute('aria-invalid') !== 'true') return;
+      f.removeAttribute('aria-invalid');
+      setState();
+      say(null);
+    });
+  }
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     if (form.getAttribute('aria-busy') === 'true') return;
     email.value = email.value.trim();
-    if (!email.checkValidity()) {
-      email.setAttribute('aria-invalid', 'true');
-      fail(MESSAGES.invalid);
-      email.focus();
-      return;
-    }
-    email.removeAttribute('aria-invalid');
-    if (outro.dataset.state === 'error') delete outro.dataset.state;
-    // un bot ha riempito il campo nascosto: lo si saluta come un iscritto, senza inviare nulla
+    company.value = company.value.trim();
+    if (!email.value || !email.checkValidity()) return fail('msg.invalid', email);
+    if (!company.value) return fail('msg.company', company);
+    if (!consent.checked) return fail('msg.consent', consent);
+    for (const f of [email, company, consent]) f.removeAttribute('aria-invalid');
+    setState();
+
+    // un bot ha riempito il campo nascosto: lo si saluta come un utente, senza inviare nulla
     if (trap.value) return finish();
 
     const endpoint = form.dataset.endpoint || ENDPOINT;
-    if (!endpoint) return say(MESSAGES.closed);
+    if (!endpoint) return say('msg.closed');
 
+    const body = new URLSearchParams({
+      email: email.value,
+      company: company.value,
+      consent: 'si',
+      consent_text: `${t('form.consent.pre')}${t('form.consent.link')}${t('form.consent.post')}`,
+      lang: document.documentElement.lang,
+      page: location.href,
+    });
     form.setAttribute('aria-busy', 'true');
-    say(MESSAGES.sending);
+    say('msg.sending');
     try {
-      const res = await fetch(endpoint, { method: 'POST', body: new FormData(form), headers: { Accept: 'application/json' } });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      await fetch(endpoint, { method: 'POST', mode: 'no-cors', body });
       finish();
     } catch {
-      fail(MESSAGES.error);
+      setState('error');
+      say('msg.error');
     } finally {
       form.removeAttribute('aria-busy');
     }
   });
 
-  // Errore: bordo più spesso e una vibrazione (CSS). Ritoccando l'email si torna allo stato normale.
-  function fail(text: string) {
-    delete outro!.dataset.state;
-    void outro!.offsetWidth; // fa ripartire la vibrazione anche al secondo errore di fila
-    outro!.dataset.state = 'error';
-    say(text);
-  }
-  email.addEventListener('input', () => {
-    if (outro.dataset.state !== 'error') return;
-    delete outro.dataset.state;
-    email.removeAttribute('aria-invalid');
-    say(DEFAULT_NOTE);
-  });
-
   function finish() {
-    outro!.dataset.state = 'done';
+    setState('done');
     outro!.querySelector('.signup-done')?.removeAttribute('aria-hidden');
-    say(MESSAGES.done);
+    say('msg.done');
   }
 }

@@ -1,8 +1,10 @@
 import './styles/fonts.css';
 import './styles/main.css';
 import { detect } from './core/capabilities';
+import { initI18n } from './i18n';
 import { initSignup } from './signup';
 
+initI18n();
 initSignup();
 const caps = detect();
 const root = document.documentElement;

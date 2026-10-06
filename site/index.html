@@ -4,11 +4,13 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>Deploiable · Make AI deployable.</title>
-    <meta name="description" content="Make AI deployable. We find where AI pays off, build the product, and measure the result. Launching October 2026." />
+    <meta name="description" content="Make AI deployable. Troviamo dove l’AI ripaga, costruiamo il prodotto e misuriamo il risultato. Lancio a novembre 2026." data-i18n-attr="content:meta.description" />
     <meta name="theme-color" content="#10261B" />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="Deploiable · Make AI deployable." />
-    <meta property="og:description" content="We find where AI pays off, build the product, and measure the result. Launching October 2026." />
+    <meta property="og:title" content="Deploiable · Make AI deployable." data-i18n-attr="content:meta.title" />
+    <meta property="og:description" content="Troviamo dove l’AI ripaga, costruiamo il prodotto e misuriamo il risultato. Lancio a novembre 2026." data-i18n-attr="content:og.description" />
+    <meta property="og:locale" content="it_IT" />
+    <meta property="og:locale:alternate" content="en_GB" />
     <meta property="og:image" content="%VITE_SITE_URL%og.jpg" />
     <meta property="og:url" content="%VITE_SITE_URL%" />
     <meta name="twitter:card" content="summary_large_image" />
@@ -17,7 +19,7 @@
     <noscript>
       <style>
         .line { transform: none !important; }
-        .sub, .outro > * { opacity: 1 !important; }
+        .sub, .outro > *, .proof { opacity: 1 !important; }
         .outro { visibility: visible !important; }
       </style>
     </noscript>
@@ -26,29 +28,68 @@
     <canvas class="gl" aria-hidden="true"></canvas>
     <i class="sweep" aria-hidden="true"></i>
     <!-- supergrafica della versione statica (in quella 3D la disegna il canvas) -->
-    <!-- symbol:supergraphic -->
-    <main class="stack">
-      <!-- Il segnaposto del logo: nella versione 3D la camera finale lo inquadra esattamente qui;
-           nella versione statica è il logo ufficiale. -->
-      <div class="logo-slot"><!-- logo:static-logo --></div>
-      <h1 class="claim">
-        <span class="mask"><span class="line line--light" lang="en">Make AI</span></span>
-        <span class="mask"><span class="line line--black" lang="en">deployable.</span></span>
-      </h1>
-      <p class="sub" lang="en">We find where AI pays off, build the product, and measure the result.</p>
-      <div class="outro" lang="en">
-        <p class="soon"><i class="soon-dot" aria-hidden="true"></i>Launching October 2026</p>
-        <form class="signup" novalidate>
-          <label class="sr-only" for="signup-email">Email</label>
-          <input id="signup-email" name="email" type="email" required autocomplete="email" inputmode="email" enterkeyhint="send" spellcheck="false" placeholder="your@email.com" />
-          <!-- trappola per i bot: invisibile alle persone -->
-          <input class="hp" name="_gotcha" type="text" tabindex="-1" autocomplete="off" aria-hidden="true" />
-          <button type="submit">Claim your spot<svg class="arrow" viewBox="0 0 12 12" aria-hidden="true"><path d="M1 6h9M6.5 2.5 10 6l-3.5 3.5" /></svg></button>
-        </form>
-        <p class="signup-done" aria-hidden="true"><svg class="check" viewBox="0 0 12 12"><path d="M2 6.3 4.8 9 10 3" /></svg>You’re on the list</p>
-        <p class="signup-note" role="status" aria-live="polite">The first 20 companies get a free AI process review.</p>
-      </div>
+    <div class="sg-frame" aria-hidden="true"><!-- symbol:supergraphic --></div>
+    <!-- header: il logo piccolo in alto a sinistra. Nella versione 3D la camera finale lo inquadra esattamente
+         qui (il logo 3D "atterra" nel segnaposto); nella versione statica è il logo ufficiale. -->
+    <header class="top">
+      <a class="logo-slot" href="./" aria-label="Deploiable"><!-- logo:static-logo --></a>
+    </header>
+    <!-- lingua: italiano predefinito, inglese a scelta (src/i18n.ts) -->
+    <div class="lang" role="group" aria-label="Lingua" data-i18n-attr="aria-label:lang.group">
+      <button type="button" data-lang="it" aria-pressed="true" lang="it">IT</button>
+      <span aria-hidden="true">/</span>
+      <button type="button" data-lang="en" aria-pressed="false" lang="en">EN</button>
+    </div>
+    <main class="page">
+      <section class="hero">
+        <h1 class="claim">
+          <span class="mask"><span class="line line--light" lang="en">Make AI</span></span>
+          <span class="mask"><span class="line line--black" lang="en">deployable.</span></span>
+        </h1>
+        <p class="sub" data-i18n="sub">Troviamo dove l’AI ripaga, costruiamo il prodotto e misuriamo il risultato.</p>
+        <div class="outro">
+          <p class="soon"><i class="soon-dot" aria-hidden="true"></i><span data-i18n="launch">Lancio · Novembre 2026</span></p>
+          <p class="offer" data-i18n="form.offer">Le prime 20 aziende ricevono una AI process review gratuita.</p>
+          <form class="signup" novalidate>
+            <div class="signup-row">
+              <label class="sr-only" for="signup-email" data-i18n="form.email.label">Email aziendale</label>
+              <input id="signup-email" name="email" type="email" required autocomplete="email" inputmode="email" enterkeyhint="next" spellcheck="false" placeholder="nome@azienda.it" data-i18n-attr="placeholder:form.email.placeholder" />
+              <i class="signup-divider" aria-hidden="true"></i>
+              <label class="sr-only" for="signup-company" data-i18n="form.company.label">Azienda</label>
+              <input id="signup-company" name="company" type="text" required autocomplete="organization" enterkeyhint="send" placeholder="Azienda" data-i18n-attr="placeholder:form.company.placeholder" />
+              <button type="submit"><span data-i18n="form.submit">Prenota la tua AI process review</span><svg class="arrow" viewBox="0 0 12 12" aria-hidden="true"><path d="M1 6h9M6.5 2.5 10 6l-3.5 3.5" /></svg></button>
+            </div>
+            <label class="consent">
+              <input id="signup-consent" name="consent" type="checkbox" value="si" required />
+              <span class="consent-box" aria-hidden="true"><svg viewBox="0 0 12 12"><path d="M2 6.3 4.8 9 10 3" /></svg></span>
+              <span class="consent-text"><span data-i18n="form.consent.pre">Ho letto l’</span><a href="privacy.html" data-i18n="form.consent.link">informativa privacy</a><span data-i18n="form.consent.post"> e acconsento al trattamento dei dati per essere ricontattato.</span></span>
+            </label>
+            <!-- trappola per i bot: invisibile alle persone -->
+            <input class="hp" name="_gotcha" type="text" tabindex="-1" autocomplete="off" aria-hidden="true" />
+          </form>
+          <p class="signup-done" aria-hidden="true"><svg class="check" viewBox="0 0 12 12"><path d="M2 6.3 4.8 9 10 3" /></svg><span data-i18n="form.done">Richiesta ricevuta.</span></p>
+          <!-- messaggi del modulo (errori, avvisi, conferma): vuoto finché non serve -->
+          <p class="signup-note" role="status" aria-live="polite"></p>
+        </div>
+        <!-- Prova sociale. Per mettere un logo vero: salvare il file in public/assets/clients/ (SVG o PNG, su fondo
+             trasparente) e sostituire lo <span> segnaposto con
+             <img src="assets/clients/nome.svg" alt="Nome cliente" loading="lazy" />. Il colore lo uniforma il CSS. -->
+        <div class="proof">
+          <p class="proof-line" data-i18n="proof.line">Dal 2021 al fianco di PMI, corporate e startup</p>
+          <ul class="clients">
+            <li class="client"><span class="client-ph">[CLIENTE_1]</span></li>
+            <li class="client"><span class="client-ph">[CLIENTE_2]</span></li>
+            <li class="client"><span class="client-ph">[CLIENTE_3]</span></li>
+            <li class="client"><span class="client-ph">[CLIENTE_4]</span></li>
+            <li class="client"><span class="client-ph">[CLIENTE_5]</span></li>
+          </ul>
+        </div>
+      </section>
     </main>
+    <footer class="foot">
+      <p class="foot-legal" data-i18n="foot.legal">Deploiable è un marchio di WDA srl (Partita IVA: 15274611001 - Codice Fiscale: 15274611001, Via Marsala 29/H, 00185 Roma (RM), PEC: wdasrl@legalmail.it)</p>
+      <a class="foot-link" href="privacy.html" data-i18n="foot.privacy">Privacy</a>
+    </footer>
 
     <script type="module" src="/src/main.ts"></script>
   </body>
