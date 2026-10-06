@@ -80,14 +80,38 @@ p {
   margin: 0;
 }
 
-/* ---------- Header: il logo piccolo in alto a sinistra ---------- */
+/* ---------- Header: il logo piccolo in alto a sinistra, fisso; scorrendo diventa una barra di vetro ---------- */
 
 .top {
-  position: absolute;
+  position: fixed;
   z-index: 15; /* sopra l'hero (che parte da y = 0): il logo deve ricevere passaggio del mouse e clic */
   top: 0;
   left: 0;
-  padding: max(var(--pad-top), env(safe-area-inset-top)) var(--pad-x) 0;
+  right: 0;
+  padding: max(var(--pad-top), env(safe-area-inset-top)) var(--pad-x) 14px;
+}
+/* Il vetro compare solo a pagina scorsa: in cima l'header resta trasparente e il logo 3D (sul canvas, sotto
+   la pagina) non viene sfocato. Scorrendo il logo passa all'SVG ufficiale, sopra il vetro (src/app.ts). */
+.top::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: color-mix(in srgb, var(--bg) 74%, transparent);
+  -webkit-backdrop-filter: blur(18px) saturate(115%);
+  backdrop-filter: blur(18px) saturate(115%);
+  border-bottom: 1px solid color-mix(in srgb, var(--ink-strong) 10%, transparent);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  pointer-events: none;
+}
+.is-scrolled .top::before {
+  opacity: 1;
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .top::before {
+    background: color-mix(in srgb, var(--bg) 92%, transparent);
+  }
 }
 .logo-slot {
   display: block;
@@ -105,6 +129,9 @@ p {
 .is-webgl .logo-slot svg {
   opacity: 0;
 }
+.is-webgl.is-docked .logo-slot svg {
+  opacity: 1;
+}
 
 /* ---------- Hero: una schermata, la frase protagonista ---------- */
 
@@ -121,6 +148,12 @@ p {
   gap: var(--gap);
   /* sopra lo spazio dell'header; sotto un po' di più: il centro ottico sta sopra il centro geometrico */
   padding: calc(var(--pad-top) + var(--logo-w) * 0.19 + 24px) var(--pad-x) calc(var(--pad-top) + var(--logo-w) * 0.19 + 24px + 4svh);
+}
+/* Su telefono il contenuto è più alto dello schermo: un po' d'aria in più fra l'header e la frase */
+@media (max-width: 640px) {
+  .hero {
+    padding-top: calc(var(--pad-top) + var(--logo-w) * 0.19 + 24px + 5svh);
+  }
 }
 
 /* La frase, due pesi di Satoshi (300 + 900): la parte leggera introduce, quella pesante dice la cosa. */
@@ -914,18 +947,24 @@ p {
   from { opacity: 0; transform: translateY(0.6em); }
   to { opacity: 1; transform: none; }
 }
-/* Senza 3D: passando sul logo le tre barre fanno un piccolo salto in sequenza (120 ms, come la motion ufficiale). */
+/* Senza 3D (o col logo SVG a pagina scorsa): passando sul logo le tre barre fanno un piccolo salto in sequenza (120 ms, come la motion ufficiale). */
 @media (hover: hover) and (prefers-reduced-motion: no-preference) {
   .is-static .logo-slot:hover .bar,
-  .is-static .logo-slot:focus-visible .bar {
+  .is-static .logo-slot:focus-visible .bar,
+  .is-docked .logo-slot:hover .bar,
+  .is-docked .logo-slot:focus-visible .bar {
     animation: bar-hop 0.5s cubic-bezier(0.3, 0.7, 0.3, 1) both;
   }
   .is-static .logo-slot:hover .bar-2,
-  .is-static .logo-slot:focus-visible .bar-2 {
+  .is-static .logo-slot:focus-visible .bar-2,
+  .is-docked .logo-slot:hover .bar-2,
+  .is-docked .logo-slot:focus-visible .bar-2 {
     animation-delay: 0.12s;
   }
   .is-static .logo-slot:hover .bar-3,
-  .is-static .logo-slot:focus-visible .bar-3 {
+  .is-static .logo-slot:focus-visible .bar-3,
+  .is-docked .logo-slot:hover .bar-3,
+  .is-docked .logo-slot:focus-visible .bar-3 {
     animation-delay: 0.24s;
   }
 }

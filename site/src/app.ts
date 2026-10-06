@@ -72,7 +72,7 @@ export async function start(caps: Capabilities) {
   // con lo stesso giro del ciclo. Solo a animazione finita, e mai sopra un giro già in corso.
   let hoverAt: number | null = null;
   const spin = () => {
-    if (time < DURATION || hoverAt !== null) return;
+    if (time < DURATION || hoverAt !== null || docked) return;
     hoverAt = time;
   };
   slotEl.addEventListener('pointerenter', spin);
@@ -120,8 +120,24 @@ export async function start(caps: Capabilities) {
     document.querySelector('meta[name="theme-color"]')?.setAttribute('content', PALETTES[name].background);
   };
 
+  // Header fisso: scorrendo compare la barra di vetro e, a intro finita, il logo passa all'SVG sopra il vetro
+  // (il vetro sfocherebbe il logo 3D, che sta sul canvas sotto la pagina).
+  let scrolled = false;
+  let docked = false;
+  const dock = () => {
+    const root = document.documentElement;
+    if (scrolled !== scrollY > 2) root.classList.toggle('is-scrolled', (scrolled = scrollY > 2));
+    if (docked !== (scrolled && time >= DURATION)) {
+      docked = !docked;
+      root.classList.toggle('is-docked', docked);
+      stage.setHidden(docked);
+      if (docked) hoverAt = null;
+    }
+  };
+
   const draw = () => {
     stateAt(time, state);
+    dock();
     if (hoverAt !== null) {
       const u = time - hoverAt;
       if (u > ROLL_DUR + 0.3 || u < 0) hoverAt = null;
@@ -189,7 +205,7 @@ export async function start(caps: Capabilities) {
     twShown = -1; // ridisegna il cursore nella nuova posizione
     draw();
   });
-  // Lo scorrimento porta via con sé il logo dell'header e la supergrafica dell'hero: il 3D li segue.
+  // Lo scorrimento porta via con sé la supergrafica dell'hero (il 3D la segue) e accende il vetro dell'header.
   window.addEventListener(
     'scroll',
     () => {
