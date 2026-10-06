@@ -111,7 +111,9 @@ p {
   transition: opacity 0.25s ease;
   pointer-events: none;
 }
-.is-scrolled .top::before {
+/* con il 3D il vetro aspetta la fine dell'intro (logo atterrato, Lime): mai sopra il Forest dell'apertura */
+.is-scrolled:not(.is-webgl) .top::before,
+.is-webgl.is-docked .top::before {
   opacity: 1;
 }
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
