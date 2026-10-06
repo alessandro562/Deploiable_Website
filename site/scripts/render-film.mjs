@@ -23,7 +23,7 @@ const browser = await chromium.launch({
 });
 const page = await browser.newPage({ viewport: { width: W, height: H } });
 page.setDefaultTimeout(300000);
-await page.goto(`${base}?__test=1&tier=${tier}`);
+await page.goto(`${base}?__test=1&tier=${tier}${process.env.EXTRA ?? ""}`);
 await page.waitForFunction(() => window.__DEPLOIABLE__?.ready === true);
 const duration = await page.evaluate(() => window.__DEPLOIABLE__.duration);
 

@@ -8,6 +8,7 @@ import { PALETTES, type PaletteName } from './config/brand';
 import { Color } from 'three';
 import { Backdrop } from './gl/backdrop';
 import { onLangChange } from './i18n';
+import { initTerminal } from './terminal';
 
 // Tre livelli, come nella skill web3d-integration-patterns (Pattern 1):
 //  · 3D      Three.js: renderer, barre, scintille (src/gl)
@@ -31,6 +32,9 @@ export async function start(caps: Capabilities) {
   const engine = new Engine(canvas, quality, testMode);
   const stage = new Stage(engine.scene);
   const backdrop = new Backdrop(engine.bgScene);
+  // Prova: apertura "terminale" (?term=1), spenta con riduzione del movimento
+  const terminal =
+    q.get('term') === '1' && !matchMedia('(prefers-reduced-motion: reduce)').matches ? initTerminal() : null;
 
   const claim = Array.from(document.querySelectorAll<HTMLElement>('.claim .line'));
   const sweep = document.querySelector<HTMLElement>('.sweep')!;
@@ -152,6 +156,7 @@ export async function start(caps: Capabilities) {
       twCaret = tw.caret;
     }
     applyPalette(paletteAt(time));
+    terminal?.(time);
     stage.apply(state, engine.camera, engine.width, engine.height);
     backdrop.apply(state, engine.bgCamera, engine.width, engine.height, scrollY);
     claim.forEach((el, i) => {

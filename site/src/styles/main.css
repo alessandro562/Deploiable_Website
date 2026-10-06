@@ -849,6 +849,77 @@ p {
 
 /* La linea del finale: stessa inclinazione di 8° delle barre, alla quota del centro del simbolo.
    La testa e la coda si regolano con clip-path (src/app.ts). Sulle barre Lime non si vede: le attraversa. */
+/* Prova "terminale" (?term=1): il comando di deploy sul Forest dell'apertura (src/terminal.ts) */
+.term {
+  position: fixed;
+  z-index: 3;
+  left: var(--pad-x);
+  top: calc(var(--pad-top) + 13svh);
+  font: 500 17px/1.75 var(--sans);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.01em;
+  color: var(--sage);
+  pointer-events: none;
+  transform-origin: center;
+  visibility: hidden;
+}
+.term-line {
+  position: relative;
+  width: max-content;
+}
+.term-ps,
+.term-cmd,
+.term-mark.ok,
+.term-done {
+  color: var(--lime);
+}
+.term-cmd {
+  white-space: pre;
+}
+.term-caret {
+  display: inline-block;
+  width: 0.55em;
+  height: 1.05em;
+  margin-left: 2px;
+  vertical-align: -0.17em;
+  background: var(--lime);
+}
+.term-mark {
+  display: inline-block;
+  width: 1.4em;
+}
+.term-label {
+  display: inline-block;
+  min-width: 13em;
+}
+.term-time {
+  color: var(--moss);
+}
+.term-done {
+  font-weight: 700;
+}
+.term-bar {
+  position: absolute;
+  left: 0;
+  top: 22%;
+  width: 100%;
+  height: 56%;
+  border-radius: 2px;
+  background: var(--lime);
+  opacity: 0;
+  transform-origin: left center;
+}
+@media (max-width: 640px) {
+  .term {
+    top: auto;
+    bottom: 9svh;
+    font-size: 12.5px;
+  }
+  .term-label {
+    min-width: 11em;
+  }
+}
+
 .is-webgl .sweep {
   display: block;
   position: fixed;
