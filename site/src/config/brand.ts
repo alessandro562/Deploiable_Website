@@ -60,19 +60,20 @@ export const PALETTES: Record<PaletteName, Palette> = {
 // Supergrafica tono su tono (brand book, 05 · Elementi grafici): il simbolo ingrandito dietro ai contenuti.
 // Lime Deep su Lime ("texture leggera"), Pine su Forest. Il contrasto del testo non cambia.
 export const TONE_PALETTES: Record<PaletteName, Palette> = {
-  // Pareti solo nella famiglia del Lime, con poca luce: il rilievo si legge come carta incisa, non come muro.
+  // Pareti in ombra decisa (Lime Deep verso Moss): il rilievo si legge chiaro e regolare su ogni barra,
+  // la faccia frontale resta Lime Deep esatto.
   lime: {
     background: COLORS.lime,
     front: COLORS.limeDeep,
-    top: COLORS.lime,
-    bottom: COLORS.limeDeep,
-    side: [COLORS.limeDeep, COLORS.lime, 0.5],
-    back: [COLORS.limeDeep, COLORS.lime, 0.3],
+    top: COLORS.limeDeep,
+    bottom: '#8EB545', // Lime Deep scurito verso Moss (35 %)
+    side: [COLORS.limeDeep, COLORS.moss, 0.38],
+    back: [COLORS.limeDeep, COLORS.moss, 0.3],
     rim: COLORS.lime,
     rimAmount: 0,
     cap: COLORS.lime,
-    ambient: 0.9,
-    diffuse: 0.16,
+    ambient: 0.82,
+    diffuse: 0.22,
   },
   forest: {
     background: COLORS.forest,

@@ -91,7 +91,7 @@ export class Backdrop {
     this.group.position.set((cx - width / 2) * k, (height / 2 - cy) * k, 0);
     this.group.rotation.set(s.bgRx, s.bgRy, 0);
     // più sottile del logo: in grande lo spessore pieno diventerebbe un muro, qui deve restare una texture
-    this.group.scale.set(g || 1e-4, g || 1e-4, 0.3 * (g || 1e-4));
+    this.group.scale.set(g || 1e-4, g || 1e-4, 0.42 * (g || 1e-4));
 
     // Le barre entrano dal bordo destro lungo l'inclinazione di 8°; nel ciclo scivolano in avanti e tornano.
     const away = (width * k * 1.2) / (g || 1) + SYMBOL_W;
