@@ -2,8 +2,8 @@
 
 ## Landing (`site/index.html`)
 - **Loghi clienti**: online Comtel, Braga Moro, Marchiani, Junker (servono le autorizzazioni scritte all'uso).
-  **Green Stone** è pronto in `site/public/assets/clients/green-stone.svg` ma non pubblicato (NDA nel brief):
-  da aggiungere solo con autorizzazione (istruzioni nel commento sopra i loghi in `index.html`).
+  **Green Stone** è pronto in `site/integrations/clients-pending/green-stone.svg`, fuori dai file pubblicati (NDA nel brief):
+  con l'autorizzazione, spostarlo in `site/public/assets/clients/` e aggiungerlo (commento sopra i loghi in `index.html`).
 
 ## Invio del modulo (configurazione, non testo)
 - **`SIGNUP_ENDPOINT`**: URL della web app Google Apps Script (istruzioni in `site/integrations/apps-script/README.md`).
