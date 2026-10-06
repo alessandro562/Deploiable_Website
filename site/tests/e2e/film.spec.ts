@@ -301,6 +301,13 @@ test('iscrizione: email non valida, invio riuscito, errore del servizio', async 
   await page.fill('#signup-email', 'non-una-email');
   await page.click('.signup button');
   await expect(note).toHaveText(/valid email/);
+  // errore: bordo più spesso (ombra interna da 2,5 px) e nota in Forest pieno
+  await expect(page.locator('.outro')).toHaveAttribute('data-state', 'error');
+  await expect.poll(() => page.locator('.signup').evaluate((el) => getComputedStyle(el).boxShadow)).toContain('2.5px');
+  expect(await note.evaluate((el) => getComputedStyle(el).color)).toBe('rgb(16, 38, 27)');
+  // ritoccando l'email l'errore si spegne
+  await page.type('#signup-email', 'x');
+  await expect(page.locator('.outro')).not.toHaveAttribute('data-state', 'error');
 
   let status = 500;
   let body = '';
@@ -314,7 +321,46 @@ test('iscrizione: email non valida, invio riuscito, errore del servizio', async 
   await expect(note).toHaveText(/went wrong/);
   status = 200;
   await page.click('.signup button');
-  await expect(note).toHaveText(/on the list/);
+  await expect(page.locator('.signup-done')).toBeVisible();
+  await expect(page.locator('.signup-done')).toHaveText(/on the list/);
+  await expect(note).toHaveText(/See you at launch/);
   expect(body).toContain('ciao@deploiable.com');
   await expect(page.locator('.signup')).toBeHidden();
+});
+
+test('dettagli: testo secondario in Moss pieno, etichette in JetBrains Mono', async ({ page }) => {
+  await openFilm(page);
+  await seek(page, END);
+  const css = (sel: string, prop: string, pseudo?: string) =>
+    page.locator(sel).evaluate((el, [p, ps]) => getComputedStyle(el, ps || null).getPropertyValue(p), [prop, pseudo ?? ''] as const);
+  const MOSS = 'rgb(79, 106, 85)';
+  expect(await css('.signup-note', 'color')).toBe(MOSS);
+  expect(await css('#signup-email', 'color', '::placeholder')).toBe(MOSS);
+  expect(await css('.signup-note', 'opacity')).toBe('1');
+  expect(await css('.soon', 'font-family')).toContain('JetBrains Mono');
+  expect(await page.evaluate(() => document.fonts.check('500 11px "JetBrains Mono"'))).toBe(true);
+});
+
+test('ritmo verticale: stesso spazio a inchiostro fra logo e frase e fra frase e "Coming soon"', async ({ page }) => {
+  await openFilm(page, '', 'high');
+  await seek(page, END);
+  const box = async (sel: string) => (await page.locator(sel).boundingBox())!;
+  const png = PNG.sync.read(await page.screenshot());
+  // righe con inchiostro Forest dentro un riquadro: prima e ultima
+  const rows = (b: { x: number; y: number; width: number; height: number }) => {
+    let T = 1e9, B = -1;
+    for (let y = Math.max(0, Math.floor(b.y - 4)); y < Math.min(png.height, Math.ceil(b.y + b.height + 4)); y++)
+      for (let x = Math.floor(b.x); x < Math.ceil(b.x + b.width); x++) {
+        const i = (y * png.width + x) * 4;
+        if (Math.abs(png.data[i] - 16) + Math.abs(png.data[i + 1] - 38) + Math.abs(png.data[i + 2] - 27) < 110) { T = Math.min(T, y); B = Math.max(B, y + 1); }
+      }
+    return { T, B };
+  };
+  const logo = rows(await box('.logo-slot'));
+  const line1 = rows(await box('.line--light'));
+  const line2 = rows(await box('.line--black'));
+  const soon = rows(await box('.soon'));
+  const a = line1.T - logo.B;
+  const b = soon.T - line2.B;
+  expect(Math.abs(a - b), `logo→frase ${a}px, frase→coming soon ${b}px`).toBeLessThanOrEqual(3);
 });

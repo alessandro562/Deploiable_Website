@@ -3,16 +3,24 @@
   --lime-deep: #b0dd3c;
   --forest: #10261b;
   --mist: #f1f3ea;
+  --pine: #1c3a2a;
+  --moss: #4f6a55;
+  --sage: #8fa596;
   /* colori della pagina: cambiano con la palette (html[data-palette]) */
   --bg: var(--forest);
   --ink-light: var(--mist);
   --ink-strong: var(--lime);
   --sweep-color: var(--lime);
+  --ink-soft: var(--sage); /* testo secondario su fondo scuro (brand: Sage, AA) */
+  --ink-hover: var(--lime-deep);
+  --mono: 'JetBrains Mono', ui-monospace, monospace;
   --sans: 'Satoshi', 'Helvetica Neue', Arial, sans-serif;
 
-  /* Composizione del finale: il logo orizzontale in alto, la frase sotto, tutto allineato al bordo sinistro del logo.
+  /* Composizione del finale: il logo orizzontale in alto, la frase sotto, tutto centrato sulla pagina.
      La larghezza del logo è l'unica misura: la camera 3D inquadra il segnaposto .logo-slot (src/gl/stage.ts). */
   --logo-w: min(88vw, max(52vw, 360px), 150svh);
+  /* corpo della frase: 1/9 del logo (1/7 su schermi verticali) */
+  --claim-fs: calc(var(--logo-w) / 9);
   color-scheme: dark;
 }
 
@@ -22,6 +30,8 @@ html[data-palette='lime'] {
   --ink-light: var(--forest);
   --ink-strong: var(--forest);
   --sweep-color: var(--forest);
+  --ink-soft: var(--moss); /* testo secondario su fondo chiaro (brand: Moss, AA) */
+  --ink-hover: var(--pine);
   color-scheme: light;
 }
 
@@ -41,7 +51,20 @@ body {
   -webkit-text-size-adjust: 100%;
 }
 
+/* il cambio di palette (Forest → Lime) è un taglio netto: niente transizioni in quel fotogramma (src/app.ts) */
+.palette-snap *,
+.palette-snap *::before,
+.palette-snap *::after {
+  transition: none !important;
+}
+
+::selection {
+  background: var(--ink-strong);
+  color: var(--bg);
+}
+
 body {
+  -webkit-tap-highlight-color: transparent;
   color: var(--ink-light);
   font-family: var(--sans);
   font-weight: 500;
@@ -91,7 +114,7 @@ p {
   display: flex;
   flex-direction: column;
   gap: 0.05em;
-  font-size: calc(var(--logo-w) / 9);
+  font-size: var(--claim-fs);
   line-height: 1;
   letter-spacing: -0.045em;
   font-weight: 300;
@@ -123,25 +146,31 @@ p {
 }
 
 /* ---------- Coming soon e iscrizione ---------- */
-/* Piccoli, sotto la frase: compaiono per ultimi. Su Lime solo Forest (i colori seguono la palette). */
+/* Piccoli, sotto la frase: compaiono per ultimi. Su Lime solo Forest (i colori seguono la palette);
+   etichetta e nota in JetBrains Mono, come le didascalie del brand book; testo secondario in Moss. */
 
 .outro {
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 14px;
-  /* un respiro in più rispetto allo spazio fra logo e frase: è un blocco a parte */
-  opacity: 0;
   visibility: hidden;
+  /* stesso spazio "a inchiostro" fra logo e frase e fra frase e blocco: la discendente di "Measurably." e
+     l'interlinea della frase rubano 0,16 em del corpo della frase (misurato con scripts/align.mjs) */
+  margin-top: calc(var(--claim-fs) * 0.16);
+}
+/* ognuno dei tre elementi entra per conto suo, sfalsati (src/app.ts) */
+.outro > * {
+  opacity: 0;
 }
 
 .soon {
   display: inline-flex;
   align-items: center;
-  gap: 0.6em;
-  font-size: 12px;
-  font-weight: 900;
-  letter-spacing: 0.22em;
+  gap: 10px;
+  margin-bottom: 18px;
+  font: 500 11px/1 var(--mono);
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--ink-strong);
 }
@@ -150,37 +179,62 @@ p {
   height: 6px;
   border-radius: 50%;
   background: currentColor;
-  animation: soon-pulse 1.8s ease-in-out infinite;
+  /* due battiti per ciclo di 5 s: lo stesso respiro del logo */
+  animation: soon-pulse 2.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
 @keyframes soon-pulse {
-  50% { opacity: 0.2; }
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.25; transform: scale(0.7); }
 }
 
 .signup {
+  position: relative;
   display: flex;
-  width: min(100%, 400px);
-  height: 48px;
-  padding: 4px;
-  border: 1.5px solid var(--ink-strong);
+  align-items: center;
+  width: min(100%, 420px);
+  height: 52px;
+  padding: 5px;
   border-radius: 999px;
+  /* il bordo è un'ombra: quando diventa più spesso (errore) il layout non si muove di un pixel */
+  box-shadow: inset 0 0 0 1.5px var(--ink-strong);
+  outline: 2px solid transparent;
+  outline-offset: 3px;
+  transition: box-shadow 0.16s var(--ease), outline-color 0.16s var(--ease);
+}
+.signup:focus-within {
+  outline-color: var(--ink-strong);
 }
 .signup input[type='email'] {
   flex: 1;
   min-width: 0;
-  padding: 0 14px 0 16px;
+  height: 100%;
+  padding: 0 12px 0 17px;
   border: 0;
+  border-radius: 999px;
   background: transparent;
   color: var(--ink-strong);
+  caret-color: var(--ink-strong);
   font: 500 16px/1 var(--sans); /* 16 px: iOS non ingrandisce la pagina al tocco */
+  letter-spacing: -0.005em;
   outline: none;
 }
 .signup input[type='email']::placeholder {
-  color: var(--ink-strong);
-  opacity: 0.45;
+  color: var(--ink-soft);
+  opacity: 1;
+}
+/* autocompilazione del browser: niente fondo azzurro o giallo, testo Forest */
+.signup input:-webkit-autofill,
+.signup input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--ink-strong);
+  transition: background-color 600000s 0s;
 }
 .signup button {
   flex: none;
-  padding: 0 18px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 100%;
+  padding: 0 18px 0 20px;
   border: 0;
   border-radius: 999px;
   background: var(--ink-strong);
@@ -188,29 +242,100 @@ p {
   font: 900 14px/1 var(--sans);
   letter-spacing: -0.01em;
   cursor: pointer;
+  transition: background-color 0.16s var(--ease), transform 0.16s var(--ease);
 }
-.signup:focus-within {
-  box-shadow: 0 0 0 1.5px var(--ink-strong);
+.signup button:focus-visible {
+  outline: 2px solid var(--bg);
+  outline-offset: -5px;
+}
+.arrow,
+.check {
+  width: 12px;
+  height: 12px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.arrow {
+  transition: transform 0.16s var(--ease);
+}
+@media (hover: hover) {
+  .signup button:hover {
+    background: var(--ink-hover);
+  }
+  .signup button:hover .arrow {
+    transform: translateX(2px);
+  }
+}
+.signup button:active {
+  transform: scale(0.97);
 }
 .signup[aria-busy='true'] button {
-  opacity: 0.6;
   cursor: progress;
 }
+.signup[aria-busy='true'] .arrow {
+  animation: nudge 0.6s var(--ease) infinite alternate;
+}
+@keyframes nudge {
+  to { transform: translateX(3px); }
+}
+
+/* Errore: bordo più spesso e una breve vibrazione orizzontale. */
+.outro[data-state='error'] .signup {
+  box-shadow: inset 0 0 0 2.5px var(--ink-strong);
+  animation: shake 0.36s var(--ease);
+}
+@keyframes shake {
+  20% { transform: translateX(-6px); }
+  40% { transform: translateX(5px); }
+  60% { transform: translateX(-3px); }
+  80% { transform: translateX(2px); }
+}
+.outro[data-state='error'] .signup-note {
+  color: var(--ink-strong);
+}
+
 .signup-note {
-  font-size: 13px;
+  margin-top: 14px;
+  font: 500 11px/1.4 var(--mono);
+  letter-spacing: 0.02em;
   text-align: center;
   white-space: nowrap; /* può uscire dalla larghezza del logo, che sui telefoni in orizzontale è stretta */
-  font-weight: 500;
-  color: var(--ink-light);
-  opacity: 0.75;
+  color: var(--ink-soft);
 }
-/* Iscritto: il modulo lascia il posto al messaggio. */
+
+/* Iscritto: il modulo lascia il posto a una pillola Forest con la spunta. */
+.signup-done {
+  display: none;
+  align-items: center;
+  gap: 10px;
+  height: 52px;
+  padding: 0 24px 0 22px;
+  border-radius: 999px;
+  background: var(--ink-strong);
+  color: var(--bg);
+  font: 900 14px/1 var(--sans);
+  letter-spacing: -0.01em;
+}
 .outro[data-state='done'] .signup {
   display: none;
 }
-.outro[data-state='done'] .signup-note {
-  font-weight: 900;
-  opacity: 1;
+.outro[data-state='done'] .signup-done {
+  display: inline-flex;
+  animation: pop-in 0.42s var(--ease) both;
+}
+.outro[data-state='done'] .check path {
+  stroke-dasharray: 14;
+  animation: draw 0.4s 0.18s var(--ease) both;
+}
+@keyframes pop-in {
+  from { opacity: 0; transform: scale(0.92); }
+}
+@keyframes draw {
+  from { stroke-dashoffset: 14; }
+  to { stroke-dashoffset: 0; }
 }
 
 .hp,
@@ -231,19 +356,23 @@ p {
   .stack {
     padding-bottom: 0;
   }
-  .outro {
-    gap: 8px;
+  .signup,
+  .signup-done {
+    height: 44px;
   }
-  .signup {
-    height: 42px;
+  .soon {
+    margin-bottom: 10px;
+  }
+  .signup-note {
+    margin-top: 8px;
   }
 }
 
 /* Su schermi verticali (telefono) il logo occupa quasi tutta la larghezza e sotto c'è molto spazio:
    la frase è più grande, in proporzione. */
 @media (max-aspect-ratio: 1/1) {
-  .claim {
-    font-size: calc(var(--logo-w) / 7);
+  :root {
+    --claim-fs: calc(var(--logo-w) / 7);
   }
 }
 
@@ -331,9 +460,15 @@ p {
 }
 .is-static .outro {
   visibility: visible;
-  opacity: 1;
-  animation: fade-up 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) 1.5s both;
 }
+.is-static .outro > * {
+  opacity: 1;
+  animation: fade-up 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+.is-static .outro > :nth-child(1) { animation-delay: 1.5s; }
+.is-static .outro > :nth-child(2),
+.is-static .outro > :nth-child(3) { animation-delay: 1.58s; }
+.is-static .outro > :nth-child(4) { animation-delay: 1.66s; }
 @keyframes fade-up {
   from { opacity: 0; transform: translateY(0.6em); }
   to { opacity: 1; transform: none; }
@@ -351,7 +486,9 @@ p {
   .is-static .logo-slot .bar,
   .is-static .logo-slot .logo-lettering,
   .is-static .line,
-  .is-static .outro,
+  .is-static .outro > *,
+  .outro[data-state] .signup,
+  .outro[data-state] .signup-done,
   .soon-dot {
     animation: none;
   }

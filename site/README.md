@@ -81,4 +81,11 @@ Senza indirizzo il modulo non finge l'iscrizione: risponde "Sign-ups open very s
 GitHub Pages via `.github/workflows/deploy-pages.yml` (push su `main`). Settings → Pages → Source: **GitHub Actions**.
 Con un dominio proprio: `public/CNAME`, `BASE_PATH=/` nel workflow e `VITE_SITE_URL` in `.env`.
 
-Font: Satoshi (Fontshare, licenza ITF FFL) servito dal sito.
+Font: Satoshi (Fontshare, licenza ITF FFL) e JetBrains Mono (OFL, per etichetta e nota come le didascalie del brand book), serviti dal sito.
+
+## Dettagli
+
+- Ritmo verticale: lo spazio "a inchiostro" fra logo e frase è uguale a quello fra frase e "Coming soon" (entro 2 px, test automatico e `scripts/align.mjs`).
+- Testo secondario in Moss pieno (su Lime), mai con l'opacità.
+- Modulo: hover (Pine), pressione, anello di focus concentrico, autocompilazione del browser neutralizzata, errore con bordo più spesso e vibrazione, conferma con pillola Forest e spunta disegnata.
+- Il cambio di palette Forest → Lime è un taglio netto anche per l'HTML: nessuna transizione CSS lo sfuma.

@@ -13,6 +13,8 @@ export function createBarMaterial() {
       uBack: { value: new Color() },
       uRim: { value: new Color() },
       uRimAmount: { value: 0 },
+      uAmbient: { value: 0.5 },
+      uDiffuse: { value: 0.62 },
       uCap: { value: new Color() },
       uCam: { value: new Vector3() },
     },
@@ -33,7 +35,7 @@ export function createBarMaterial() {
     `,
     fragmentShader: /* glsl */ `
       uniform vec3 uFront, uTop, uBottom, uSide, uBack, uRim, uCap, uCam;
-      uniform float uRimAmount;
+      uniform float uRimAmount, uAmbient, uDiffuse;
       varying vec3 vN;
       varying vec3 vLocalN;
       varying vec3 vWorld;
@@ -50,7 +52,7 @@ export function createBarMaterial() {
           float up = vLocalN.y;
           vec3 base = up > 0.35 ? uTop : (up < -0.35 ? uBottom : uSide);
           vec3 L = normalize(vec3(0.35, 0.85, 0.4));
-          col = base * (0.5 + 0.62 * max(dot(n, L), 0.0));
+          col = base * (uAmbient + uDiffuse * max(dot(n, L), 0.0));
           float rim = pow(1.0 - abs(dot(n, V)), 3.0);
           col += uRim * rim * uRimAmount;
           col = min(col, uCap);
@@ -76,4 +78,6 @@ export function setPalette(m: ShaderMaterial, p: Palette) {
   u.uRim.value.set(p.rim);
   u.uRimAmount.value = p.rimAmount;
   u.uCap.value.set(p.cap);
+  u.uAmbient.value = p.ambient ?? 0.5;
+  u.uDiffuse.value = p.diffuse ?? 0.62;
 }

@@ -19,3 +19,12 @@
   font-style: normal;
   font-display: swap;
 }
+
+/* JetBrains Mono: note e didascalie (brand book). OFL. */
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('../assets/fonts/jetbrains-mono-500.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}

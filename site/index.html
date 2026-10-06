@@ -37,11 +37,12 @@
         <p class="soon"><i class="soon-dot" aria-hidden="true"></i>Coming soon</p>
         <form class="signup" novalidate>
           <label class="sr-only" for="signup-email">Email</label>
-          <input id="signup-email" name="email" type="email" required autocomplete="email" inputmode="email" spellcheck="false" placeholder="your@email.com" />
+          <input id="signup-email" name="email" type="email" required autocomplete="email" inputmode="email" enterkeyhint="send" spellcheck="false" placeholder="your@email.com" />
           <!-- trappola per i bot: invisibile alle persone -->
           <input class="hp" name="_gotcha" type="text" tabindex="-1" autocomplete="off" aria-hidden="true" />
-          <button type="submit">Notify me</button>
+          <button type="submit">Notify me<svg class="arrow" viewBox="0 0 12 12" aria-hidden="true"><path d="M1 6h9M6.5 2.5 10 6l-3.5 3.5" /></svg></button>
         </form>
+        <p class="signup-done" aria-hidden="true"><svg class="check" viewBox="0 0 12 12"><path d="M2 6.3 4.8 9 10 3" /></svg>You’re on the list</p>
         <p class="signup-note" role="status" aria-live="polite">Be the first to know when we launch. No spam.</p>
       </div>
     </main>
