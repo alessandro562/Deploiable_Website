@@ -1,0 +1,87 @@
+/* Pagine di testo (informativa privacy): stessa palette, stesso carattere, una colonna leggibile. */
+
+.doc body {
+  min-height: 100svh;
+}
+
+.doc .logo-slot {
+  display: block;
+}
+
+.doc-main {
+  position: relative;
+  z-index: 10;
+  width: min(100% - 2 * var(--pad-x), 720px);
+  margin: 0 auto;
+  padding: calc(var(--pad-top) + var(--logo-w) * 0.19 + 56px) 0 48px;
+}
+
+/* l'articolo nell'altra lingua resta nel documento ma non si mostra */
+html[lang='it'] .doc-body[lang='en'],
+html[lang='en'] .doc-body[lang='it'] {
+  display: none;
+}
+
+.doc-draft {
+  margin-bottom: 32px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  background: var(--forest);
+  color: var(--lime);
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.doc-body {
+  color: var(--forest);
+  font-size: 16px;
+  line-height: 1.6;
+}
+.doc-body h1 {
+  margin: 0 0 12px;
+  font-size: clamp(32px, 6vw, 52px);
+  font-weight: 900;
+  line-height: 1.05;
+  letter-spacing: -0.035em;
+}
+.doc-lead {
+  margin-bottom: 36px;
+  font-size: 18px;
+  font-weight: 300;
+}
+.doc-body h2 {
+  margin: 32px 0 8px;
+  font-size: 18px;
+  font-weight: 900;
+  letter-spacing: -0.01em;
+}
+.doc-body p,
+.doc-body ul {
+  margin: 0 0 12px;
+}
+.doc-body ul {
+  padding-left: 1.2em;
+}
+.doc-body li + li {
+  margin-top: 4px;
+}
+.doc-body a,
+.doc-back a {
+  color: var(--forest);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-decoration-thickness: 1px;
+}
+.doc-updated {
+  margin-top: 32px !important;
+  color: var(--moss);
+  font-size: 14px;
+}
+.doc-back {
+  margin-top: 40px;
+  font-size: 15px;
+  font-weight: 500;
+}

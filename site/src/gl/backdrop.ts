@@ -53,9 +53,11 @@ export class Backdrop {
       // visibile: dal 75 % della larghezza fino al bordo destro (il resto esce dallo schermo)
       return { x0: width - w * BLEED_IN, y0: height - h, x1: width, y1: height };
     };
+    // la supergrafica vive nell'hero (la prima schermata): i testi sotto, come il footer, non la riguardano
+    const inHero = texts.filter((r) => r.y0 < height);
     const hits = (h: number) => {
       const b = boxFor(h);
-      return texts.some((r) => r.x0 - margin < b.x1 && r.x1 + margin > b.x0 && r.y0 - margin < b.y1 && r.y1 + margin > b.y0);
+      return inHero.some((r) => r.x0 - margin < b.x1 && r.x1 + margin > b.x0 && r.y0 - margin < b.y1 && r.y1 + margin > b.y0);
     };
     let lo = 0;
     let hi = height * 1.1;

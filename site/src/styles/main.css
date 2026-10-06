@@ -599,6 +599,29 @@ p {
   }
 }
 
+/* ---------- Footer: dati societari e privacy ---------- */
+.foot {
+  position: relative;
+  z-index: 10;
+  padding: 28px var(--pad-x) max(28px, env(safe-area-inset-bottom));
+  border-top: 1px solid color-mix(in srgb, var(--ink-strong) 18%, transparent);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.6;
+  text-align: center;
+  color: var(--ink-soft);
+}
+.foot p {
+  max-width: 880px;
+  margin: 0 auto;
+}
+.foot a {
+  color: var(--ink-strong);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-decoration-thickness: 1px;
+}
+
 .hp,
 .sr-only {
   position: absolute;

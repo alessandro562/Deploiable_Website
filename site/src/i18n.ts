@@ -45,6 +45,11 @@ const DICT = {
     'msg.error': 'Invio non riuscito: controlla la connessione e riprova.',
     'msg.closed': 'Le richieste si aprono a brevissimo.',
     'proof.line': 'Dal 2021 al fianco di PMI, corporate e startup',
+    'foot.legal': 'Deploiable è un marchio di WDA srl (Partita IVA: 15274611001 - Codice Fiscale: 15274611001, Via Marsala 29/H, 00185 Roma (RM), PEC: wdasrl@legalmail.it)',
+    'foot.privacy': 'Privacy',
+    'privacy.title': 'Informativa privacy · Deploiable',
+    'privacy.description': 'Informativa sul trattamento dei dati personali raccolti dal modulo di contatto di Deploiable.',
+    'privacy.back': 'Torna alla pagina principale',
   },
   en: {
     'meta.title': `Deploiable · ${TAGLINE}`,
@@ -72,6 +77,11 @@ const DICT = {
     'msg.error': 'Sending failed: check your connection and try again.',
     'msg.closed': 'Requests open very soon.',
     'proof.line': 'Since 2021, working with SMEs, corporates and startups',
+    'foot.legal': 'Deploiable is a trademark of WDA srl (VAT number: 15274611001 - Tax code: 15274611001, Via Marsala 29/H, 00185 Rome (RM), Italy, certified email: wdasrl@legalmail.it)',
+    'foot.privacy': 'Privacy',
+    'privacy.title': 'Privacy notice · Deploiable',
+    'privacy.description': 'Notice on the processing of personal data collected through the Deploiable contact form.',
+    'privacy.back': 'Back to the main page',
   },
 } satisfies Record<Lang, Record<string, string>>;
 
@@ -111,7 +121,8 @@ function apply() {
       if (attr && key) el.setAttribute(attr, t(key as Key));
     }
   });
-  document.title = t('meta.title');
+  // ogni pagina indica la chiave del suo titolo (data-title-key su <html>), la landing usa meta.title
+  document.title = t((root.dataset.titleKey as Key) || 'meta.title');
   document.querySelectorAll<HTMLButtonElement>('[data-lang]').forEach((b) => {
     b.setAttribute('aria-pressed', String(b.dataset.lang === current));
   });
