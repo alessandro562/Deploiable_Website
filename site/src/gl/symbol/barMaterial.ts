@@ -17,6 +17,7 @@ export function createBarMaterial() {
       uDiffuse: { value: 0.62 },
       uCap: { value: new Color() },
       uCam: { value: new Vector3() },
+      uLit: { value: 0 },
     },
     vertexShader: /* glsl */ `
       attribute float aKind;
@@ -35,7 +36,7 @@ export function createBarMaterial() {
     `,
     fragmentShader: /* glsl */ `
       uniform vec3 uFront, uTop, uBottom, uSide, uBack, uRim, uCap, uCam;
-      uniform float uRimAmount, uAmbient, uDiffuse;
+      uniform float uRimAmount, uAmbient, uDiffuse, uLit;
       varying vec3 vN;
       varying vec3 vLocalN;
       varying vec3 vWorld;
@@ -56,6 +57,22 @@ export function createBarMaterial() {
           float rim = pow(1.0 - abs(dot(n, V)), 3.0);
           col += uRim * rim * uRimAmount;
           col = min(col, uCap);
+        }
+        // Luce da studio (solo con uLit > 0, nella prova ?story=1): luce chiave dall'alto a sinistra,
+        // riempimento da destra, un riflesso morbido e un bordo di Fresnel. Con uLit = 0 il colore resta esatto.
+        if (uLit > 0.0) {
+          vec3 L1 = normalize(vec3(-0.45, 0.75, 0.75));
+          vec3 L2 = normalize(vec3(0.9, -0.25, 0.35));
+          float d1 = max(dot(n, L1), 0.0);
+          float d2 = max(dot(n, L2), 0.0);
+          float spec = pow(max(dot(n, normalize(L1 + V)), 0.0), 40.0);
+          float fres = pow(1.0 - max(dot(n, V), 0.0), 2.5);
+          float sheen = pow(max(dot(n, normalize(L1 + V)), 0.0), 6.0);
+          // la luce scende in diagonale sulla faccia: più chiara in alto a sinistra, più scura in basso a destra
+          float grad = mix(0.8, 1.12, smoothstep(-5.0, 5.0, dot(vWorld.xy, vec2(-0.45, 0.9))));
+          vec3 lit = col * (0.26 + 0.86 * d1 + 0.2 * d2) * grad
+            + vec3(1.0, 1.0, 0.9) * (spec * 0.4 + sheen * 0.1) + col * fres * 0.45;
+          col = mix(col, lit, uLit);
         }
         gl_FragColor = vec4(col, 1.0);
         #include <colorspace_fragment>

@@ -64,6 +64,11 @@ export class Stage {
     this.slot = slot;
   }
 
+  /** Luce da studio sulle barre (0 colori esatti del brand, 1 luce piena). */
+  setLit(v: number) {
+    for (const b of this.bars) b.mat.uniforms.uLit.value = v;
+  }
+
   /** A pagina scorsa il logo dell'header lo mostra l'SVG sopra la barra di vetro: il 3D si nasconde. */
   setHidden(hidden: boolean) {
     this.hidden = hidden;

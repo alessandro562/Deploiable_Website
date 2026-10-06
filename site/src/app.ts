@@ -9,6 +9,7 @@ import { Color } from 'three';
 import { Backdrop } from './gl/backdrop';
 import { onLangChange } from './i18n';
 import { initTerminal } from './terminal';
+import { Story } from './gl/story';
 
 // Tre livelli, come nella skill web3d-integration-patterns (Pattern 1):
 //  · 3D      Three.js: renderer, barre, scintille (src/gl)
@@ -32,6 +33,10 @@ export async function start(caps: Capabilities) {
   const engine = new Engine(canvas, quality, testMode);
   const stage = new Stage(engine.scene);
   const backdrop = new Backdrop(engine.bgScene);
+  // Prova: luci da studio sull'intro e racconto a scorrimento (?story=1), spenti con riduzione del movimento
+  const story = q.get('story') === '1' && !matchMedia('(prefers-reduced-motion: reduce)').matches ? new Story() : null;
+  const header = document.querySelector<HTMLElement>('.top')!;
+  let darkUnder = false;
   // Prova: apertura "terminale" (?term=1), spenta con riduzione del movimento
   const terminal =
     q.get('term') === '1' && !matchMedia('(prefers-reduced-motion: reduce)').matches ? initTerminal() : null;
@@ -157,6 +162,13 @@ export async function start(caps: Capabilities) {
     }
     applyPalette(paletteAt(time));
     terminal?.(time);
+    if (story) {
+      // l'intro prende luce e volume; al clic (passaggio al Lime) torna ai colori esatti del logo
+      stage.setLit(1 - Math.min(1, Math.max(0, (time - (LOCK[2] - 0.25)) / (LOCK[0] - LOCK[2] + 0.25))));
+      story.update(time, engine.width, engine.height);
+      const dark = story.under(header.offsetHeight / 2);
+      if (dark !== darkUnder) document.documentElement.classList.toggle('is-dark-under', (darkUnder = dark));
+    }
     stage.apply(state, engine.camera, engine.width, engine.height);
     backdrop.apply(state, engine.bgCamera, engine.width, engine.height, scrollY);
     claim.forEach((el, i) => {
@@ -176,7 +188,7 @@ export async function start(caps: Capabilities) {
     });
     // la linea: testa e coda sono percentuali della sua lunghezza
     sweep.style.clipPath = `inset(0 ${((1 - state.sweepHead) * 100).toFixed(2)}% 0 ${(state.sweepTail * 100).toFixed(2)}%)`;
-    engine.render();
+    engine.render(story ? () => story.render(engine.renderer, engine.width, engine.height) : undefined);
   };
 
   measureSlot();
