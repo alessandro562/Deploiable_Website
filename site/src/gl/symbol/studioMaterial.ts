@@ -7,16 +7,33 @@ import { COLORS } from '../../config/brand';
 
 export const STUDIO_GLSL = /* glsl */ `
   uniform vec3 uLime, uLimeDeep, uForest;
-  // lo studio visto da un riflesso: pavimento Lime, orizzonte scuro (la parete in ombra), cielo con un
-  // grande softbox bianco; due softbox netti danno i lampi che fanno leggere il metallo
+  uniform float uEnvRot;
+  // Lo studio visto in un riflesso: cielo che sale da verde scuro ad argento, un grande softbox bianco in
+  // alto, due strisce di luce verticali, la linea d'orizzonte Lime e il pavimento Lime che rimbalza.
   vec3 studio(vec3 R) {
-    vec3 ground = uLime * 0.9;
-    vec3 sky = mix(uLime * 1.05, vec3(1.7), smoothstep(0.35, 0.95, R.y));
-    vec3 c = mix(ground, sky, smoothstep(-0.08, 0.12, R.y));
-    c = mix(c, uForest * 2.0, exp(-R.y * R.y / 0.012) * 0.75);
-    c += vec3(1.0) * pow(max(dot(R, normalize(vec3(-0.55, 0.75, 0.45))), 0.0), 60.0) * 3.0;
-    c += vec3(1.0) * pow(max(dot(R, normalize(vec3(0.85, 0.2, 0.5))), 0.0), 220.0) * 2.4;
+    vec3 c = mix(uForest * 0.7, vec3(0.62, 0.7, 0.62), smoothstep(-0.02, 0.85, R.y));
+    c = mix(c, uLime * 0.85, smoothstep(-0.04, -0.4, R.y)); // pavimento Lime
+    c += uLime * 1.3 * exp(-pow(R.y + 0.015, 2.0) / 0.0018); // orizzonte
+    c += vec3(1.0) * smoothstep(0.6, 0.97, R.y) * 2.2; // softbox dall'alto
+    c += vec3(1.0) * smoothstep(0.07, 0.0, abs(R.x + 0.6)) * smoothstep(-0.25, 0.3, R.y) * 3.0;
+    c += vec3(0.92, 1.0, 0.82) * smoothstep(0.04, 0.0, abs(R.x - 0.75)) * smoothstep(-0.15, 0.4, R.y) * 2.4;
     return c;
+  }
+  // Forest metallico lucido con vernice trasparente: il colore viene dai riflessi tinti di verde scuro,
+  // la vernice aggiunge i lampi bianchi puri; di taglio tutto si accende. Le luci ruotano piano (uEnvRot):
+  // i riflessi scorrono sulle facce anche a simbolo fermo.
+  vec3 forestMetal(vec3 n, vec3 V) {
+    vec3 R = reflect(-V, n);
+    float cr = cos(uEnvRot), sr = sin(uEnvRot);
+    R.xz = mat2(cr, -sr, sr, cr) * R.xz;
+    float ndv = clamp(dot(n, V), 0.0, 1.0);
+    float fres = pow(1.0 - ndv, 5.0);
+    vec3 env = studio(R);
+    vec3 F0 = vec3(0.07, 0.17, 0.1);
+    vec3 metal = env * mix(F0, vec3(0.8, 0.88, 0.75), fres) + uForest * 0.25;
+    float coat = 0.05 + 0.95 * fres;
+    vec3 lamps = max(env - vec3(0.95), 0.0);
+    return metal + lamps * coat * 0.55;
   }
 `;
 
@@ -26,6 +43,7 @@ export function createStudioMaterial() {
     uniforms: {
       uCam: { value: new Vector3() },
       uMetal: { value: 0 },
+      uEnvRot: { value: 0 },
       uLime: { value: new Color(COLORS.lime) },
       uLimeDeep: { value: new Color(COLORS.limeDeep) },
       uForest: { value: new Color(COLORS.forest) },
@@ -61,11 +79,7 @@ export function createStudioMaterial() {
         float glassA = 0.38 + 0.55 * fres;
 
         // Forest metallico: scuro, riflette lo studio Lime (più forte di taglio), con i softbox netti
-        // F0 basso e scuro: il colore resta Forest; lo studio si accende di taglio e nei lampi dei softbox
-        vec3 F = mix(vec3(0.05, 0.075, 0.06), vec3(0.9), fres);
-        float lamps = pow(max(dot(R, normalize(vec3(-0.55, 0.75, 0.45))), 0.0), 60.0) * 1.6
-                    + pow(max(dot(R, normalize(vec3(0.85, 0.2, 0.5))), 0.0), 220.0) * 1.4;
-        vec3 metal = uForest * (0.75 + 0.5 * diff) + studio(R) * F + vec3(0.85, 1.0, 0.75) * lamps * 0.35;
+        vec3 metal = forestMetal(n, V);
 
         vec3 col = mix(glass, metal, uMetal);
         gl_FragColor = vec4(col, mix(glassA, 1.0, uMetal));

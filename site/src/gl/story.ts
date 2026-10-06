@@ -207,6 +207,7 @@ export class Story {
       mesh.position.set(PIVOT[b][0] + away * 26, PIVOT[b][1] + away * 16, -away * 10);
       mesh.rotation.set(away * 1.3, -away * 2.2, away * 0.9);
       mat.uniforms.uMetal.value = metal;
+      mat.uniforms.uEnvRot.value = Math.sin(time * 0.35) * 0.5;
       mesh.renderOrder = metal > 0.5 ? 0 : 1; // il vetro dopo il metallo
     });
     const front = smooth(2.35, 3, s);

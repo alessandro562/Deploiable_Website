@@ -69,6 +69,14 @@ export class Stage {
     for (const b of this.bars) b.mat.uniforms.uLit.value = v;
   }
 
+  /** Forest metallico sulle barre (prova ?story=1). */
+  setChrome(v: number, envRot = 0) {
+    for (const b of this.bars) {
+      b.mat.uniforms.uChrome.value = v;
+      b.mat.uniforms.uEnvRot.value = envRot;
+    }
+  }
+
   /** A pagina scorsa il logo dell'header lo mostra l'SVG sopra la barra di vetro: il 3D si nasconde. */
   setHidden(hidden: boolean) {
     this.hidden = hidden;

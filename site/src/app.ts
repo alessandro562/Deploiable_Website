@@ -162,7 +162,7 @@ export async function start(caps: Capabilities) {
     terminal?.(time);
     if (story) {
       // l'intro prende luce e volume; al clic (passaggio al Lime) torna ai colori esatti del logo
-      stage.setLit(1 - Math.min(1, Math.max(0, (time - (LOCK[2] - 0.25)) / (LOCK[0] - LOCK[2] + 0.25))));
+      stage.setChrome(1, Math.sin(time * 0.35) * 0.5);
       story.update(time, engine.width, engine.height);
       // camera più cinematografica nell'intro: giri più ampi, che rientrano prima dell'incastro
       const amp = 1 + 0.7 * (1 - Math.min(1, Math.max(0, (time - (LOCK[2] - 0.6)) / 0.6)));

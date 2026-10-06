@@ -1,5 +1,6 @@
 import { Color, ShaderMaterial, Vector3 } from 'three';
-import { PALETTES, type Palette } from '../../config/brand';
+import { COLORS, PALETTES, type Palette } from '../../config/brand';
+import { STUDIO_GLSL } from './studioMaterial';
 
 // Faccia frontale nel colore pieno della palette (nessuna luce, nessun tone mapping): esce identico al brand.
 // Pareti con una luce chiave e un bordo controluce; nessun pixel supera il colore "cap" della palette.
@@ -19,6 +20,11 @@ export function createBarMaterial() {
       uCam: { value: new Vector3() },
       uLit: { value: 0 },
       uShade: { value: new Color('#071811') },
+      uChrome: { value: 0 },
+      uEnvRot: { value: 0 },
+      uLime: { value: new Color(COLORS.lime) },
+      uLimeDeep: { value: new Color(COLORS.limeDeep) },
+      uForest: { value: new Color(COLORS.forest) },
     },
     vertexShader: /* glsl */ `
       attribute float aKind;
@@ -37,6 +43,8 @@ export function createBarMaterial() {
     `,
     fragmentShader: /* glsl */ `
       uniform vec3 uFront, uTop, uBottom, uSide, uBack, uRim, uCap, uCam, uShade;
+      uniform float uChrome;
+      ${STUDIO_GLSL}
       uniform float uRimAmount, uAmbient, uDiffuse, uLit;
       varying vec3 vN;
       varying vec3 vLocalN;
@@ -80,6 +88,8 @@ export function createBarMaterial() {
           lit += vec3(1.0) * pow(max(dot(R, normalize(vec3(0.85, 0.25, 0.45))), 0.0), 140.0) * 0.8;
           col = mix(col, lit, uLit);
         }
+        // Forest metallico (prova ?story=1): sostituisce il colore pieno in tutte le animazioni del simbolo
+        if (uChrome > 0.0) col = mix(col, forestMetal(n, V), uChrome);
         gl_FragColor = vec4(col, 1.0);
         #include <colorspace_fragment>
       }
