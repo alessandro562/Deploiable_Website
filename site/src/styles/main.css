@@ -849,10 +849,10 @@ p {
 
 /* La linea del finale: stessa inclinazione di 8° delle barre, alla quota del centro del simbolo.
    La testa e la coda si regolano con clip-path (src/app.ts). Sulle barre Lime non si vede: le attraversa. */
-/* Prova "racconto" (?story=1): testi a sinistra, 3D a destra (src/gl/story.ts); il fondo è lo spazio del canvas */
+/* Prova "racconto" (?story=1): testi a sinistra, 3D a destra nello studio Lime disegnato dal canvas (src/gl/story.ts) */
 .story {
   position: relative;
-  height: 600svh;
+  height: 500svh;
 }
 .story-pin {
   position: sticky;
@@ -862,113 +862,71 @@ p {
 }
 .act {
   position: absolute;
-  left: calc(var(--pad-x) + 40px);
+  left: var(--pad-x);
   top: 50%;
-  max-width: min(42vw, 600px);
+  max-width: min(40vw, 580px);
   transform: translateY(-50%);
   visibility: hidden;
 }
 .act-num {
-  margin: 0 0 20px;
+  margin: 0 0 22px;
   font: 500 12px/1 var(--sans);
-  letter-spacing: 0.24em;
-  text-transform: uppercase;
-  color: var(--lime);
+  letter-spacing: 0.26em;
+  color: var(--moss-ink);
 }
 .act-title {
   margin: 0;
-  font: 700 clamp(34px, 4.4vw, 66px)/1.04 var(--sans);
-  letter-spacing: -0.03em;
+  font: 900 clamp(38px, 5vw, 76px)/0.98 var(--sans);
+  letter-spacing: -0.035em;
   text-wrap: balance;
-  color: var(--mist);
+  color: var(--forest);
 }
 .act-sub {
-  margin: 22px 0 0;
-  max-width: 30em;
-  font: 400 clamp(16px, 1.25vw, 19px)/1.5 var(--sans);
-  color: var(--sage);
+  margin: 24px 0 0;
+  max-width: 26em;
+  font: 500 clamp(16px, 1.3vw, 20px)/1.45 var(--sans);
+  color: var(--moss-ink);
   text-wrap: pretty;
 }
 .act-claim {
-  margin: 0 0 30px;
-  font: 300 clamp(36px, 4.8vw, 72px)/1.02 var(--sans);
-  letter-spacing: -0.03em;
-  color: var(--mist);
+  margin: 0 0 32px;
+  font: 300 clamp(38px, 5vw, 76px)/1 var(--sans);
+  letter-spacing: -0.035em;
+  color: var(--forest);
 }
 .act-claim strong {
   display: block;
   font-weight: 900;
-  color: var(--lime);
 }
 .act-cta {
   display: inline-flex;
   align-items: center;
-  height: 54px;
-  padding: 0 28px;
+  height: 56px;
+  padding: 0 30px;
   border-radius: 999px;
-  background: var(--lime);
-  color: var(--forest);
+  background: var(--forest);
+  color: var(--lime);
   font: 700 15px/1 var(--sans);
   letter-spacing: 0.01em;
   text-decoration: none;
-  box-shadow: 0 0 0 1px rgb(200 242 90 / 0.4), 0 12px 40px -12px rgb(200 242 90 / 0.5);
+  box-shadow: 0 18px 40px -18px rgb(16 38 27 / 0.6);
 }
 .act-cta::after {
   content: '→';
   margin-left: 10px;
-}
-/* avanzamento: una linea verticale con cinque tacche, si riempie di Lime scorrendo */
-.story-rail {
-  position: absolute;
-  left: var(--pad-x);
-  top: 50%;
-  height: 220px;
-  margin-top: -110px;
-  width: 2px;
-  background: linear-gradient(var(--lime) calc(var(--p, 0) * 100%), rgb(143 165 150 / 0.25) 0);
-  border-radius: 2px;
-}
-.story-rail i {
-  position: absolute;
-  left: -3px;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--forest);
-  border: 1.5px solid rgb(143 165 150 / 0.5);
-  transition: background 0.2s, border-color 0.2s;
-}
-.story-rail i:nth-child(1) { top: -4px; }
-.story-rail i:nth-child(2) { top: calc(25% - 4px); }
-.story-rail i:nth-child(3) { top: calc(50% - 4px); }
-.story-rail i:nth-child(4) { top: calc(75% - 4px); }
-.story-rail i:nth-child(5) { top: calc(100% - 4px); }
-.story-rail i.on {
-  background: var(--lime);
-  border-color: var(--lime);
 }
 @media (max-width: 759px) {
   .act {
     left: var(--pad-x);
     right: var(--pad-x);
     top: auto;
-    bottom: 9svh;
+    bottom: 8svh;
     max-width: none;
     transform: none;
   }
   .act-sub {
     margin-top: 14px;
   }
-  .story-rail {
-    display: none;
-  }
-}
-/* sul fondo scuro l'header è vetro scuro */
-html[data-palette='forest'] .top::before,
-.is-dark-under .top::before {
-  background: linear-gradient(180deg, rgb(16 38 27 / 0.6), rgb(16 38 27 / 0.38));
-  border-bottom-color: rgb(200 242 90 / 0.14);
-  box-shadow: none;
 }
 
 /* Prova "terminale" (?term=1): il comando di deploy sul Forest dell'apertura (src/terminal.ts) */

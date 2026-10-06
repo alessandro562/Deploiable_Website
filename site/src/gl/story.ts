@@ -1,107 +1,148 @@
 import {
+  BufferGeometry,
+  Color,
   DoubleSide,
+  Float32BufferAttribute,
   Group,
   Mesh,
   PerspectiveCamera,
   PlaneGeometry,
   Scene,
   ShaderMaterial,
+  Vector3,
   type WebGLRenderer,
 } from 'three';
-import { PALETTES } from '../config/brand';
+import { COLORS } from '../config/brand';
 import { t, type Key } from '../i18n';
 import { BarGeometry } from './symbol/barGeometry';
-import { createBarMaterial, setPalette } from './symbol/barMaterial';
+import { createStudioMaterial } from './symbol/studioMaterial';
 import { PIVOT, REST, SYMBOL_H, SYMBOL_W } from './symbol/symbolSpec';
 
-// Prova (?story=1): il racconto a scorrimento sotto l'hero. Il 3D resta fermo nello schermo e segue lo
-// scorrimento, avanti e indietro. Cinque tappe:
-//   0  il problema: i tre pezzi sono sparsi e fluttuano, non si incastrano (l'AI che resta una demo)
-//   1–3 il metodo: trovare, costruire, misurare; ogni tappa porta una barra al suo posto (dal basso)
-//   4  la chiusura: simbolo completo e di fronte, "We make AI deployable." e il pulsante per la review
-// Profondità: barre spesse con luce da studio, un pavimento a griglia in prospettiva che riflette il simbolo.
+// Prova (?story=1): il racconto a scorrimento sotto l'hero, in uno "studio infinito" Lime (pavimento e parete
+// raccordati in curva, luce morbida, ombre sotto le barre). Il 3D segue lo scorrimento, avanti e indietro.
+//   step 1–3  una barra per step entra da fuori scena come vetro smerigliato, prende il suo posto nel simbolo
+//             e diventa Forest metallico; al terzo step il simbolo è completo
+//   chiusura  il simbolo si gira di fronte, accanto a "We make AI deployable." e al pulsante per la review
 
-const ORDER = [2, 1, 0]; // barra che arriva nelle tappe 1, 2, 3: bassa, centrale, alta
-const STEPS = 5;
-// dove fluttuano i pezzi nella tappa del problema (posizione e rotazione di ognuno)
-const SCATTER = [
-  { p: [3.2, 1.6, -4], r: [0.9, -1.1, 0.5] },
-  { p: [-4.2, 0.4, -1.5], r: [-0.6, 0.9, -0.35] },
-  { p: [2.4, -2.2, 2], r: [0.5, 0.6, 0.8] },
-];
+const ORDER = [2, 1, 0]; // barra di ogni step: bassa, centrale, alta
+const STAGES = 4; // tre step più la chiusura
+const FLOOR = -SYMBOL_H * 0.68;
+const WALL_Z = -13;
+const COVE = 9;
 
 const smooth = (a: number, b: number, x: number) => {
   const k = Math.min(1, Math.max(0, (x - a) / (b - a)));
   return k * k * (3 - 2 * k);
 };
 
+/** Profilo dello studio: pavimento, curva di raccordo, parete; esteso lungo x. */
+function cycloramaGeometry() {
+  const prof: [number, number][] = [[90, FLOOR]];
+  const zc = WALL_Z + COVE;
+  for (let i = 0; i <= 16; i++) {
+    const a = (i / 16) * (Math.PI / 2);
+    prof.push([zc - COVE * Math.sin(a), FLOOR + COVE - COVE * Math.cos(a)]);
+  }
+  prof.push([WALL_Z, FLOOR + 140]);
+  const pos: number[] = [];
+  const X = 260;
+  for (let i = 0; i < prof.length - 1; i++) {
+    const [z0, y0] = prof[i];
+    const [z1, y1] = prof[i + 1];
+    pos.push(-X, y0, z0, X, y0, z0, X, y1, z1, -X, y0, z0, X, y1, z1, -X, y1, z1);
+  }
+  const g = new BufferGeometry();
+  g.setAttribute('position', new Float32BufferAttribute(pos, 3));
+  return g;
+}
+
 export class Story {
   private readonly scene = new Scene();
-  private readonly floorScene = new Scene();
-  private readonly camera = new PerspectiveCamera(30, 1, 1, 600);
+  private readonly room = new Scene();
+  private readonly camera = new PerspectiveCamera(28, 1, 1, 800);
   private readonly group = new Group();
-  private readonly inner = new Group();
-  private readonly bars: { mesh: Mesh; mat: ShaderMaterial }[] = [];
-  private readonly floor: ShaderMaterial;
-  private readonly floorY = -SYMBOL_H * 0.95;
+  private readonly bars: { mesh: Mesh; mat: ShaderMaterial; shadow: Mesh; shadowMat: ShaderMaterial }[] = [];
+  private readonly roomMat: ShaderMaterial;
   private readonly section: HTMLElement;
   private readonly steps: HTMLElement[];
-  private readonly rail: HTMLElement;
+  private rect = { top: 0, bottom: 0 };
   private visible = false;
+  private readonly tmp = new Vector3();
   progress = -1;
 
   constructor() {
-    for (let i = 0; i < 3; i++) {
-      const geo = new BarGeometry(i);
-      geo.update(REST, true);
-      const mat = createBarMaterial();
-      setPalette(mat, PALETTES.forest); // Lime su Forest
-      mat.uniforms.uLit.value = 1;
-      mat.side = DoubleSide; // il riflesso è il simbolo capovolto
-      const mesh = new Mesh(geo.geometry, mat);
-      mesh.frustumCulled = false;
-      this.inner.add(mesh);
-      this.bars.push({ mesh, mat });
-    }
-    this.inner.scale.z = 2.1; // barre spesse: il volume si legge anche di fronte
-    this.group.add(this.inner);
-    this.scene.add(this.group);
-
-    // Pavimento: Forest quasi opaco (il riflesso traspare appena sotto il simbolo e si spegne in lontananza)
-    // con una griglia sottile, nitida, che si dissolve verso l'orizzonte.
-    this.floor = new ShaderMaterial({
-      transparent: true,
-      depthTest: false,
+    const lime = new Color(COLORS.lime);
+    const limeDeep = new Color(COLORS.limeDeep);
+    this.roomMat = new ShaderMaterial({
+      side: DoubleSide,
       depthWrite: false,
+      uniforms: { uLime: { value: lime }, uLimeDeep: { value: limeDeep }, uTop: { value: 0 }, uVh: { value: 1 } },
       vertexShader: /* glsl */ `
         varying vec3 vW;
         void main() { vec4 w = modelMatrix * vec4(position, 1.0); vW = w.xyz; gl_Position = projectionMatrix * viewMatrix * w; }
       `,
       fragmentShader: /* glsl */ `
+        uniform vec3 uLime, uLimeDeep;
+        uniform float uTop, uVh;
         varying vec3 vW;
         void main() {
-          vec2 g = vW.xz / 2.4;
-          vec2 a = abs(fract(g - 0.5) - 0.5) / fwidth(g);
-          float line = 1.0 - min(min(a.x, a.y), 1.0);
-          float r = length(vW.xz * vec2(1.0, 1.5));
-          float near = 1.0 - smoothstep(4.0, 46.0, r);
-          vec3 forest = vec3(0.0052, 0.0194, 0.0103);
-          vec3 pine = vec3(0.0116, 0.0423, 0.0232);
-          vec3 lime = vec3(0.578, 0.888, 0.102);
-          vec3 col = forest + (pine * 2.2 + lime * 0.05) * line * near;
-          float alpha = mix(1.0, 0.8, smoothstep(26.0, 3.0, r));
-          gl_FragColor = vec4(col, alpha);
+          // pavimento più chiaro (la luce cade dall'alto), parete un tono sotto, raccordo in leggera ombra:
+          // si legge la stanza. Tutto nella famiglia Lime / Lime Deep, mai verso l'oliva.
+          float h = vW.y - ${FLOOR.toFixed(2)};
+          float wall = smoothstep(0.5, ${COVE.toFixed(1)} * 0.9, h);
+          float pool = exp(-(vW.x * vW.x * 0.6 + (vW.z + 1.0) * (vW.z + 1.0)) / (2.0 * 15.0 * 15.0));
+          float side = exp(-vW.x * vW.x / (2.0 * 55.0 * 55.0));
+          vec3 col = mix(uLime * (0.97 + 0.06 * pool), mix(uLimeDeep, uLime, 0.55), wall * 0.8);
+          col *= mix(0.94, 1.0, side);
+          float cove = exp(-pow((h - ${COVE.toFixed(1)} * 0.35) / 2.2, 2.0)) * smoothstep(${(WALL_Z + COVE).toFixed(1)}, ${(WALL_Z + COVE * 0.3).toFixed(1)}, vW.z);
+          col *= 1.0 - 0.06 * cove;
+          // in alto la fascia si fonde con il Lime pieno dell'hero
+          float fade = smoothstep(uTop - uVh * 0.32, uTop - uVh * 0.02, gl_FragCoord.y);
+          gl_FragColor = vec4(mix(col, uLime, fade), 1.0);
           #include <colorspace_fragment>
         }
       `,
     });
-    const plane = new Mesh(new PlaneGeometry(220, 220), this.floor);
-    plane.rotation.x = -Math.PI / 2;
-    plane.position.y = this.floorY;
-    plane.frustumCulled = false;
-    this.floorScene.add(plane);
+    const room = new Mesh(cycloramaGeometry(), this.roomMat);
+    room.frustumCulled = false;
+    this.room.add(room);
 
-    // il testo: cinque tappe (titolo e riga di spiegazione) e una barra di avanzamento
+    for (let i = 0; i < 3; i++) {
+      const geo = new BarGeometry(i);
+      geo.update(REST, true);
+      const mat = createStudioMaterial();
+      mat.uniforms.uLime.value = lime;
+      mat.uniforms.uLimeDeep.value = limeDeep;
+      const mesh = new Mesh(geo.geometry, mat);
+      mesh.frustumCulled = false;
+      this.group.add(mesh);
+      // ombra morbida sul pavimento, sotto la barra
+      const shadowMat = new ShaderMaterial({
+        transparent: true,
+        depthWrite: false,
+        depthTest: false,
+        uniforms: { uOpacity: { value: 0 }, uColor: { value: new Color(COLORS.forest) } },
+        vertexShader: /* glsl */ `varying vec2 vUv; void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
+        fragmentShader: /* glsl */ `
+          uniform float uOpacity; uniform vec3 uColor; varying vec2 vUv;
+          void main() {
+            float r = length((vUv - 0.5) * 2.0);
+            float a = pow(1.0 - smoothstep(0.0, 1.0, r), 1.6) * uOpacity;
+            gl_FragColor = vec4(uColor, a);
+            #include <colorspace_fragment>
+          }
+        `,
+      });
+      const shadow = new Mesh(new PlaneGeometry(1, 1), shadowMat);
+      shadow.rotation.x = -Math.PI / 2;
+      shadow.frustumCulled = false;
+      this.room.add(shadow);
+      this.bars.push({ mesh, mat, shadow, shadowMat });
+    }
+    this.group.scale.z = 1.6; // barre spesse: il volume si legge anche di fronte
+    this.scene.add(this.group);
+
+    // il testo: tre step (numero, titolo, riga) e la chiusura
     const el = (tag: string, cls: string, key?: Key, text?: string) => {
       const e = document.createElement(tag);
       e.className = cls;
@@ -115,16 +156,10 @@ export class Story {
     this.section.setAttribute('aria-label', t('story.label'));
     this.section.dataset.i18nAttr = 'aria-label:story.label';
     const pin = el('div', 'story-pin');
-    const copy: [Key, Key, string][] = [
-      ['story.0', 'story.0s', ''],
-      ['story.1', 'story.1s', '01'],
-      ['story.2', 'story.2s', '02'],
-      ['story.3', 'story.3s', '03'],
-    ];
-    this.steps = copy.map(([title, sub, num]) => {
+    this.steps = ([1, 2, 3] as const).map((n) => {
       const a = el('article', 'act');
-      a.append(num ? el('p', 'act-num', undefined, `${num} / 03`) : el('p', 'act-num', 'story.label'));
-      a.append(el('h2', 'act-title', title), el('p', 'act-sub', sub));
+      a.append(el('p', 'act-num', undefined, `0${n} / 03`));
+      a.append(el('h2', 'act-title', `story.${n}` as Key), el('p', 'act-sub', `story.${n}s` as Key));
       return a;
     });
     const end = el('article', 'act act--end');
@@ -140,87 +175,87 @@ export class Story {
     });
     end.append(claim, cta);
     this.steps.push(end);
-    this.rail = el('div', 'story-rail');
-    this.rail.setAttribute('aria-hidden', 'true');
-    for (let i = 0; i < STEPS; i++) this.rail.append(el('i', ''));
-    pin.append(this.rail, ...this.steps);
+    pin.append(...this.steps);
     this.section.append(pin);
     document.querySelector('.hero')!.after(this.section);
   }
 
   update(time: number, width: number, height: number) {
     const r = this.section.getBoundingClientRect();
+    this.rect = { top: r.top, bottom: r.bottom };
     this.visible = r.bottom > 0 && r.top < height;
-    const s = (-r.top / Math.max(1, r.height - height)) * (STEPS - 1);
+    const s = (-r.top / Math.max(1, r.height - height)) * (STAGES - 1);
     this.progress = s;
 
     this.steps.forEach((a, i) => {
       const inn = smooth(i - 0.45, i - 0.05, s);
-      const out = i < STEPS - 1 ? smooth(i + 0.55, i + 0.9, s) : 0;
+      const out = i < STAGES - 1 ? smooth(i + 0.55, i + 0.9, s) : 0;
       const o = inn * (1 - out);
       a.style.opacity = o.toFixed(3);
-      a.style.transform = `translate3d(0, ${((1 - inn) * 36 - out * 36).toFixed(1)}px, 0)`;
+      a.style.transform = `translate3d(0, ${((1 - inn) * 40 - out * 40).toFixed(1)}px, 0)`;
       a.style.visibility = o > 0.01 ? 'visible' : 'hidden';
     });
-    this.rail.style.setProperty('--p', Math.min(1, Math.max(0, s / (STEPS - 1))).toFixed(4));
-    this.rail.style.opacity = String(smooth(-0.4, 0, s) * (1 - smooth(STEPS - 0.6, STEPS - 0.1, s)));
-    Array.from(this.rail.children).forEach((c, i) => c.classList.toggle('on', s > i - 0.5));
     if (!this.visible) return;
 
-    // pezzi: sparsi e fluttuanti nella tappa del problema, poi ognuno al suo posto nella sua tappa
+    // ogni barra entra da fuori scena (in alto a destra, dal fondo), avvitandosi, poi diventa metallo
     ORDER.forEach((b, i) => {
-      const k = smooth(i + 0.2, i + 0.95, s);
-      const away = 1 - k;
-      const sc = SCATTER[b];
-      const f = time * 0.6 + b * 2.1;
-      const m = this.bars[b].mesh;
-      m.position.set(
-        PIVOT[b][0] + away * (sc.p[0] + Math.sin(f) * 0.5),
-        PIVOT[b][1] + away * (sc.p[1] + Math.cos(f * 0.8) * 0.5),
-        away * (sc.p[2] + Math.sin(f * 0.7) * 0.6),
-      );
-      m.rotation.set(away * (sc.r[0] + Math.sin(f * 0.5) * 0.15), away * sc.r[1], away * sc.r[2]);
+      const k = smooth(i - 0.8, i - 0.12, s);
+      const away = Math.pow(1 - k, 1.6);
+      const metal = smooth(i - 0.2, i + 0.35, s);
+      const { mesh, mat } = this.bars[b];
+      mesh.visible = k > 0.001;
+      mesh.position.set(PIVOT[b][0] + away * 26, PIVOT[b][1] + away * 16, -away * 10);
+      mesh.rotation.set(away * 1.3, -away * 2.2, away * 0.9);
+      mat.uniforms.uMetal.value = metal;
+      mesh.renderOrder = metal > 0.5 ? 0 : 1; // il vetro dopo il metallo
     });
-    const front = smooth(3.2, 4, s);
-    const breathe = Math.sin(time * 0.45) * 0.08 * (1 - front * 0.7);
-    // il simbolo ruota piano mentre si costruisce, poi si gira di fronte
-    this.group.rotation.set(0.18 * (1 - front), -0.75 + 0.35 * smooth(0, 3, s) + 0.4 * front + breathe, 0);
+    const front = smooth(2.35, 3, s);
+    const click = smooth(1.8, 1.95, s) * (1 - smooth(1.95, 2.25, s)); // il simbolo si chiude: un piccolo colpo
+    const breathe = Math.sin(time * 0.5) * 0.035 * (1 - front);
+    this.group.rotation.set(0.1 * (1 - front), -0.6 * (1 - front) + breathe, 0);
+    const g = 1 + 0.035 * click;
+    this.group.scale.set(g, g, 1.6 * g);
+    this.group.updateMatrixWorld();
+
+    // ombre: sotto ogni barra, più nette e scure quanto più la barra è metallo e vicina al suo posto
+    ORDER.forEach((b, i) => {
+      const { mesh, shadow, shadowMat } = this.bars[b];
+      mesh.getWorldPosition(this.tmp);
+      const k = smooth(i - 0.8, i - 0.12, s);
+      shadow.position.set(this.tmp.x + SYMBOL_W * 0.08, FLOOR + 0.02, this.tmp.z + 1.2);
+      shadow.scale.set(SYMBOL_W * 0.8, SYMBOL_H * 0.42, 1);
+      shadowMat.uniforms.uOpacity.value = k * (0.16 + 0.2 * (this.bars[b].mat.uniforms.uMetal.value as number));
+    });
 
     const narrow = width < 760;
     const aspect = width / height;
     const tan = Math.tan((this.camera.fov * Math.PI) / 360);
-    const spread = 1.4 - 0.4 * smooth(0.3, 3, s); // i pezzi sparsi occupano più spazio
-    const fitH = (SYMBOL_H * spread) / ((narrow ? 0.36 : 0.56) * 2 * tan);
-    const fitW = (SYMBOL_W * spread) / ((narrow ? 0.7 : 0.42) * 2 * tan * aspect);
-    const d = Math.max(fitH, fitW) * (1 - 0.06 * front);
-    // la camera guarda leggermente dall'alto: si vedono il pavimento e il riflesso
-    this.camera.position.set(0, d * 0.16, d);
-    this.camera.lookAt(0, -SYMBOL_H * 0.12, 0);
+    const fitH = SYMBOL_H / ((narrow ? 0.34 : 0.56) * 2 * tan);
+    const fitW = SYMBOL_W / ((narrow ? 0.66 : 0.42) * 2 * tan * aspect);
+    const d = Math.max(fitH, fitW) * (1 + 0.14 * front);
+    // camera appena sopra il simbolo: si vedono il pavimento, le ombre e la curva dello studio
+    this.camera.position.set(0, d * 0.14, d);
+    this.camera.lookAt(0, -SYMBOL_H * 0.18, 0);
     this.camera.aspect = aspect;
-    this.camera.setViewOffset(width, height, narrow ? 0 : -width * 0.18, narrow ? height * 0.14 : 0, width, height);
+    this.camera.setViewOffset(width, height, narrow ? 0 : -width * 0.19, narrow ? height * 0.15 : 0, width, height);
     this.camera.updateMatrixWorld();
     for (const { mat } of this.bars) mat.uniforms.uCam.value.copy(this.camera.position);
   }
 
-  /** Riflesso (il simbolo capovolto sotto il pavimento), pavimento, poi il simbolo. */
-  render(renderer: WebGLRenderer) {
+  /** Lo studio (solo dentro la fascia visibile), le ombre, poi le barre. */
+  render(renderer: WebGLRenderer, width: number, height: number, dpr: number) {
     if (!this.visible) return;
+    const top = Math.max(0, this.rect.top);
+    const bottom = Math.min(height, this.rect.bottom);
+    if (bottom <= top) return;
+    this.roomMat.uniforms.uTop.value = (height - this.rect.top) * dpr;
+    this.roomMat.uniforms.uVh.value = height * dpr;
+    renderer.setScissorTest(true);
+    renderer.setScissor(0, height - bottom, width, bottom - top);
     renderer.clearDepth();
-    const g = this.group;
-    g.position.y = 2 * this.floorY;
-    g.scale.y = -1;
-    g.updateMatrixWorld();
-    renderer.render(this.scene, this.camera);
-    g.position.y = 0;
-    g.scale.y = 1;
-    g.updateMatrixWorld();
-    renderer.render(this.floorScene, this.camera);
+    renderer.render(this.room, this.camera);
     renderer.clearDepth();
     renderer.render(this.scene, this.camera);
-  }
-
-  under(y: number) {
-    const r = this.section.getBoundingClientRect();
-    return r.top <= y && r.bottom > y;
+    renderer.setScissorTest(false);
   }
 }

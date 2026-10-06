@@ -11,7 +11,7 @@ const p = await b.newPage({ viewport: { width: W, height: H } });
 await p.goto('http://localhost:4173/?__test=1&tier=high&story=1' + (process.env.EXTRA ?? ''));
 await p.waitForFunction(() => window.__DEPLOIABLE__?.ready === true);
 const heroH = await p.evaluate(() => document.querySelector('.hero').offsetHeight);
-const end = heroH + 5 * H; // fine della fascia
+const end = heroH + 4 * H; // fine della fascia
 let f = 0;
 const shot = async (t, y) => {
   await p.evaluate(([t, y]) => { scrollTo(0, y); window.__DEPLOIABLE__.seek(t); }, [t, y]);

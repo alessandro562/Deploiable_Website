@@ -74,6 +74,10 @@ export function createBarMaterial() {
           vec3 base = vKind < 0.5 ? uFront : uFront * 0.96;
           vec3 lit = mix(uShade, base, min(k, 1.0)) * max(k, 1.0)
             + vec3(1.0, 1.0, 0.92) * spec * 0.35 + uFront * fres * 0.35;
+          // riflessi da studio (gli stessi softbox del racconto): il volume diventa materiale
+          vec3 R = reflect(-V, n);
+          lit += vec3(1.0) * pow(max(dot(R, normalize(vec3(-0.55, 0.75, 0.45))), 0.0), 70.0) * 1.2;
+          lit += vec3(1.0) * pow(max(dot(R, normalize(vec3(0.85, 0.25, 0.45))), 0.0), 140.0) * 0.8;
           col = mix(col, lit, uLit);
         }
         gl_FragColor = vec4(col, 1.0);

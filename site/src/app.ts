@@ -10,7 +10,6 @@ import { Backdrop } from './gl/backdrop';
 import { onLangChange } from './i18n';
 import { initTerminal } from './terminal';
 import { Story } from './gl/story';
-import { Space } from './gl/space';
 
 // Tre livelli, come nella skill web3d-integration-patterns (Pattern 1):
 //  · 3D      Three.js: renderer, barre, scintille (src/gl)
@@ -36,11 +35,6 @@ export async function start(caps: Capabilities) {
   const backdrop = new Backdrop(engine.bgScene);
   // Prova: luci da studio sull'intro e racconto a scorrimento (?story=1), spenti con riduzione del movimento
   const story = q.get('story') === '1' && !matchMedia('(prefers-reduced-motion: reduce)').matches ? new Story() : null;
-  // con il racconto: lo spazio di punti dietro a tutta la pagina e la supergrafica in rilievo
-  const space = story ? new Space(document.documentElement.scrollHeight) : null;
-  if (story) backdrop.setLit(1);
-  const header = document.querySelector<HTMLElement>('.top')!;
-  let darkUnder = false;
   // Prova: apertura "terminale" (?term=1), spenta con riduzione del movimento
   const terminal =
     q.get('term') === '1' && !matchMedia('(prefers-reduced-motion: reduce)').matches ? initTerminal() : null;
@@ -115,7 +109,7 @@ export async function start(caps: Capabilities) {
 
   // Palette: "forest" (barre Lime su Forest), "lime" (barre Forest su Lime) oppure "flip" (Forest fino al clic
   // dell'ultima barra, poi Lime). Si sceglie con ?palette=; il valore predefinito è in DEFAULT_PALETTE.
-  const mode = (q.get('palette') ?? (q.get('story') === '1' ? 'forest' : DEFAULT_PALETTE)) as PaletteName | 'flip';
+  const mode = (q.get('palette') ?? DEFAULT_PALETTE) as PaletteName | 'flip';
   const paletteAt = (t: number): PaletteName => (mode === 'flip' ? (t >= LOCK[0] ? 'lime' : 'forest') : mode);
   let current: PaletteName | null = null;
   const applyPalette = (name: PaletteName) => {
@@ -170,9 +164,10 @@ export async function start(caps: Capabilities) {
       // l'intro prende luce e volume; al clic (passaggio al Lime) torna ai colori esatti del logo
       stage.setLit(1 - Math.min(1, Math.max(0, (time - (LOCK[2] - 0.25)) / (LOCK[0] - LOCK[2] + 0.25))));
       story.update(time, engine.width, engine.height);
-      space!.apply(time, scrollY, engine.width, engine.height, engine.dpr, Math.min(1, Math.max(0, (time - 0.3) / 1.2)));
-      const dark = story.under(header.offsetHeight / 2);
-      if (dark !== darkUnder) document.documentElement.classList.toggle('is-dark-under', (darkUnder = dark));
+      // camera più cinematografica nell'intro: giri più ampi, che rientrano prima dell'incastro
+      const amp = 1 + 0.7 * (1 - Math.min(1, Math.max(0, (time - (LOCK[2] - 0.6)) / 0.6)));
+      state.az *= amp;
+      state.el *= amp;
     }
     stage.apply(state, engine.camera, engine.width, engine.height);
     backdrop.apply(state, engine.bgCamera, engine.width, engine.height, scrollY);
@@ -193,7 +188,7 @@ export async function start(caps: Capabilities) {
     });
     // la linea: testa e coda sono percentuali della sua lunghezza
     sweep.style.clipPath = `inset(0 ${((1 - state.sweepHead) * 100).toFixed(2)}% 0 ${(state.sweepTail * 100).toFixed(2)}%)`;
-    engine.render(story ? () => story.render(engine.renderer) : undefined, space ? () => space.render(engine.renderer) : undefined);
+    engine.render(story ? () => story.render(engine.renderer, engine.width, engine.height, engine.dpr) : undefined);
   };
 
   measureSlot();
