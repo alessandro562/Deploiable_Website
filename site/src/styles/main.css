@@ -17,9 +17,13 @@
 
   /* Composizione del finale: il logo orizzontale in alto, la frase sotto, tutto centrato sulla pagina.
      La larghezza del logo è l'unica misura: la camera 3D inquadra il segnaposto .logo-slot (src/gl/stage.ts). */
-  --logo-w: min(88vw, max(52vw, 360px), 150svh);
+  /* la larghezza dipende anche dall'altezza: il blocco intero (logo, frase, sottotitolo, modulo) occupa al massimo
+     circa due terzi dello schermo, così su finestre larghe e basse resta centrato con aria sopra e sotto */
+  --logo-w: min(88vw, max(52vw, 360px), calc(110svh - 260px));
   /* corpo della frase: 1/9 del logo (1/7 su schermi verticali) */
   --claim-fs: calc(var(--logo-w) / 9);
+  /* spazio fra logo, frase e blocco iscrizione */
+  --gap: calc(var(--logo-w) / 14);
   color-scheme: dark;
 }
 
@@ -88,9 +92,9 @@ p {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: calc(var(--logo-w) / 14);
+  gap: var(--gap);
   /* il centro ottico sta un po' sopra il centro geometrico */
-  padding-bottom: 8svh;
+  padding-bottom: 3svh;
 }
 
 .logo-slot {
@@ -133,15 +137,16 @@ p {
 }
 /* "Make AI" non ha discendenti e "deployable." ha le ascendenti: le due righe si avvicinano un po'. */
 .mask + .mask {
-  margin-top: -0.1em;
+  margin-top: -0.25em; /* −0,15 em della maschera e −0,1 em per avvicinare le righe */
 }
 
 .mask {
   display: block;
   overflow: hidden;
-  /* la maschera taglia solo in verticale: ai lati si estende oltre il blocco senza spostare il layout */
-  padding: 0 0.5em 0.08em;
-  margin: 0 -0.5em -0.08em;
+  /* la maschera taglia solo il testo che sta entrando: si estende oltre la riga in ogni direzione (ascendenti,
+     discendenti come la "y" di deployable, spalle laterali) senza spostare il layout di un pixel */
+  padding: 0.15em 0.5em 0.3em;
+  margin: -0.15em -0.5em -0.3em;
 }
 .line {
   display: block;
@@ -151,7 +156,7 @@ p {
 /* ---------- Sottotitolo ---------- */
 /* Dice per chi e cosa si ottiene: il metodo in tre verbi. Più vicino alla frase che al blocco iscrizione. */
 .sub {
-  margin: calc(var(--logo-w) / 14 * -0.55) auto 0;
+  margin: calc(var(--gap) * -0.55) auto 0;
   max-width: min(100%, 36em);
   font-size: clamp(15px, calc(var(--claim-fs) * 0.25), 21px);
   font-weight: 500;
@@ -391,8 +396,13 @@ p {
 /* Su schermi verticali (telefono) il logo occupa quasi tutta la larghezza e sotto c'è molto spazio:
    la frase è più grande, in proporzione. */
 @media (max-aspect-ratio: 1/1) {
+  /* in verticale c'è molta altezza libera: frase più grande e più respiro fra i blocchi */
   :root {
-    --claim-fs: calc(var(--logo-w) / 7);
+    --claim-fs: calc(var(--logo-w) / 6.2);
+    --gap: calc(var(--logo-w) / 9.5);
+  }
+  .sub {
+    font-size: 16px;
   }
 }
 
@@ -400,7 +410,7 @@ p {
 /* Di default (prima che parta il JavaScript) il testo è nascosto: niente anticipazioni, la suspense parte subito. */
 
 .line {
-  transform: translateY(110%);
+  transform: translateY(150%);
 }
 
 .gl,
@@ -501,7 +511,7 @@ p {
   from { transform: translateY(-40%); opacity: 0; }
 }
 @keyframes rise {
-  from { transform: translateY(110%); }
+  from { transform: translateY(150%); }
 }
 @keyframes letters-in {
   from { opacity: 0; }

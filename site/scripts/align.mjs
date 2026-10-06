@@ -4,7 +4,7 @@
 import { chromium } from '@playwright/test';
 import { PNG } from 'pngjs';
 
-const SIZES = [[1920, 1080], [1440, 900], [1280, 720], [768, 1024], [414, 896], [390, 844], [375, 667], [360, 740], [844, 390]];
+const SIZES = [[2000, 934], [1920, 1080], [1680, 1050], [1536, 864], [1440, 900], [1280, 720], [768, 1024], [414, 896], [390, 844], [375, 667], [360, 740], [844, 390]];
 const base = process.env.BASE_URL ?? 'http://localhost:4173/';
 const browser = await chromium.launch({
   args: ['--use-angle=swiftshader', '--use-gl=angle', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'],
@@ -44,7 +44,7 @@ for (const [w, h] of SIZES) {
     '| centro: logo', f((logo.L + logo.R) / 2 - w / 2), 'riga1', f((lines[0].L + lines[0].R) / 2 - w / 2), 'riga2', f((lines[1].L + lines[1].R) / 2 - w / 2),
     '| gap logo→riga1', f(lines[0].T - logo.B), '| gap riga1→2', f(lines[1].T - lines[0].B),
     '| gap riga2→sub', f(sub.T - lines[1].B), '| gap sub→soon', f(soon.T - sub.B),
-    '| blocco', f(logo.T), '→', f(rects.note.y + rects.note.h), `(margine sopra ${f(logo.T).trim()} / sotto ${(h - rects.note.y - rects.note.h).toFixed(1)})`);
+    '| blocco', f(logo.T), '→', f(rects.note.y + rects.note.h), `(sopra ${f(logo.T).trim()} / sotto ${(h - rects.note.y - rects.note.h).toFixed(1)} · blocco ${(((rects.note.y + rects.note.h - logo.T) / h) * 100).toFixed(0)}% · sopra/libero ${((logo.T / (h - (rects.note.y + rects.note.h - logo.T))) * 100).toFixed(0)}%)`);
   await page.close();
 }
 await browser.close();
