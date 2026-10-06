@@ -88,8 +88,8 @@ export function createBarMaterial() {
           lit += vec3(1.0) * pow(max(dot(R, normalize(vec3(0.85, 0.25, 0.45))), 0.0), 140.0) * 0.8;
           col = mix(col, lit, uLit);
         }
-        // Forest metallico (prova ?story=1): sostituisce il colore pieno in tutte le animazioni del simbolo
-        if (uChrome > 0.0) col = mix(col, forestMetal(n, V), uChrome);
+        // Metallo nel colore del brand (prova ?story=1): Lime sul Forest dell'apertura, Forest dopo il passaggio al Lime
+        if (uChrome > 0.0) col = mix(col, brandMetal(n, V, uFront), uChrome);
         gl_FragColor = vec4(col, 1.0);
         #include <colorspace_fragment>
       }
