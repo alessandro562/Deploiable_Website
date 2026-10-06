@@ -5,8 +5,8 @@ const ENDPOINT: string | undefined = import.meta.env.VITE_SIGNUP_ENDPOINT;
 
 const MESSAGES = {
   invalid: 'Please enter a valid email address.',
-  sending: 'Adding you to the list…',
-  done: 'See you at launch.',
+  sending: 'Saving your spot…',
+  done: 'We’ll be in touch before launch.',
   error: 'Something went wrong. Please try again.',
   closed: 'Sign-ups open very soon.',
 };

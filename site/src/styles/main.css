@@ -125,12 +125,16 @@ p {
 .line--light {
   font-weight: 300;
   color: var(--ink-light);
+  /* centratura ottica di "Make AI": la M ha più aria a sinistra della I a destra (misurato in scripts/align.mjs) */
+  margin-left: -0.05em;
 }
 .line--black {
   font-weight: 900;
   color: var(--ink-strong);
-  /* centratura ottica: la M ha più spazio a sinistra del punto a destra (−0,03 em, misurato in scripts/align.mjs) */
-  margin-left: -0.06em;
+}
+/* "Make AI" non ha discendenti e "deployable." ha le ascendenti: le due righe si avvicinano un po'. */
+.mask + .mask {
+  margin-top: -0.1em;
 }
 
 .mask {
@@ -145,6 +149,21 @@ p {
   will-change: transform;
 }
 
+/* ---------- Sottotitolo ---------- */
+/* Dice per chi e cosa si ottiene: il metodo in tre verbi. Più vicino alla frase che al blocco iscrizione. */
+.sub {
+  margin: calc(var(--logo-w) / 14 * -0.55) auto 0;
+  max-width: min(100%, 36em);
+  font-size: clamp(15px, calc(var(--claim-fs) * 0.25), 21px);
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+  text-align: center;
+  text-wrap: balance;
+  color: var(--ink-light);
+  opacity: 0; /* compare dopo la frase (src/app.ts) */
+}
+
 /* ---------- Coming soon e iscrizione ---------- */
 /* Piccoli, sotto la frase: compaiono per ultimi. Su Lime solo Forest (i colori seguono la palette);
    etichetta e nota in JetBrains Mono, come le didascalie del brand book; testo secondario in Moss. */
@@ -155,9 +174,8 @@ p {
   flex-direction: column;
   align-items: center;
   visibility: hidden;
-  /* stesso spazio "a inchiostro" fra logo e frase e fra frase e blocco: la discendente di "Measurably." e
-     l'interlinea della frase rubano 0,16 em del corpo della frase (misurato con scripts/align.mjs) */
-  margin-top: calc(var(--claim-fs) * 0.16);
+  /* stesso spazio "a inchiostro" fra logo e frase e fra sottotitolo e blocco (misurato con scripts/align.mjs) */
+  margin-top: calc(var(--claim-fs) * 0.13);
 }
 /* ognuno dei tre elementi entra per conto suo, sfalsati (src/app.ts) */
 .outro > * {
@@ -302,7 +320,8 @@ p {
   font: 500 11px/1.4 var(--mono);
   letter-spacing: 0.02em;
   text-align: center;
-  white-space: nowrap; /* può uscire dalla larghezza del logo, che sui telefoni in orizzontale è stretta */
+  max-width: min(92vw, 440px);
+  text-wrap: balance;
   color: var(--ink-soft);
 }
 
@@ -461,6 +480,10 @@ p {
 .is-static .outro {
   visibility: visible;
 }
+.is-static .sub {
+  opacity: 1;
+  animation: fade-up 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) 1.35s both;
+}
 .is-static .outro > * {
   opacity: 1;
   animation: fade-up 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both;
@@ -487,6 +510,7 @@ p {
   .is-static .logo-slot .logo-lettering,
   .is-static .line,
   .is-static .outro > *,
+  .is-static .sub,
   .outro[data-state] .signup,
   .outro[data-state] .signup-done,
   .soon-dot {

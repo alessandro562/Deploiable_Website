@@ -35,8 +35,8 @@ export async function start(caps: Capabilities) {
   const sweep = document.querySelector<HTMLElement>('.sweep')!;
   const outro = document.querySelector<HTMLElement>('.outro')!;
   // la pillola di conferma prende il posto del modulo: entra con lui
-  const outroItems = [['.soon'], ['.signup', '.signup-done'], ['.signup-note']].map((sel) =>
-    sel.map((q) => outro.querySelector<HTMLElement>(q)!),
+  const outroItems = [['.sub'], ['.soon'], ['.signup', '.signup-done'], ['.signup-note']].map((sel) =>
+    sel.map((q) => document.querySelector<HTMLElement>(q)!),
   );
   const slotEl = document.querySelector<HTMLElement>('.logo-slot')!;
   const state = createState();
@@ -83,7 +83,7 @@ export async function start(caps: Capabilities) {
     // non si possono raggiungere col tab
     outro.style.visibility = state.outro > 0.01 ? 'visible' : 'hidden';
     outroItems.forEach((els, i) => {
-      const p = Math.min(1, Math.max(0, state.outro * 1.45 - i * 0.18));
+      const p = Math.min(1, Math.max(0, state.outro * 1.6 - i * 0.18));
       const e = 1 - Math.pow(1 - p, 3);
       for (const el of els) {
         el.style.opacity = e.toFixed(3);

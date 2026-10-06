@@ -1,8 +1,10 @@
-# Deploiable · "We deploy AI. Measurably."
+# Deploiable · "Make AI deployable."
 
 Landing pre-lancio: una sola schermata, nessuno scroll, nessuna interazione. Le tre barre del simbolo
 giocano da sole in 3D finché non scattano al loro posto; poi compare la frase.
-Titolo: **We deploy AI. Measurably.** (in inglese)
+Titolo: **Make AI deployable.** (in inglese): il nome è la promessa. Sottotitolo: "We find where AI pays off,
+build the product, and measure the result." Sotto, il blocco pre-lancio: "Launching October 2026", modulo email
+("Claim your spot") e l'offerta "The first 20 companies get a free AI process review."
 
 ## L'animazione (circa 6,6 secondi, poi resta ferma e "viva")
 

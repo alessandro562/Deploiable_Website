@@ -21,7 +21,8 @@ test('suspense: nessun testo finché le barre non scattano al loro posto', async
   // il browser normalizza lo stile in "translate3d(0px, 110%, 0px)": si legge la percentuale verticale
   const offset = () =>
     page.evaluate(() => Array.from(document.querySelectorAll<HTMLElement>('.line')).map((l) => parseFloat(/,\s*(-?[\d.]+)%/.exec(l.style.transform)?.[1] ?? 'NaN')));
-  const hidden = async () => (await offset()).every((v) => v === 110);
+  const subHidden = () => page.locator('.sub').evaluate((el) => getComputedStyle(el).opacity === '0');
+  const hidden = async () => (await offset()).every((v) => v === 110) && (await subHidden());
   for (const t of [0.8, TIMES.segreto, TIMES.deploy, TIMES.silenzio, SILENZIO_A + 0.4]) {
     await seek(page, t);
     expect(await hidden(), `t=${t}`).toBe(true);
@@ -323,7 +324,7 @@ test('iscrizione: email non valida, invio riuscito, errore del servizio', async 
   await page.click('.signup button');
   await expect(page.locator('.signup-done')).toBeVisible();
   await expect(page.locator('.signup-done')).toHaveText(/on the list/);
-  await expect(note).toHaveText(/See you at launch/);
+  await expect(note).toHaveText(/in touch before launch/);
   expect(body).toContain('ciao@deploiable.com');
   await expect(page.locator('.signup')).toBeHidden();
 });
@@ -341,7 +342,7 @@ test('dettagli: testo secondario in Moss pieno, etichette in JetBrains Mono', as
   expect(await page.evaluate(() => document.fonts.check('500 11px "JetBrains Mono"'))).toBe(true);
 });
 
-test('ritmo verticale: stesso spazio a inchiostro fra logo e frase e fra frase e "Coming soon"', async ({ page }) => {
+test('ritmo verticale: stesso spazio a inchiostro fra logo e frase e fra sottotitolo e blocco iscrizione', async ({ page }) => {
   await openFilm(page, '', 'high');
   await seek(page, END);
   const box = async (sel: string) => (await page.locator(sel).boundingBox())!;
@@ -358,9 +359,9 @@ test('ritmo verticale: stesso spazio a inchiostro fra logo e frase e fra frase e
   };
   const logo = rows(await box('.logo-slot'));
   const line1 = rows(await box('.line--light'));
-  const line2 = rows(await box('.line--black'));
+  const sub = rows(await box('.sub'));
   const soon = rows(await box('.soon'));
   const a = line1.T - logo.B;
-  const b = soon.T - line2.B;
-  expect(Math.abs(a - b), `logo→frase ${a}px, frase→coming soon ${b}px`).toBeLessThanOrEqual(3);
+  const b = soon.T - sub.B;
+  expect(Math.abs(a - b), `logo→frase ${a}px, sottotitolo→blocco ${b}px`).toBeLessThanOrEqual(3);
 });
