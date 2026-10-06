@@ -386,12 +386,12 @@ test('modulo: link all\'informativa, casella non spuntata, su telefono in colonn
   await expect(page.locator('#signup-email')).toHaveAttribute('placeholder', 'name@company.com');
 });
 
-test('dettagli: testo secondario in Moss pieno, un solo carattere (Satoshi)', async ({ page }) => {
+test('dettagli: testo secondario in Moss scurito pieno, un solo carattere (Satoshi)', async ({ page }) => {
   await openFilm(page);
   await seek(page, END);
   const css = (sel: string, prop: string, pseudo?: string) =>
     page.locator(sel).evaluate((el, [p, ps]) => getComputedStyle(el, ps || null).getPropertyValue(p), [prop, pseudo ?? ''] as const);
-  const MOSS = 'rgb(79, 106, 85)';
+  const MOSS = 'rgb(63, 90, 70)'; // Moss scurito per il testo piccolo (#3F5A46, 5,9:1 su Lime)
   expect(await css('.signup-note', 'color')).toBe(MOSS);
   expect(await css('#signup-email', 'color', '::placeholder')).toBe(MOSS);
   expect(await css('.signup-note', 'opacity')).toBe('1');

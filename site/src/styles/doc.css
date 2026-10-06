@@ -77,7 +77,7 @@ html[lang='en'] .doc-body[lang='it'] {
 }
 .doc-updated {
   margin-top: 32px !important;
-  color: var(--moss);
+  color: var(--moss-ink);
   font-size: 14px;
 }
 .doc-back {

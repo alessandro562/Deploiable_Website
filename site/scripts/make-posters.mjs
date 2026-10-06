@@ -13,7 +13,7 @@ page.setDefaultTimeout(180000);
 await page.goto(`${base}?__test=1&tier=mobile`);
 await page.waitForFunction(() => window.__DEPLOIABLE__?.ready === true);
 // nell'anteprima social il modulo non serve: solo logo, frase e supergrafica
-await page.addStyleTag({ content: '.outro { display: none !important; }' });
+await page.addStyleTag({ content: '.outro, .proof, .lang, .foot { display: none !important; }' });
 await page.evaluate(() => window.dispatchEvent(new Event('resize')));
 await page.evaluate(() => window.__DEPLOIABLE__.seek(window.__DEPLOIABLE__.duration));
 await page.waitForTimeout(400);

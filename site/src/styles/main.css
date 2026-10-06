@@ -6,6 +6,8 @@
   --pine: #1c3a2a;
   --moss: #4f6a55;
   --sage: #8fa596;
+  /* Moss scurito per il testo piccolo su Lime: stessa tinta del brand, contrasto 5,9:1 invece di 4,63:1 */
+  --moss-ink: #3f5a46;
   /* colori della pagina: cambiano con la palette (html[data-palette]) */
   --bg: var(--forest);
   --ink-light: var(--mist);
@@ -33,7 +35,7 @@ html[data-palette='lime'] {
   --ink-light: var(--forest);
   --ink-strong: var(--forest);
   --sweep-color: var(--forest);
-  --ink-soft: var(--moss); /* testo secondario su fondo chiaro (brand: Moss, AA) */
+  --ink-soft: var(--moss-ink); /* testo secondario su fondo chiaro: Moss scurito (AA con margine) */
   --ink-hover: var(--pine);
   color-scheme: light;
 }
