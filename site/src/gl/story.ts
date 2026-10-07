@@ -294,9 +294,22 @@ export class Story {
     const click = smooth(1.75, 1.85, s) * (1 - smooth(1.85, 2.15, s)); // il simbolo si chiude: un piccolo colpo
     const breathe = Math.sin(time * 0.5) * 0.035 * (1 - front);
     const yaw = -0.6 * (1 - front) + breathe;
-    this.group.rotation.set(0.1 * (1 - front), yaw, 0);
+    // fluttuazione della chiusura: due frequenze non multiple (niente altalena meccanica), un leggero dondolio
+    // sugli assi che fa scorrere i riflessi sul metallo, e il simbolo che segue appena il puntatore
+    const float = Math.sin(time * 0.9) * 0.72 + Math.sin(time * 0.37 + 1.1) * 0.28;
+    this.group.rotation.set(
+      0.1 * (1 - front) + front * (0.05 * Math.sin(time * 0.53 + 0.4) + this.pointer.y * 0.08),
+      yaw + front * (0.08 * Math.sin(time * 0.41) + this.pointer.x * 0.14),
+      0,
+    );
     // nella chiusura il simbolo, di fronte, fluttua piano su e giù (l'ombra respira con lui)
-    this.group.position.y = front * Math.sin(time * 0.9) * SYMBOL_H * 0.045; // stesso ritmo dell'ombra
+    this.group.position.y = front * float * SYMBOL_H * 0.05; // stesso ritmo dell'ombra
+    // respiro: salendo le tre barre si separano appena lungo il passo del simbolo, poi si richiudono
+    const sep = front * SYMBOL_H * 0.03 * (float + 1) * 0.5;
+    for (let b = 0; b < 3; b++) {
+      this.bars[b].mesh.position.y += (1 - b) * sep;
+      this.bars[b].mesh.position.x += (1 - b) * sep * 0.14;
+    }
     const g = 1 + 0.035 * click;
     this.group.scale.set(g, g, DEPTH * g);
     this.group.updateMatrixWorld();
@@ -329,7 +342,6 @@ export class Story {
     });
 
     // ombra della chiusura: centrata sotto il simbolo; respira con la fluttuazione (più su, più chiara e larga)
-    const float = Math.sin(time * 0.9);
     const [symPen, symCon] = this.symShadow;
     symPen.position.set(0, FLOOR + 0.02, 0);
     symPen.scale.set(SYMBOL_W * 1.15 * (1 + 0.05 * float), SYMBOL_H * 0.42, 1);
@@ -350,10 +362,11 @@ export class Story {
     // così non tocca mai il testo, a qualsiasi dimensione dello schermo (lascia posto anche all'ombra)
     const top = (this.header?.offsetHeight ?? 64) + 20;
     const textTop = this.steps[STAGES - 1].getBoundingClientRect().top;
-    const room = Math.max(80, textTop - 36 - top);
-    const symH = Math.min(height * 0.42, room * 0.72);
+    const room = Math.max(80, textTop - 14 - top);
+    const symH = Math.min(height * 0.42, room * 0.8);
     const dEnd = Math.max(SYMBOL_H / ((symH / height) * 2 * tan), SYMBOL_W / ((narrow ? 0.66 : 0.5) * 2 * tan * aspect));
-    const centerY = top + room * 0.44;
+    // il simbolo (con la sua ombra sotto) si appoggia subito sopra la frase, senza vuoti in mezzo
+    const centerY = Math.max(top + symH / 2, textTop - 14 - symH * 0.74);
     const d = dStep + (dEnd - dStep) * front;
     this.pointer.x += (this.pointer.tx - this.pointer.x) * 0.05;
     this.pointer.y += (this.pointer.ty - this.pointer.y) * 0.05;

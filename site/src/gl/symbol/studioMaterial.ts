@@ -34,7 +34,8 @@ export const STUDIO_GLSL = /* glsl */ `
     col += B * fres * 0.6;
     // riflessi: solo le luci più forti dello studio passano come lampi netti nella vernice (più vivi di
     // taglio); nessuna fascia di colore sulle facce
-    vec3 lamps = max(env - vec3(1.0), 0.0);
+    // lampi bianchi neutri (dalla luminosità, non dal colore: niente riflessi verdastri dall'orizzonte Lime)
+    vec3 lamps = vec3(max(lum - 1.05, 0.0));
     return col + lamps * (0.3 + 0.6 * fres) + vec3(1.0) * fres * 0.05;
   }
 `;
