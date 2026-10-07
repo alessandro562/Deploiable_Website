@@ -44,3 +44,17 @@ test('versione statica: coming soon e modulo visibili', async ({ page }) => {
   await expect(page.locator('.soon')).toHaveText(/Coming soon/i);
   await expect(page.locator('#signup-email')).toBeVisible();
 });
+
+test('nessuno scorrimento orizzontale: il modulo resta dentro lo schermo a ogni larghezza', async ({ page }) => {
+  for (const w of [360, 390, 641, 720, 768, 820, 1024, 1440]) {
+    await page.setViewportSize({ width: w, height: 900 });
+    await page.goto('/');
+    await page.waitForFunction(() => window.__DEPLOIABLE__?.ready === true);
+    const { sw, right } = await page.evaluate(() => ({
+      sw: document.documentElement.scrollWidth,
+      right: document.querySelector('.signup-row')!.getBoundingClientRect().right,
+    }));
+    expect(sw, `${w}px: larghezza della pagina`).toBeLessThanOrEqual(w);
+    expect(right, `${w}px: il modulo esce dallo schermo`).toBeLessThanOrEqual(w);
+  }
+});
