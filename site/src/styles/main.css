@@ -949,6 +949,39 @@ p {
   transform: translate3d(0, calc(-50% + var(--y, 0px)), 0);
   visibility: hidden;
 }
+/* step su fondo Forest (1 e 3): testi chiari, come vuole il brand su Forest (Mist e Lime) */
+.is-webgl .act[data-tone='dark'] .act-num {
+  color: var(--lime);
+}
+.is-webgl .act[data-tone='dark'] .act-title {
+  color: var(--mist);
+}
+.is-webgl .act[data-tone='dark'] .act-sub {
+  color: var(--sage);
+}
+/* sopra la fascia scura l'header è vetro scuro, logo e lingua chiari */
+.is-dark-under .top::before {
+  opacity: 1;
+  background: linear-gradient(180deg, rgb(16 38 27 / 0.62), rgb(16 38 27 / 0.4));
+  border-bottom-color: rgb(241 243 234 / 0.14);
+  box-shadow: none;
+}
+.is-dark-under .logo-slot {
+  color: var(--lime);
+}
+.is-dark-under .lang,
+.is-dark-under .lang [aria-pressed='false'] {
+  color: var(--sage);
+}
+.is-dark-under .lang [aria-pressed='true'] {
+  color: var(--lime);
+}
+.top::before,
+.logo-slot,
+.lang {
+  transition-property: opacity, background, color, border-color;
+  transition-duration: 0.3s;
+}
 /* la chiusura è centrata: il simbolo sopra, frase e pulsante sotto */
 .is-webgl .act--end {
   left: 50%;

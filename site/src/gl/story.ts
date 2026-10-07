@@ -32,6 +32,18 @@ const WALL_Z = -13;
 const COVE = 9;
 const DEPTH = 1.6; // barre spesse: il volume si legge anche di fronte
 
+// Colori per tappa (step 1, 2, 3, chiusura), secondo le regole del brand: su Forest Lime o Mist, su Mist
+// Forest, su Lime solo Forest. A ogni step cambiano lo sfondo e il colore dei blocchi; alla chiusura si torna
+// sul Lime e tutti i blocchi sono Forest.
+const STAGE_BG = [COLORS.forest, COLORS.mist, COLORS.forest, COLORS.lime].map((c) => new Color(c));
+const STAGE_BAR = [COLORS.lime, COLORS.forest, COLORS.mist, COLORS.forest].map((c) => new Color(c));
+/** Colore della tappa all'avanzamento s: il cambio avviene poco prima che entri il testo dello step. */
+function stageColor(list: Color[], s: number, out: Color) {
+  out.copy(list[0]);
+  for (let i = 1; i < list.length; i++) out.lerp(list[i], smooth(i - 0.44, i - 0.34, s));
+  return out;
+}
+
 const smooth = (a: number, b: number, x: number) => {
   const k = Math.min(1, Math.max(0, (x - a) / (b - a)));
   return k * k * (3 - 2 * k);
@@ -104,6 +116,12 @@ export class Story {
   private rect = { top: 0, bottom: 0 };
   private visible = false;
   private readonly tmp = new Vector3();
+  private readonly bg = new Color(COLORS.forest); // sfondo dello studio, cambia con gli step
+  private readonly bgDeep = new Color();
+  private readonly barColor = new Color(COLORS.lime);
+  private readonly shadowColor = new Color();
+  /** Lo sfondo del racconto è scuro in questo momento (l'header passa al vetro scuro). */
+  dark = false;
   private pointer = { x: 0, y: 0, tx: 0, ty: 0 };
   // lo scorrimento arriva a scatti (rotellina, trackpad): il racconto lo insegue con una molla smorzata,
   // così ogni movimento parte e si ferma morbido; in modalità test segue lo scorrimento all'istante
@@ -114,13 +132,13 @@ export class Story {
     this.section = section;
     this.steps = Array.from(section.querySelectorAll<HTMLElement>('.act'));
     const lime = new Color(COLORS.lime);
-    const limeDeep = new Color(COLORS.limeDeep);
     this.roomMat = new ShaderMaterial({
       side: DoubleSide,
       depthWrite: false,
       uniforms: {
         uLime: { value: lime },
-        uLimeDeep: { value: limeDeep },
+        uBg: { value: this.bg },
+        uBgDeep: { value: this.bgDeep },
         uTop: { value: 0 },
         uBottom: { value: 0 },
         uVh: { value: 1 },
@@ -130,7 +148,7 @@ export class Story {
         void main() { vec4 w = modelMatrix * vec4(position, 1.0); vW = w.xyz; gl_Position = projectionMatrix * viewMatrix * w; }
       `,
       fragmentShader: /* glsl */ `
-        uniform vec3 uLime, uLimeDeep;
+        uniform vec3 uLime, uBg, uBgDeep;
         uniform float uTop, uBottom, uVh;
         varying vec3 vW;
         void main() {
@@ -140,12 +158,13 @@ export class Story {
           float wall = smoothstep(0.5, ${COVE.toFixed(1)} * 0.9, h);
           float pool = exp(-(vW.x * vW.x * 0.6 + (vW.z + 1.0) * (vW.z + 1.0)) / (2.0 * 15.0 * 15.0));
           float side = exp(-vW.x * vW.x / (2.0 * 55.0 * 55.0));
-          vec3 col = mix(uLime * (0.97 + 0.06 * pool), mix(uLimeDeep, uLime, 0.55), wall * 0.8);
+          vec3 col = mix(uBg * (0.97 + 0.06 * pool), mix(uBgDeep, uBg, 0.55), wall * 0.8);
           col *= mix(0.94, 1.0, side);
           float cove = exp(-pow((h - ${COVE.toFixed(1)} * 0.35) / 2.2, 2.0)) * smoothstep(${(WALL_Z + COVE).toFixed(1)}, ${(WALL_Z + COVE * 0.3).toFixed(1)}, vW.z);
           col *= 1.0 - 0.06 * cove;
-          // in alto e in basso la fascia si fonde con il Lime pieno della pagina: nessuno stacco
-          float fade = smoothstep(uTop - uVh * 0.32, uTop - uVh * 0.02, gl_FragCoord.y)
+          // in basso la fascia si fonde con il Lime pieno della pagina
+          // in alto un bordo netto: il racconto è un capitolo nuovo, con il suo colore
+          float fade = smoothstep(uTop - uVh * 0.004, uTop, gl_FragCoord.y)
                      + 1.0 - smoothstep(uBottom + uVh * 0.02, uBottom + uVh * 0.3, gl_FragCoord.y);
           gl_FragColor = vec4(mix(col, uLime, clamp(fade, 0.0, 1.0)), 1.0);
           #include <colorspace_fragment>
@@ -161,6 +180,8 @@ export class Story {
       const geo = new BarGeometry(i);
       geo.update(REST, true);
       const mat = createStudioMaterial();
+      mat.uniforms.uBase.value = this.barColor;
+      mat.uniforms.uLime.value = this.bg; // il pavimento che si riflette nel metallo è lo sfondo dello step
       const mesh = new Mesh(geo.geometry, mat);
       mesh.frustumCulled = false;
       this.group.add(mesh);
@@ -168,6 +189,7 @@ export class Story {
       const contact = new Mesh(plane, shadowMaterial(2.4));
       const penumbra = new Mesh(plane, shadowMaterial(1.2));
       for (const m of [penumbra, contact]) {
+        (m.material as ShaderMaterial).uniforms.uColor.value = this.shadowColor;
         m.frustumCulled = false;
         this.room.add(m);
       }
@@ -221,11 +243,18 @@ export class Story {
     }
     const s = sp.x;
     this.progress = s;
+    stageColor(STAGE_BG, s, this.bg);
+    stageColor(STAGE_BAR, s, this.barColor);
+    this.bgDeep.copy(this.bg).multiplyScalar(0.86);
+    this.shadowColor.copy(this.bg).multiplyScalar(0.3);
+    const lum = 0.2126 * this.bg.r + 0.7152 * this.bg.g + 0.0722 * this.bg.b; // lineare
+    this.dark = this.visible && r.top <= 40 && lum < 0.2;
 
     // testi: entrano e restano fermi per buona parte dello step, poi escono salendo
     this.steps.forEach((a, i) => {
-      const inn = smooth(i - 0.42, i - 0.08, s);
-      const out = i < STAGES - 1 ? smooth(i + 0.6, i + 0.9, s) : 0;
+      // il testo vecchio esce prima del cambio di colore, il nuovo entra subito dopo: mai due testi insieme
+      const inn = smooth(i - 0.33, i - 0.12, s);
+      const out = i < STAGES - 1 ? smooth(i + 0.48, i + 0.6, s) : 0;
       const o = inn * (1 - out);
       a.style.opacity = o.toFixed(3);
       a.style.setProperty('--y', `${((1 - inn) * 32 - out * 32).toFixed(1)}px`);

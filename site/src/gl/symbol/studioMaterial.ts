@@ -1,7 +1,7 @@
 import { Color, ShaderMaterial, Vector3 } from 'three';
 import { COLORS } from '../../config/brand';
 
-// Materiale delle barre nel racconto: da vetro smerigliato a Forest metallico (uMetal 0 → 1).
+// Materiale delle barre nel racconto: da vetro smerigliato a metallo nel colore del brand (uMetal 0 → 1).
 // Nessuna mappa d'ambiente da scaricare: lo studio Lime che le circonda è descritto qui come luce
 // (pavimento e parete Lime, due softbox bianchi), così i riflessi del metallo sono coerenti con la scena.
 
@@ -50,6 +50,7 @@ export function createStudioMaterial() {
       uCam: { value: new Vector3() },
       uMetal: { value: 0 },
       uEnvRot: { value: 0 },
+      uBase: { value: new Color(COLORS.forest) }, // colore del metallo (cambia con gli step del racconto)
       uLime: { value: new Color(COLORS.lime) },
       uLimeDeep: { value: new Color(COLORS.limeDeep) },
       uForest: { value: new Color(COLORS.forest) },
@@ -65,7 +66,7 @@ export function createStudioMaterial() {
       }
     `,
     fragmentShader: /* glsl */ `
-      uniform vec3 uCam;
+      uniform vec3 uCam, uBase;
       uniform float uMetal;
       varying vec3 vN;
       varying vec3 vWorld;
@@ -84,8 +85,8 @@ export function createStudioMaterial() {
         vec3 glass = mix(uLime * 1.04, vec3(1.0), 0.5) * (0.92 + 0.1 * diff) + studio(R) * (0.06 + 0.6 * fres);
         float glassA = 0.38 + 0.55 * fres;
 
-        // Forest metallico: scuro, riflette lo studio Lime (più forte di taglio), con i softbox netti
-        vec3 metal = brandMetal(n, V, uForest);
+        // metallo nel colore del brand dello step (Lime, Forest o Mist), che riflette lo studio
+        vec3 metal = brandMetal(n, V, uBase);
 
         vec3 col = mix(glass, metal, uMetal);
         gl_FragColor = vec4(col, mix(glassA, 1.0, uMetal));
