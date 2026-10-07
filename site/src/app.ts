@@ -92,6 +92,7 @@ export async function start(caps: Capabilities) {
   // I testi che la supergrafica non deve mai toccare (in coordinate della pagina, non della finestra).
   const textSel = '.lang, .claim .line, .sub, .soon, .offer, .signup, .signup-done, .signup-note, .proof, .clients, .foot';
   let scrollY = window.scrollY;
+  let moved = true; // la pagina si è mossa dall'ultimo disegno: il segnaposto del logo va rimisurato
   const measureSlot = () => {
     scrollY = window.scrollY;
     const r = slotEl.getBoundingClientRect();
@@ -142,6 +143,10 @@ export async function start(caps: Capabilities) {
   };
 
   const draw = () => {
+    if (moved) {
+      moved = false;
+      measureSlot();
+    }
     stateAt(time, state);
     dock();
     if (hoverAt !== null) {
@@ -199,6 +204,7 @@ export async function start(caps: Capabilities) {
   claim.forEach((el) => (el.style.transform = 'translate3d(0, 150%, 0)'));
   await document.fonts.ready;
   measureTexts(); // con i font veri le righe hanno la loro larghezza definitiva
+  story?.measure();
   measureCaret();
   // Riscaldamento: shader e geometrie vengono compilati e caricati sulla GPU ora, con la pagina ancora
   // nel Forest iniziale, così nessun scatto arriva all'incastro (9,2 s) o al lampo (10,2 s).
@@ -220,20 +226,29 @@ export async function start(caps: Capabilities) {
     measureSlot();
     measureTexts();
     measureCaret();
+    story?.measure();
     twShown = -1; // ridisegna il cursore nella nuova posizione
     draw();
   });
   // Lo scorrimento porta via con sé la supergrafica dell'hero (il 3D la segue) e accende il vetro dell'header.
+  // Al massimo un disegno per fotogramma: lo scorrimento segna solo che la pagina si è mossa; se l'animazione
+  // gira ci pensa il ticker, altrimenti (tempo fermo) si chiede un solo fotogramma.
+  let queued = false;
   window.addEventListener(
     'scroll',
     () => {
-      measureSlot();
-      draw();
+      moved = true;
+      if ((playing && !paused) || queued) return;
+      queued = true;
+      requestAnimationFrame(() => {
+        queued = false;
+        draw();
+      });
     },
     { passive: true },
   );
-  // Cambiando lingua le righe cambiano larghezza: la supergrafica si ricalcola.
-  onLangChange(() => requestAnimationFrame(() => (measureTexts(), draw())));
+  // Cambiando lingua le righe cambiano larghezza: la supergrafica e il racconto si ricalcolano.
+  onLangChange(() => requestAnimationFrame(() => (measureTexts(), story?.measure(), draw())));
   document.addEventListener('visibilitychange', () => {
     paused = document.hidden;
     if (paused) gsap.ticker.sleep();

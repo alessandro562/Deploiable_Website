@@ -207,6 +207,11 @@ export class Story {
   // lo scorrimento arriva a scatti (rotellina, trackpad): il racconto lo insegue con una molla smorzata,
   // così ogni movimento parte e si ferma morbido; in modalità test segue lo scorrimento all'istante
   private spring = { x: NaN, v: 0, last: 0 };
+  // con il dito l'inerzia la fa già il telefono: la molla segue più stretta, senza ritardo
+  private readonly stiff = matchMedia('(pointer: coarse)').matches ? 180 : 70;
+  // misure della pagina che cambiano solo con resize, lingua e font (measure()): nessuna lettura di layout
+  // per fotogramma oltre al rettangolo della sezione. Le quote sono relative alla fascia fissa (.story-pin).
+  private lay = { pinH: 1, headerH: 64, copyTop: 0, copyRight: 0, actsTop: 0, actsBottom: 0, endTop: 0 };
   progress = -1;
 
   constructor(section: HTMLElement, private readonly instant = false) {
@@ -301,6 +306,7 @@ export class Story {
     this.group.scale.z = DEPTH;
     this.scene.add(this.group);
 
+    this.measure();
     // la camera segue appena il puntatore: pochi gradi, smorzata (non sugli schermi touch)
     if (matchMedia('(hover: hover)').matches) {
       addEventListener(
@@ -320,11 +326,31 @@ export class Story {
     });
   }
 
+  /** Rilegge le misure della pagina: da chiamare a resize, cambio lingua e font caricati. */
+  measure() {
+    const pin = this.pin.getBoundingClientRect();
+    const c = this.copy.getBoundingClientRect();
+    const a = this.acts.getBoundingClientRect();
+    this.lay = {
+      pinH: this.pin.clientHeight || innerHeight,
+      headerH: this.header?.offsetHeight ?? 64,
+      copyTop: c.top - pin.top,
+      copyRight: c.right,
+      actsTop: a.top - pin.top,
+      actsBottom: a.bottom - pin.top,
+      endTop: this.steps[STAGES - 1].offsetTop,
+    };
+  }
+
+  /** width, height: il canvas (alto quanto lo schermo più grande); l'area visibile è lay.pinH. */
   update(time: number, width: number, height: number) {
+    const L = this.lay;
     const r = this.section.getBoundingClientRect();
     this.rect = { top: r.top, bottom: r.bottom };
     this.visible = r.bottom > 0 && r.top < height;
-    const target = (-r.top / Math.max(1, r.height - height)) * (STAGES - 1);
+    // la fascia è sticky in cima: dove sta adesso, senza leggerla dal layout
+    const pinTop = Math.max(r.top, Math.min(0, r.bottom - L.pinH));
+    const target = (-r.top / Math.max(1, r.height - L.pinH)) * (STAGES - 1);
     const now = performance.now();
     const sp = this.spring;
     const dt = Math.min(0.05, (now - sp.last) / 1000);
@@ -334,7 +360,7 @@ export class Story {
       sp.v = 0;
     } else {
       // molla smorzata criticamente (circa 0,25 s per assestarsi): niente rimbalzi, niente scatti
-      const k = 70;
+      const k = this.stiff;
       const c = 2 * Math.sqrt(k);
       for (let t = dt; t > 0; t -= 1 / 240) {
         const h = Math.min(t, 1 / 240);
@@ -349,7 +375,7 @@ export class Story {
     this.bg.copy(FOREST).lerp(LIME, wave);
     this.shadowColor.copy(FOREST).multiplyScalar(0.3).lerp(FOREST, wave);
     // l'header resta vetro scuro finché l'onda Lime non arriva a metà della sua altezza
-    const headerH = this.header?.offsetHeight ?? 64;
+    const headerH = L.headerH;
     this.dark = this.visible && r.top <= 40 && (wave * 1.12 - 0.04) * height < height - headerH / 2;
 
     // testi: entrano e restano fermi per buona parte dello step, poi escono salendo
@@ -471,29 +497,29 @@ export class Story {
     // Negli step il simbolo sta accanto alla colonna di testo (sopra, su telefono e tablet in verticale), dentro
     // la griglia della pagina (al massimo 1120 px): le misure vengono dalla pagina, così a qualsiasi dimensione
     // dello schermo il simbolo non tocca mai il testo.
-    const acts = this.acts.getBoundingClientRect(); // il blocco dei tre step, alto quanto il più alto
-    const copy = this.copy.getBoundingClientRect();
+    // il blocco dei tre step (alto quanto il più alto) e la colonna con l'avanzamento, sullo schermo adesso
+    const copyTop = pinTop + L.copyTop;
     let stepH: number, stepW: number, stepX: number, stepY: number;
     if (stacked) {
       const top = headerH + 16;
-      const room = Math.max(80, copy.top - 32 - top);
+      const room = Math.max(80, copyTop - 32 - top);
       stepH = Math.min(room * 0.78, height * 0.42);
       stepW = (width - 2 * pad) * 0.8;
       stepX = width / 2;
       stepY = top + room / 2;
     } else {
-      const left = copy.right + 48;
+      const left = L.copyRight + 48;
       const right = Math.min(width - pad, width / 2 + 560);
       stepH = height * 0.56;
       stepW = Math.max(120, right - left);
       stepX = (left + right) / 2;
-      stepY = (acts.top + acts.bottom) / 2 - height * 0.02; // un filo sopra: l'ombra sta sotto
+      stepY = pinTop + (L.actsTop + L.actsBottom) / 2 - height * 0.02; // un filo sopra: l'ombra sta sotto
     }
     const dStep = Math.max(SYMBOL_H / ((stepH / height) * 2 * tan), SYMBOL_W / ((stepW / width) * 2 * tan * aspect));
     // nella chiusura: il simbolo sta nello spazio libero fra l'header e la frase, misurato sulla pagina (senza lo
     // spostamento d'ingresso del testo), così non tocca mai il testo e lascia posto anche all'ombra
     const top = headerH + 20;
-    const textTop = this.pin.getBoundingClientRect().top + this.steps[STAGES - 1].offsetTop;
+    const textTop = pinTop + L.endTop;
     const room = Math.max(80, textTop - 14 - top);
     const symH = Math.min(height * 0.42, room * 0.8);
     const dEnd = Math.max(SYMBOL_H / ((symH / height) * 2 * tan), SYMBOL_W / ((narrow ? 0.66 : 0.5) * 2 * tan * aspect));
