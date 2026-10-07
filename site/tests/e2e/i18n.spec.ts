@@ -8,7 +8,7 @@ test('italiano predefinito, inglese col toggle: testi, lang, title e meta', asyn
   await page.goto('/');
   await page.waitForFunction(() => window.__DEPLOIABLE__?.ready === true);
   await expect(page.locator('html')).toHaveAttribute('lang', 'it');
-  await expect(page.locator('.sub')).toHaveText(/Mappiamo i processi/);
+  await expect(page.locator('.sub')).toHaveText(/Li costruiamo dentro la tua azienda/);
   await expect(page.locator('.soon')).toHaveText(/Coming soon/);
   await expect(page.locator('#signup-email')).toHaveAttribute('placeholder', 'nome@azienda.it');
   await expect(page.locator('[data-lang="it"]')).toHaveAttribute('aria-pressed', 'true');
@@ -18,12 +18,12 @@ test('italiano predefinito, inglese col toggle: testi, lang, title e meta', asyn
 
   await page.click('[data-lang="en"]');
   await expect(page.locator('html')).toHaveAttribute('lang', 'en');
-  await expect(page.locator('.sub')).toHaveText('We map your processes, build tailored AI agents and measure their impact.');
+  await expect(page.locator('.sub')).toHaveText('Built inside your company or proven on the market first, and taken all the way to everyday use.');
   await expect(page.locator('.soon')).toHaveText(/Coming soon/);
   await expect(page.locator('[data-lang="en"]')).toHaveAttribute('aria-pressed', 'true');
-  expect(await meta(page, 'meta[name="description"]')).toMatch(/measure their impact\. Coming soon\./);
-  expect(await meta(page, 'meta[property="og:description"]')).toMatch(/We map your processes/);
-  await expect(page).toHaveTitle('Deploiable · We make AI work.');
+  expect(await meta(page, 'meta[name="description"]')).toMatch(/everyday use\. Coming soon\./);
+  expect(await meta(page, 'meta[property="og:description"]')).toMatch(/Built inside your company/);
+  await expect(page).toHaveTitle('Deploiable · We build the AI products companies run on.');
 
   // la scelta vale per la sessione
   await page.reload();

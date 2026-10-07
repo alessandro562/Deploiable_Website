@@ -12,10 +12,10 @@ export type Lang = 'it' | 'en';
 /** Etichetta del lancio: niente data per ora, solo "Coming soon" (in maiuscolo dal CSS), uguale nelle due lingue. */
 export const LAUNCH = 'Coming soon';
 
-const TAGLINE = 'We make AI work.'; // resta in inglese in entrambe le lingue: breve e diretta, è la firma del brand
+const TAGLINE = 'We build the AI products companies run on.'; // resta in inglese in entrambe le lingue: breve e diretta, è la firma del brand
 const SUB = {
-  it: 'Mappiamo i processi, costruiamo agenti AI su misura e ne misuriamo l’impatto.',
-  en: 'We map your processes, build tailored AI agents and measure their impact.',
+  it: 'Li costruiamo dentro la tua azienda o li validiamo prima sul mercato, e li portiamo fino all’uso di ogni giorno.',
+  en: 'Built inside your company or proven on the market first, and taken all the way to everyday use.',
 };
 
 const DICT = {
@@ -46,15 +46,15 @@ const DICT = {
     'msg.closed': 'Le richieste si aprono a brevissimo.',
     'proof.line': 'clienti dal 2021',
     'story.label': 'Come lavoriamo',
-    'story.1k': 'Analisi',
-    'story.2k': 'Sviluppo',
-    'story.3k': 'Misura',
-    'story.1': 'Mappiamo i tuoi processi.',
-    'story.1s': 'Troviamo dove l’AI ti rende più efficiente e riduce l’errore umano.',
-    'story.2': 'Costruiamo agenti su misura.',
-    'story.2s': 'Agenti e skill progettati per te, testati e messi in produzione sui tuoi sistemi.',
-    'story.3': 'Misuriamo l’impatto.',
-    'story.3s': 'Governance e KPI per vedere ogni giorno cosa cambia davvero.',
+    'story.1k': 'Problema',
+    'story.2k': 'Prodotto',
+    'story.3k': 'Uso',
+    'story.1': 'Partiamo dal problema.',
+    'story.1s': 'Troviamo dove l’AI cambia davvero il lavoro di ogni giorno: tempo, errori, decisioni.',
+    'story.2': 'Costruiamo il prodotto.',
+    'story.2s': 'Su misura dentro la tua azienda, oppure già provato sul mercato e pronto da adottare.',
+    'story.3': 'Lo portiamo in uso.',
+    'story.3s': 'Integrato nei processi e nei sistemi, misurato con i KPI, pronto a scalare.',
     'foot.mark': 'Deploiable è un marchio di WDA srl',
     'foot.vat': 'P.IVA e C.F.',
     'foot.pec': 'PEC',
@@ -92,15 +92,15 @@ const DICT = {
     'msg.closed': 'Requests open very soon.',
     'proof.line': 'clients since 2021',
     'story.label': 'How we work',
-    'story.1k': 'Discovery',
-    'story.2k': 'Build',
-    'story.3k': 'Measure',
-    'story.1': 'We map your processes.',
-    'story.1s': 'We find where AI makes you more efficient and cuts human error.',
-    'story.2': 'We build tailored agents.',
-    'story.2s': 'Agents and skills designed for you, tested and deployed on your systems.',
-    'story.3': 'We measure the impact.',
-    'story.3s': 'Governance and KPIs to see, every day, what really changes.',
+    'story.1k': 'Problem',
+    'story.2k': 'Product',
+    'story.3k': 'Adoption',
+    'story.1': 'We start from the problem.',
+    'story.1s': 'We find where AI really changes everyday work: time, errors, decisions.',
+    'story.2': 'We build the product.',
+    'story.2s': 'Tailored inside your company, or already proven on the market and ready to adopt.',
+    'story.3': 'We put it to work.',
+    'story.3s': 'Integrated into your processes and systems, measured with KPIs, ready to scale.',
     'foot.mark': 'Deploiable is a trademark of WDA srl',
     'foot.vat': 'VAT no. & tax code',
     'foot.pec': 'Certified email',
