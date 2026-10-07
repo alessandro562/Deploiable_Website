@@ -254,6 +254,8 @@ export class Story {
     const breathe = Math.sin(time * 0.5) * 0.035 * (1 - front);
     const yaw = -0.6 * (1 - front) + breathe;
     this.group.rotation.set(0.1 * (1 - front), yaw, 0);
+    // nella chiusura il simbolo, di fronte, fluttua piano su e giù (l'ombra respira con lui)
+    this.group.position.y = front * Math.sin(time * 0.9) * SYMBOL_H * 0.045;
     const g = 1 + 0.035 * click;
     this.group.scale.set(g, g, DEPTH * g);
     this.group.updateMatrixWorld();
@@ -287,17 +289,23 @@ export class Story {
 
     const narrow = width < 760;
     const aspect = width / height;
+    // negli step la camera guarda appena dall'alto (si leggono pavimento, ombre e curva dello studio); nella
+    // chiusura scende all'altezza del simbolo e lo guarda dritto, con un obiettivo più lungo (prospettiva piatta)
+    this.camera.fov = 28 - 12 * front;
     const tan = Math.tan((this.camera.fov * Math.PI) / 360);
-    const fitH = SYMBOL_H / ((narrow ? 0.32 : 0.52) * 2 * tan);
+    const fitH = SYMBOL_H / ((narrow ? 0.32 : 0.52 - 0.1 * front) * 2 * tan);
     const fitW = SYMBOL_W / ((narrow ? 0.62 : 0.4) * 2 * tan * aspect);
-    const d = Math.max(fitH, fitW) * (1 + 0.16 * front);
+    const d = Math.max(fitH, fitW);
     this.pointer.x += (this.pointer.tx - this.pointer.x) * 0.05;
     this.pointer.y += (this.pointer.ty - this.pointer.y) * 0.05;
-    // camera appena sopra il simbolo: si vedono il pavimento, le ombre e la curva dello studio
-    this.camera.position.set(this.pointer.x * d * 0.08, d * (0.14 - this.pointer.y * 0.05), d);
-    this.camera.lookAt(0, -SYMBOL_H * 0.2, 0);
+    const tilt = 1 - front;
+    this.camera.position.set(this.pointer.x * d * 0.06, d * (0.14 * tilt - this.pointer.y * 0.04), d);
+    this.camera.lookAt(0, -SYMBOL_H * 0.2 * tilt, 0);
     this.camera.aspect = aspect;
-    this.camera.setViewOffset(width, height, narrow ? 0 : -width * 0.2, narrow ? height * 0.17 : 0, width, height);
+    // composizione: negli step simbolo a destra del testo; nella chiusura al centro, sopra la frase e il pulsante
+    const shiftX = narrow ? 0 : -width * 0.2 * tilt;
+    const shiftY = narrow ? height * 0.17 : height * 0.17 * front;
+    this.camera.setViewOffset(width, height, shiftX, shiftY, width, height);
     this.camera.updateMatrixWorld();
     for (const { mat } of this.bars) mat.uniforms.uCam.value.copy(this.camera.position);
   }
