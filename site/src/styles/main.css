@@ -19,7 +19,7 @@
   --sans: 'Satoshi', 'Helvetica Neue', Arial, sans-serif;
   --text: 'Geist', 'Helvetica Neue', Arial, sans-serif; /* testi piccoli */
 
-  /* Il protagonista è la frase "We make AI deployable.": il suo corpo è la misura di tutto il resto.
+  /* Il protagonista è la frase "We make AI work.": il suo corpo è la misura di tutto il resto.
      Dipende da larghezza e altezza, così l'hero sta sempre in una schermata con aria sopra e sotto. */
   --claim-fs: clamp(44px, min(15vw, 13.5svh), 144px);
   /* spazio fra frase, sottotitolo e blocco iscrizione */
@@ -240,7 +240,7 @@ p {
   font-weight: 900;
   color: var(--ink-strong);
 }
-/* "We make AI" non ha discendenti e "deployable." ha le ascendenti: le due righe si avvicinano un po'. */
+/* "We make AI" non ha discendenti e "work." ha l'ascendente della k: le due righe si avvicinano un po'. */
 .mask + .mask {
   margin-top: -0.25em; /* −0,15 em della maschera e −0,1 em per avvicinare le righe */
 }
@@ -249,7 +249,7 @@ p {
   display: block;
   overflow: hidden;
   /* la maschera taglia solo il testo che sta entrando: si estende oltre la riga in ogni direzione (ascendenti,
-     discendenti come la "y" di deployable, spalle laterali) senza spostare il layout di un pixel */
+     discendenti, spalle laterali) senza spostare il layout di un pixel */
   padding: 0.15em 0.5em 0.3em;
   margin: -0.15em -0.5em -0.3em;
 }
@@ -258,7 +258,7 @@ p {
   will-change: transform;
 }
 
-/* Macchina da scrivere su "deployable." (src/app.ts): le lettere cancellate tengono il loro posto, il cursore è
+/* Macchina da scrivere su "work." (src/app.ts): le lettere cancellate tengono il loro posto, il cursore è
    una barra sottile alta quanto le ascendenti, che scorre a scatti di lettera in lettera. */
 .tw {
   position: relative;

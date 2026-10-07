@@ -12,7 +12,7 @@ export type Lang = 'it' | 'en';
 /** Etichetta del lancio: niente data per ora, solo "Coming soon" (in maiuscolo dal CSS), uguale nelle due lingue. */
 export const LAUNCH = 'Coming soon';
 
-const TAGLINE = 'We make AI deployable.'; // resta in inglese in entrambe le lingue: il gioco di parole vive solo così
+const TAGLINE = 'We make AI work.'; // resta in inglese in entrambe le lingue: breve e diretta, è la firma del brand
 const SUB = {
   it: 'Mappiamo i processi, costruiamo agenti AI su misura e ne misuriamo l’impatto.',
   en: 'We map your processes, build tailored AI agents and measure their impact.',
