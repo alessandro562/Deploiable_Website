@@ -12,10 +12,10 @@ export type Lang = 'it' | 'en';
 /** Etichetta del lancio: niente data per ora, solo "Coming soon" (in maiuscolo dal CSS), uguale nelle due lingue. */
 export const LAUNCH = 'Coming soon';
 
-const TAGLINE = 'We build the AI products companies run on.'; // resta in inglese in entrambe le lingue: breve e diretta, è la firma del brand
+const TAGLINE = 'Building the AI products companies run on.'; // resta in inglese in entrambe le lingue: breve e diretta, è la firma del brand
 const SUB = {
-  it: 'Prodotti AI su misura per la tua azienda, o già validati sul mercato: li integriamo nei tuoi processi e li portiamo fino all’uso quotidiano.',
-  en: 'Custom-built for your company, or already proven on the market: we integrate them into your processes and take them all the way to daily use.',
+  it: 'Progettiamo, sviluppiamo e integriamo prodotti AI nei tuoi processi.',
+  en: 'We design, build and integrate AI products into your processes.',
 };
 
 const DICT = {
@@ -34,7 +34,8 @@ const DICT = {
     'form.consent.pre': 'Ho letto l’',
     'form.consent.link': 'informativa privacy',
     'form.consent.post': ' e acconsento al trattamento dei miei dati per essere ricontattato/a.',
-    'form.offer': 'Le prime 20 aziende ricevono gratis una AI process review: l’analisi dei processi per capire dove l’AI rende di più.',
+    'form.offer.title': 'AI process review gratuita',
+    'form.offer': 'Per le prime 20 aziende: analizziamo i tuoi processi e ti mostriamo dove l’AI rende di più.',
     'form.done': 'Richiesta ricevuta.',
     'msg.invalid': 'Inserisci un indirizzo email valido.',
     'msg.company': 'Inserisci il nome della tua azienda.',
@@ -80,7 +81,8 @@ const DICT = {
     'form.consent.pre': 'I have read the ',
     'form.consent.link': 'privacy notice',
     'form.consent.post': ' and consent to the processing of my data in order to be contacted.',
-    'form.offer': 'The first 20 companies get a free AI process review: an assessment of where AI pays off most in your processes.',
+    'form.offer.title': 'Free AI process review',
+    'form.offer': 'For the first 20 companies: we analyse your processes and show you where AI pays off most.',
     'form.done': 'Request received.',
     'msg.invalid': 'Please enter a valid email address.',
     'msg.company': 'Please enter your company name.',

@@ -8,7 +8,7 @@ test('italiano predefinito, inglese col toggle: testi, lang, title e meta', asyn
   await page.goto('/');
   await page.waitForFunction(() => window.__DEPLOIABLE__?.ready === true);
   await expect(page.locator('html')).toHaveAttribute('lang', 'it');
-  await expect(page.locator('.sub')).toHaveText(/Prodotti AI su misura per la tua azienda/);
+  await expect(page.locator('.sub')).toHaveText(/Progettiamo, sviluppiamo e integriamo prodotti AI/);
   await expect(page.locator('.soon')).toHaveText(/Coming soon/);
   await expect(page.locator('#signup-email')).toHaveAttribute('placeholder', 'nome@azienda.it');
   await expect(page.locator('[data-lang="it"]')).toHaveAttribute('aria-pressed', 'true');
@@ -18,12 +18,12 @@ test('italiano predefinito, inglese col toggle: testi, lang, title e meta', asyn
 
   await page.click('[data-lang="en"]');
   await expect(page.locator('html')).toHaveAttribute('lang', 'en');
-  await expect(page.locator('.sub')).toHaveText('Custom-built for your company, or already proven on the market: we integrate them into your processes and take them all the way to daily use.');
+  await expect(page.locator('.sub')).toHaveText('We design, build and integrate AI products into your processes.');
   await expect(page.locator('.soon')).toHaveText(/Coming soon/);
   await expect(page.locator('[data-lang="en"]')).toHaveAttribute('aria-pressed', 'true');
-  expect(await meta(page, 'meta[name="description"]')).toMatch(/daily use\. Coming soon\./);
-  expect(await meta(page, 'meta[property="og:description"]')).toMatch(/Custom-built for your company/);
-  await expect(page).toHaveTitle('Deploiable · We build the AI products companies run on.');
+  expect(await meta(page, 'meta[name="description"]')).toMatch(/into your processes\. Coming soon\./);
+  expect(await meta(page, 'meta[property="og:description"]')).toMatch(/We design, build and integrate/);
+  await expect(page).toHaveTitle('Deploiable · Building the AI products companies run on.');
 
   // la scelta vale per la sessione
   await page.reload();

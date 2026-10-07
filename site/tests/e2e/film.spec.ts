@@ -596,8 +596,8 @@ test('macchina da scrivere: "companies run on." si cancella e si riscrive in cic
   await openFilm(page, '', 'high');
   const st = () => page.evaluate(() => window.__DEPLOIABLE__!.state!());
   const visible = () => page.locator('.tw .ch:not(.off)').count();
-  // il titolo resta "We build the AI products companies run on." per i lettori di schermo, qualunque cosa mostri la macchina da scrivere
-  await expect(page.getByRole('heading', { level: 1 })).toHaveAccessibleName(/We build the AI products\s*companies run on\./);
+  // il titolo resta "Building the AI products companies run on." per i lettori di schermo, qualunque cosa mostri la macchina da scrivere
+  await expect(page.getByRole('heading', { level: 1 })).toHaveAccessibleName(/Building the AI products\s*companies run on\./);
   await seek(page, END);
   expect(await visible()).toBe(17);
   const full = (await page.locator('.tw').boundingBox())!;
