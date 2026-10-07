@@ -345,7 +345,7 @@ export class Story {
     this.camera.fov = 28 - 12 * front;
     const tan = Math.tan((this.camera.fov * Math.PI) / 360);
     // negli step: simbolo alto metà schermo, a destra del testo (sopra, su telefono)
-    const dStep = Math.max(SYMBOL_H / ((narrow ? 0.32 : 0.52) * 2 * tan), SYMBOL_W / ((narrow ? 0.62 : 0.4) * 2 * tan * aspect));
+    const dStep = Math.max(SYMBOL_H / ((narrow ? 0.32 : 0.58) * 2 * tan), SYMBOL_W / ((narrow ? 0.62 : 0.4) * 2 * tan * aspect));
     // nella chiusura: il simbolo sta nello spazio libero fra l'header e la frase, misurato sulla pagina,
     // così non tocca mai il testo, a qualsiasi dimensione dello schermo (lascia posto anche all'ombra)
     const top = (this.header?.offsetHeight ?? 64) + 20;
@@ -359,13 +359,27 @@ export class Story {
     this.pointer.y += (this.pointer.ty - this.pointer.y) * 0.05;
     const tilt = 1 - front;
     // appena sopra il simbolo negli step; quasi dritta nella chiusura (resta un filo d'altezza per l'ombra)
-    this.camera.position.set(this.pointer.x * d * 0.06, d * (0.14 * tilt + 0.05 * front - this.pointer.y * 0.04), d);
-    this.camera.lookAt(0, -SYMBOL_H * 0.2 * tilt, 0);
+    const camY = d * (0.14 * tilt + 0.05 * front);
+    const lookY = -SYMBOL_H * 0.2 * tilt;
     this.camera.aspect = aspect;
+    // dove cade il centro del simbolo sullo schermo con questa camera (senza spostamenti né puntatore)
+    this.camera.position.set(0, camY, d);
+    this.camera.lookAt(0, lookY, 0);
+    this.camera.clearViewOffset();
+    this.camera.updateMatrixWorld();
+    const centerPx = ((1 - this.tmp.set(0, 0, 0).project(this.camera).y) / 2) * height;
+    // dove deve stare: negli step all'altezza del centro del testo (un filo sopra, l'ombra sta sotto); su
+    // telefono nella metà alta, sopra il testo; nella chiusura nello spazio libero sopra la frase
+    const active = this.steps[Math.min(STAGES - 2, Math.max(0, Math.round(s)))].getBoundingClientRect();
+    const textMid = active.height > 0 ? (active.top + active.bottom) / 2 : height * 0.5;
+    const stepY = narrow ? height * 0.33 : textMid - height * 0.02;
+    const targetY = stepY + (centerY - stepY) * front;
+    this.camera.position.set(this.pointer.x * d * 0.06, camY - this.pointer.y * d * 0.04, d);
+    this.camera.lookAt(0, lookY, 0);
     // composizione: negli step simbolo a destra del testo; nella chiusura al centro, sopra la frase e il pulsante
     // testo e simbolo formano un blocco unico centrato: il simbolo sta appena a destra della colonna di testo
     const shiftX = narrow ? 0 : -Math.min(width * 0.14, 230) * tilt;
-    const shiftY = (narrow ? height * 0.17 : 0) * tilt + (height / 2 - centerY) * front;
+    const shiftY = centerPx - targetY;
     this.camera.setViewOffset(width, height, shiftX, shiftY, width, height);
     this.camera.updateMatrixWorld();
     for (const { mat } of this.bars) mat.uniforms.uCam.value.copy(this.camera.position);
