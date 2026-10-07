@@ -403,7 +403,8 @@ test('dettagli: testo secondario in Moss scurito pieno, Satoshi per i titoli e G
   for (const sel of ['.soon', '.signup-note', '.sub', '.signup button', '#signup-email'])
     expect(await css(sel, 'font-family'), sel).toMatch(/^"?Geist/);
   expect(await css('.soon', 'text-transform')).toBe('uppercase');
-  expect(await css('.soon', 'font-weight')).toBe('400');
+  // etichetta del sistema (--t-label): Geist 500, maiuscolo spaziato
+  expect(await css('.soon', 'font-weight')).toBe('500');
 });
 
 test('hero: il blocco dei testi è centrato in altezza (centro ottico appena sopra la metà)', async ({ page }) => {

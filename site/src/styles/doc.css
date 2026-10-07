@@ -13,7 +13,7 @@
   z-index: 10;
   width: min(100% - 2 * var(--pad-x), 720px);
   margin: 0 auto;
-  padding: calc(var(--pad-top) + var(--logo-w) * 0.19 + 56px) 0 48px;
+  padding: calc(var(--pad-top) + var(--logo-w) * 0.19 + var(--s-8)) 0 var(--s-7);
 }
 
 /* l'articolo nell'altra lingua resta nel documento ma non si mostra */
@@ -23,65 +23,70 @@ html[lang='en'] .doc-body[lang='it'] {
 }
 
 .doc-draft {
-  margin-bottom: 32px;
-  padding: 12px 16px;
-  border-radius: 10px;
+  margin-bottom: var(--s-6);
+  padding: var(--s-3) var(--s-4);
+  border-radius: var(--radius);
   background: var(--forest);
   color: var(--lime);
-  font-size: 13px;
-  font-weight: 900;
-  letter-spacing: 0.08em;
+  font: var(--t-label);
+  letter-spacing: var(--track-label);
+  line-height: 1.5;
   text-transform: uppercase;
   text-align: center;
 }
 
 .doc-body {
   color: var(--forest);
-  font-size: 16px;
-  line-height: 1.6;
+  font: var(--t-body);
 }
 .doc-body h1 {
-  margin: 0 0 12px;
-  font-size: clamp(32px, 6vw, 52px);
-  font-weight: 900;
-  line-height: 1.05;
-  letter-spacing: -0.035em;
+  margin: 0 0 var(--s-4);
+  font: var(--t-doc-h1);
+  letter-spacing: var(--track-h2);
+  text-wrap: balance;
 }
 .doc-lead {
-  margin-bottom: 36px;
-  font-size: 18px;
-  font-weight: 300;
+  margin-bottom: var(--s-7);
+  font: var(--t-lead);
 }
 .doc-body h2 {
-  margin: 32px 0 8px;
-  font-size: 18px;
-  font-weight: 900;
+  margin: var(--s-7) 0 var(--s-3);
+  font: var(--t-h3);
   letter-spacing: -0.01em;
 }
 .doc-body p,
 .doc-body ul {
-  margin: 0 0 12px;
+  max-width: 68ch;
+  margin: 0 0 var(--s-3);
 }
 .doc-body ul {
   padding-left: 1.2em;
 }
 .doc-body li + li {
-  margin-top: 4px;
+  margin-top: var(--s-1);
 }
 .doc-body a,
 .doc-back a {
   color: var(--forest);
   text-decoration: underline;
-  text-underline-offset: 2px;
+  text-decoration-color: color-mix(in srgb, currentColor 45%, transparent);
+  text-underline-offset: 3px;
   text-decoration-thickness: 1px;
+  transition: text-decoration-color var(--dur-ui) var(--ease);
+}
+@media (hover: hover) {
+  .doc-body a:hover,
+  .doc-back a:hover {
+    text-decoration-color: currentColor;
+  }
 }
 .doc-updated {
-  margin-top: 32px !important;
+  margin-top: var(--s-6) !important;
   color: var(--moss-ink);
-  font-size: 14px;
+  font: var(--t-small);
 }
 .doc-back {
-  margin-top: 40px;
-  font-size: 15px;
+  margin-top: var(--s-7);
+  font: var(--t-body);
   font-weight: 500;
 }
