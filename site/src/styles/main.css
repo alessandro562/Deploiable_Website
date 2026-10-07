@@ -987,7 +987,9 @@ p {
   top: 0;
   display: block;
   max-width: none;
+  /* l'area visibile: su telefono segue la barra del browser, i testi in basso restano sempre sopra di lei */
   height: 100svh;
+  height: 100dvh;
   overflow: hidden;
 }
 /* la colonna di testo: all'inizio della griglia, centrata in altezza */
@@ -1112,7 +1114,7 @@ p {
   z-index: 2;
   left: -10vw;
   width: 120vw;
-  top: calc(50svh - 1px);
+  top: calc(var(--gl-h, 100vh) / 2 - 1px); /* a metà del canvas, alla quota del simbolo */
   height: 2px;
   background: var(--sweep-color);
   transform: rotate(-8deg);
@@ -1123,9 +1125,12 @@ p {
 .is-webgl .gl {
   display: block;
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
   width: 100vw;
-  height: 100svh;
+  /* alto quanto lo schermo più grande: su telefono copre anche la zona della barra del browser quando si ritira */
+  height: 100vh;
+  height: 100lvh;
   z-index: 0;
 }
 

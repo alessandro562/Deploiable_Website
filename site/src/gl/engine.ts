@@ -39,14 +39,26 @@ export class Engine {
     this.resize(true);
   }
 
+  // Il canvas è sempre alto quanto lo schermo più grande (100lvh: barre del browser ritirate). Su telefono,
+  // quando la barra degli indirizzi entra o esce, l'area visibile cambia ma lo schermo grande no: il canvas
+  // copre sempre tutto, non si rialloca e sotto non compare mai la pagina.
+  private readonly probe = (() => {
+    const d = document.createElement('div');
+    d.setAttribute('aria-hidden', 'true');
+    d.style.cssText = 'position:fixed;left:0;top:0;width:0;height:100vh;height:100lvh;visibility:hidden;pointer-events:none';
+    document.body.appendChild(d);
+    return d;
+  })();
+
   resize(force = false) {
     const w = window.innerWidth;
-    const h = window.innerHeight;
-    // Su mobile la barra degli indirizzi cambia l'altezza: si ridimensiona solo per variazioni vere.
-    if (!force && w === this.width && Math.abs(h - this.height) < this.height * 0.25) return false;
+    const h = Math.max(this.probe.offsetHeight, window.innerHeight);
+    if (!force && w === this.width && h === this.height) return false;
     this.width = w;
     this.height = h;
-    this.renderer.setSize(w, h, true);
+    // lo stile lo dà il CSS (100vw × 100lvh): qui solo la risoluzione del disegno
+    this.renderer.setSize(w, h, false);
+    document.documentElement.style.setProperty('--gl-h', `${h}px`);
     this.camera.aspect = w / h;
     this.res.set(w * this.dpr, h * this.dpr);
     return true;

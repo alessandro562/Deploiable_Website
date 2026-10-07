@@ -70,3 +70,32 @@ test.describe('senza animazioni', () => {
     await expect(page.locator('.story-meter')).toBeHidden();
   });
 });
+
+/** Colore medio delle ultime righe dello schermo, come lo vede chi guarda (pagina e canvas composti). */
+async function bottomColor(page: import('@playwright/test').Page) {
+  const { PNG } = await import('pngjs');
+  const vp = page.viewportSize()!;
+  const png = PNG.sync.read(await page.screenshot({ clip: { x: 0, y: vp.height - 6, width: vp.width, height: 6 } }));
+  let r = 0, g = 0, b = 0;
+  for (let i = 0; i < png.data.length; i += 4) {
+    r += png.data[i]; g += png.data[i + 1]; b += png.data[i + 2];
+  }
+  const n = png.data.length / 4;
+  return [r / n, g / n, b / n];
+}
+
+test('telefono: quando la barra del browser si ritira, sotto il racconto non compare mai il Lime', async ({ page }, info) => {
+  test.skip(info.project.name !== 'mobile', 'solo telefono');
+  // si apre con la barra visibile (schermo più basso), poi la barra si ritira e torna
+  await page.setViewportSize({ width: 390, height: 760 });
+  await openFilm(page, '', 'high');
+  await seek(page, 7.3);
+  for (const h of [760, 844, 760]) {
+    await page.setViewportSize({ width: 390, height: h });
+    await scrollToStage(page, 0.5);
+    await seek(page, 7.3);
+    const [r, g, b] = await bottomColor(page);
+    // Forest (16, 38, 27), non Lime (200, 242, 90)
+    expect(g, `verde in basso a ${h} px: ${[r, g, b].map(Math.round)}`).toBeLessThan(90);
+  }
+});
