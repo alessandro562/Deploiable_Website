@@ -45,6 +45,11 @@
   --track-label: 0.14em;
   /* pulsanti */
   --t-button: 600 14px / 1 var(--text);
+  /* campi del modulo: 16 px, così iOS non ingrandisce la pagina al tocco */
+  --t-input: 500 16px / 1 var(--text);
+  /* pagine di testo: titolo e titoletti */
+  --t-doc-h1: 900 clamp(34px, max(4vw, 4.4svh), 56px) / 1.04 var(--sans);
+  --t-h3: 700 20px / 1.3 var(--sans);
   /* spazi: 4 · 8 · 12 · 16 · 24 · 32 · 48 · 64 · 96 */
   --s-1: 4px;
   --s-2: 8px;
@@ -130,7 +135,7 @@ p {
   top: 0;
   left: 0;
   right: 0;
-  padding: max(var(--pad-top), env(safe-area-inset-top)) var(--pad-x) 14px;
+  padding: max(var(--pad-top), env(safe-area-inset-top)) var(--pad-x) var(--s-4);
 }
 /* Il vetro compare solo a pagina scorsa: in cima l'header resta trasparente e il logo 3D (sul canvas, sotto
    la pagina) non viene sfocato. Scorrendo il logo passa all'SVG ufficiale, sopra il vetro (src/app.ts). */
@@ -146,7 +151,7 @@ p {
   border-bottom: 1px solid rgb(255 255 255 / 0.55);
   box-shadow: 0 8px 24px -14px color-mix(in srgb, var(--ink-strong) 18%, transparent);
   opacity: 0;
-  transition: opacity 0.25s ease;
+  transition: opacity var(--dur-state) var(--ease);
   pointer-events: none;
 }
 /* con il 3D il vetro aspetta la fine dell'intro (logo atterrato, Lime): mai sopra il Forest dell'apertura */
@@ -165,6 +170,15 @@ p {
   width: var(--logo-w);
   aspect-ratio: 514.158 / 97.3;
   color: var(--ink-strong);
+}
+/* area di tocco alta 44 px senza cambiare la misura del segnaposto (la usa il 3D per atterrare) */
+.logo-slot {
+  position: relative;
+}
+.logo-slot::after {
+  content: '';
+  position: absolute;
+  inset: calc((100% - 44px) / 2) 0;
 }
 .logo-slot svg {
   display: block;
@@ -193,12 +207,12 @@ p {
   justify-content: center;
   gap: var(--gap);
   /* sopra lo spazio dell'header; sotto un po' di più: il centro ottico sta sopra il centro geometrico */
-  padding: calc(var(--pad-top) + var(--logo-w) * 0.19 + 24px) var(--pad-x) calc(var(--pad-top) + var(--logo-w) * 0.19 + 24px + 4svh);
+  padding: calc(var(--pad-top) + var(--logo-w) * 0.19 + var(--s-5)) var(--pad-x) calc(var(--pad-top) + var(--logo-w) * 0.19 + var(--s-5) + 4svh);
 }
 /* Su telefono il contenuto è più alto dello schermo: un po' d'aria in più fra l'header e la frase */
 @media (max-width: 640px) {
   .hero {
-    padding-top: calc(var(--pad-top) + var(--logo-w) * 0.19 + 24px + 5svh);
+    padding-top: calc(var(--pad-top) + var(--logo-w) * 0.19 + var(--s-5) + 5svh);
   }
 }
 
@@ -277,26 +291,26 @@ p {
   right: max(calc(var(--pad-x) - 8px), env(safe-area-inset-right));
   display: flex;
   align-items: center;
-  font: 500 12px/1 var(--sans);
-  letter-spacing: 0.14em;
+  font: var(--t-label);
+  letter-spacing: var(--track-label);
   color: var(--ink-soft);
 }
 .lang button {
   /* area di tocco 44×44 anche se la scritta è piccola */
   min-width: 44px;
   min-height: 44px;
-  padding: 0 6px;
+  padding: 0 var(--s-2);
   border: 0;
   background: none;
   font: inherit;
   letter-spacing: inherit;
   color: inherit;
   cursor: pointer;
-  transition: color 0.16s ease;
+  transition: color var(--dur-ui) var(--ease);
 }
 .lang button[aria-pressed='true'] {
   color: var(--ink-strong);
-  font-weight: 900;
+  font-weight: 700;
 }
 @media (hover: hover) {
   .lang button:hover {
@@ -312,10 +326,8 @@ p {
 .sub {
   margin: calc(var(--gap) * -0.55) auto 0;
   max-width: min(100%, 36em);
-  font-size: clamp(16px, calc(var(--claim-fs) * 0.17), 22px);
-  font-weight: 500;
-  line-height: 1.4;
-  letter-spacing: -0.01em;
+  font: var(--t-lead);
+  letter-spacing: -0.005em;
   text-align: center;
   text-wrap: balance;
   color: var(--ink-light);
@@ -327,7 +339,6 @@ p {
    un solo carattere, Satoshi: etichetta in maiuscolo Light spaziato, nota in Moss. */
 
 .outro {
-  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -345,20 +356,20 @@ p {
 .soon {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 12px;
-  font: 300 13px/1 var(--sans);
-  letter-spacing: 0.24em;
+  gap: var(--s-2);
+  margin-bottom: var(--s-3);
+  font: var(--t-label);
+  letter-spacing: var(--track-label);
   text-transform: uppercase;
   /* la spaziatura aggiunge aria anche dopo l'ultima lettera: la si compensa per restare centrati */
-  margin-right: -0.24em;
+  margin-right: calc(-1 * var(--track-label));
   color: var(--ink-strong);
 }
 .offer {
-  margin-bottom: 18px;
-  font-size: 15px;
-  font-weight: 500;
+  margin-bottom: var(--s-4);
+  font: var(--t-body);
   letter-spacing: -0.005em;
+  line-height: 1.3; /* una riga sola: interlinea stretta, come un sottotitolo */
   text-align: center;
   text-wrap: balance;
   color: var(--ink-light);
@@ -380,7 +391,7 @@ p {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 14px;
+  gap: var(--s-4);
   width: min(100%, 760px);
 }
 /* Il modulo ha la forma del simbolo: tre parallelogrammi stondati inclinati di 8°, in fila e incastrati;
@@ -388,24 +399,24 @@ p {
 .signup-row {
   display: flex;
   align-items: stretch;
-  gap: 8px;
+  gap: var(--s-2);
   width: 100%;
   height: 56px;
-  padding: 0 4px; /* lo sbalzo degli spigoli inclinati */
+  padding: 0 var(--s-1); /* lo sbalzo degli spigoli inclinati */
 }
 .signup-field {
   position: relative;
   flex: 1 1 0;
   min-width: 0;
   display: flex;
-  border-radius: 10px;
+  border-radius: var(--radius);
   background: var(--field-bg);
   transform: skewX(-8deg);
   /* il bordo è un'ombra: quando diventa più spesso (errore) il layout non si muove di un pixel */
   box-shadow: inset 0 0 0 0 var(--ink-strong);
   outline: 2px solid transparent;
-  outline-offset: 3px;
-  transition: box-shadow 0.16s var(--ease), outline-color 0.16s var(--ease);
+  outline-offset: 4px;
+  transition: box-shadow var(--dur-ui) var(--ease), outline-color var(--dur-ui) var(--ease);
 }
 .signup-field--email {
   flex-grow: 1.35;
@@ -417,12 +428,12 @@ p {
   flex: 1 1 auto;
   min-width: 0;
   height: 100%;
-  padding: 0 16px 0 22px;
+  padding: 0 var(--s-4) 0 var(--s-5);
   border: 0;
   background: transparent;
   color: var(--ink-strong);
   caret-color: var(--ink-strong);
-  font: 500 16px/1 var(--sans); /* 16 px: iOS non ingrandisce la pagina al tocco */
+  font: var(--t-input);
   letter-spacing: -0.005em;
   outline: none;
   transform: skewX(8deg);
@@ -443,24 +454,24 @@ p {
   align-items: center;
   justify-content: center;
   height: 100%;
-  padding: 0 24px;
+  padding: 0 var(--s-5);
   border: 0;
-  border-radius: 10px;
+  border-radius: var(--radius);
   background: var(--ink-strong);
   color: var(--bg);
-  font: 900 14px/1 var(--sans);
-  letter-spacing: -0.01em;
+  font: var(--t-button);
+  letter-spacing: -0.005em;
   white-space: nowrap;
   cursor: pointer;
   transform: skewX(-8deg);
   outline: 2px solid transparent;
-  outline-offset: 3px;
-  transition: background-color 0.16s var(--ease), transform 0.16s var(--ease), outline-color 0.16s var(--ease);
+  outline-offset: 4px;
+  transition: background-color var(--dur-ui) var(--ease), transform var(--dur-ui) var(--ease), outline-color var(--dur-ui) var(--ease);
 }
 .btn-in {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--s-2);
   transform: skewX(8deg);
 }
 .signup button:focus-visible {
@@ -472,13 +483,11 @@ p {
   position: relative;
   display: flex;
   align-items: flex-start;
-  gap: 10px;
-  /* allineato all'inizio del testo del primo campo, dentro la capsula */
+  gap: var(--s-3);
+  /* allineato all'inizio del testo del primo campo (bordo del campo + il suo margine interno) */
   align-self: stretch;
-  padding: 0 24px 0 25px;
-  font-size: 12.5px;
-  font-weight: 500;
-  line-height: 1.45;
+  padding: 0 var(--s-5) 0 calc(var(--s-1) + var(--s-5));
+  font: var(--t-small);
   text-align: left;
   color: var(--ink-soft);
   cursor: pointer;
@@ -486,7 +495,7 @@ p {
 .consent input {
   position: absolute;
   top: 0;
-  left: 25px;
+  left: calc(var(--s-1) + var(--s-5));
   width: 20px;
   height: 20px;
   margin: 0;
@@ -500,9 +509,9 @@ p {
   width: 20px;
   height: 20px;
   margin-top: -1px;
-  border-radius: 5px;
+  border-radius: 6px;
   box-shadow: inset 0 0 0 1.5px var(--ink-strong);
-  transition: background-color 0.16s var(--ease);
+  transition: background-color var(--dur-ui) var(--ease);
 }
 .consent-box svg {
   width: 12px;
@@ -522,7 +531,7 @@ p {
 }
 .consent input:focus-visible + .consent-box {
   outline: 2px solid var(--ink-strong);
-  outline-offset: 3px;
+  outline-offset: 4px;
 }
 .consent input[aria-invalid='true'] + .consent-box {
   box-shadow: inset 0 0 0 2.5px var(--ink-strong);
@@ -530,27 +539,34 @@ p {
 .consent a {
   color: var(--ink-strong);
   text-decoration: underline;
-  text-underline-offset: 2px;
+  text-decoration-color: color-mix(in srgb, currentColor 45%, transparent);
+  text-underline-offset: 3px;
   text-decoration-thickness: 1px;
+  transition: text-decoration-color var(--dur-ui) var(--ease);
+}
+@media (hover: hover) {
+  .consent a:hover {
+    text-decoration-color: currentColor;
+  }
 }
 
 /* Telefono: i tre blocchi uno sotto l'altro, stessa forma, ogni bersaglio di tocco almeno 44 px. */
 @media (max-width: 640px) {
   .signup-row {
     flex-direction: column;
-    gap: 10px;
+    gap: var(--s-2);
     height: auto;
-    padding: 0 5px;
+    padding: 0 var(--s-1);
   }
   .signup-field {
     flex: none;
     height: 52px;
   }
   .consent {
-    padding: 0 4px;
+    padding: 0 var(--s-1);
   }
   .consent input {
-    left: 4px;
+    left: var(--s-1);
   }
   .signup button {
     width: 100%;
@@ -569,7 +585,7 @@ p {
   stroke-linejoin: round;
 }
 .arrow {
-  transition: transform 0.16s var(--ease);
+  transition: transform var(--dur-ui) var(--ease);
 }
 @media (hover: hover) {
   .signup button:hover {
@@ -618,28 +634,31 @@ p {
 }
 
 .signup-note {
-  min-height: 1.45em; /* lo spazio del messaggio è già riservato: il layout non salta quando compare */
-  margin-top: 10px;
-  font: 500 13px/1.45 var(--sans);
-  letter-spacing: 0.005em;
+  min-height: 1.5em; /* lo spazio del messaggio è già riservato: il layout non salta quando compare */
+  margin-top: var(--s-3);
+  font: var(--t-small);
   text-align: center;
   max-width: min(92vw, 440px);
   text-wrap: balance;
   color: var(--ink-soft);
 }
 
-/* Iscritto: il modulo lascia il posto a una pillola Forest con la spunta. */
+/* Iscritto: il modulo lascia il posto a un blocco Forest con la spunta, stessa forma del pulsante (8°). */
 .signup-done {
   display: none;
   align-items: center;
-  gap: 10px;
-  height: 52px;
-  padding: 0 24px 0 22px;
-  border-radius: 999px;
+  gap: var(--s-3);
+  height: 56px;
+  padding: 0 var(--s-5);
+  border-radius: var(--radius);
   background: var(--ink-strong);
   color: var(--bg);
-  font: 900 14px/1 var(--sans);
-  letter-spacing: -0.01em;
+  font: var(--t-button);
+  letter-spacing: -0.005em;
+  transform: skewX(-8deg);
+}
+.signup-done > * {
+  transform: skewX(8deg);
 }
 .outro[data-state='done'] .signup {
   display: none;
@@ -653,7 +672,7 @@ p {
   animation: draw 0.4s 0.18s var(--ease) both;
 }
 @keyframes pop-in {
-  from { opacity: 0; transform: scale(0.92); }
+  from { opacity: 0; transform: skewX(-8deg) scale(0.92); }
 }
 @keyframes draw {
   from { stroke-dashoffset: 14; }
@@ -665,21 +684,18 @@ p {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 16px;
+  gap: var(--s-4);
   width: min(100%, 720px);
-  margin-top: calc(var(--gap) * 0.6);
+  margin-top: calc(var(--gap) * 0.5);
   opacity: 0; /* entra per ultima, con il blocco iscrizione (src/app.ts) */
 }
 .proof-num {
-  /* il numero è la prova: Black, nel verde del testo principale */
-  font-weight: 900;
-  letter-spacing: -0.01em;
+  /* il numero è la prova: il peso più forte di Geist, nel verde del testo principale */
+  font-weight: 700;
   color: var(--ink-strong);
 }
 .proof-line {
-  font-size: 13px;
-  font-weight: 500;
-  letter-spacing: 0.005em;
+  font: var(--t-small);
   text-align: center;
   color: var(--ink-soft);
 }
@@ -695,9 +711,9 @@ p {
   display: flex;
   flex: none;
   align-items: center;
-  gap: 64px;
+  gap: var(--s-8);
   margin: 0;
-  padding: 0 32px;
+  padding: 0 var(--s-6);
   list-style: none;
   animation: clients-loop 28s linear infinite;
 }
@@ -728,8 +744,8 @@ p {
 }
 @media (max-width: 480px) {
   .clients-track {
-    gap: 44px;
-    padding: 0 22px;
+    gap: var(--s-7);
+    padding: 0 var(--s-5);
   }
   .client-logo {
     height: calc(var(--h, 24px) * 0.85);
@@ -745,7 +761,7 @@ p {
   .clients-track {
     flex-wrap: wrap;
     justify-content: center;
-    gap: 16px 40px;
+    gap: var(--s-4) var(--s-7);
     animation: none;
   }
   .clients-track[aria-hidden='true'] {
@@ -761,13 +777,11 @@ p {
   display: grid;
   grid-template-columns: auto 1fr auto;
   align-items: start;
-  gap: 20px 48px;
+  gap: var(--s-5) var(--s-7);
   margin: 0 var(--pad-x);
-  padding: 24px 0 max(24px, env(safe-area-inset-bottom));
+  padding: var(--s-6) 0 max(var(--s-6), env(safe-area-inset-bottom));
   border-top: 1px solid color-mix(in srgb, var(--ink-strong) 16%, transparent);
-  font-size: 12px;
-  font-weight: 500;
-  line-height: 1.5;
+  font: var(--t-small);
   color: var(--ink-soft);
 }
 .foot p,
@@ -780,18 +794,18 @@ p {
   color: var(--ink-strong);
 }
 .foot-copy {
-  margin-top: 2px;
+  margin-top: var(--s-1);
 }
 .foot-data {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 16px 48px;
+  gap: var(--s-4) var(--s-7);
 }
 .foot dt {
-  margin-bottom: 2px;
-  font-size: 10px;
-  letter-spacing: 0.14em;
+  margin-bottom: var(--s-2);
+  font: var(--t-label);
+  letter-spacing: var(--track-label);
   text-transform: uppercase;
 }
 .foot dd {
@@ -799,12 +813,15 @@ p {
 }
 .foot-link {
   justify-self: end;
+  /* area di tocco di 44 px senza spostare il testo */
+  margin: calc((44px - 1.5em) / -2) 0;
+  padding: calc((44px - 1.5em) / 2) 0;
   color: var(--ink-soft);
   text-decoration: underline;
   text-decoration-color: color-mix(in srgb, currentColor 45%, transparent);
   text-underline-offset: 3px;
   text-decoration-thickness: 1px;
-  transition: color 0.16s ease, text-decoration-color 0.16s ease;
+  transition: color var(--dur-ui) var(--ease), text-decoration-color var(--dur-ui) var(--ease);
 }
 @media (hover: hover) {
   .foot-link:hover {
@@ -824,13 +841,13 @@ p {
 }
 @media (max-width: 640px) {
   .foot {
-    gap: 18px 24px;
-    padding-top: 20px;
+    gap: var(--s-5);
+    padding-top: var(--s-5);
   }
   .foot-data {
     display: grid;
     grid-template-columns: auto 1fr;
-    gap: 14px 32px;
+    gap: var(--s-4) var(--s-6);
   }
   .foot-addr {
     grid-column: 1 / -1;
@@ -856,10 +873,10 @@ p {
 }
 @media (max-height: 520px) {
   .soon {
-    margin-bottom: 10px;
+    margin-bottom: var(--s-2);
   }
   .signup-note {
-    margin-top: 8px;
+    margin-top: var(--s-2);
   }
 }
 
@@ -972,6 +989,9 @@ p {
   .act-cta:hover > span::after {
     transform: translateX(4px);
   }
+}
+.act-cta:active {
+  transform: skewX(-8deg) scale(0.97);
 }
 .act-cta:focus-visible {
   outline: 2px solid var(--forest);
@@ -1265,36 +1285,6 @@ p {
   outline-offset: 4px;
 }
 
-/* ---------- Testi piccoli in Geist ----------
-   Satoshi resta per logo, titoli e frase principale; tutto ciò che è piccolo (sottotitoli, modulo, etichette,
-   righe degli step, footer) usa Geist, più nitido a queste dimensioni. Pesi: 400 testo, 500 enfasi, 600 pulsanti. */
-.sub,
-.offer,
-.soon,
-.signup-note,
-.signup-done,
-.consent,
-.proof-line,
-.lang,
-.lang button,
-.foot,
-.doc-body,
-.doc-draft,
-.doc-back {
-  font-family: var(--text);
-}
-.signup-field input,
-.signup button {
-  font-family: var(--text);
-  letter-spacing: -0.005em;
-}
-.signup button {
-  font-weight: 600;
-}
-.soon {
-  font-weight: 400;
-  letter-spacing: 0.2em;
-}
-.sub {
-  font-weight: 400;
-}
+/* Caratteri: Satoshi per logo, titoli e frase principale; Geist per tutto ciò che è piccolo (sottotitolo, modulo,
+   etichette, footer, testi degli step e della privacy), più nitido a queste dimensioni. Le famiglie arrivano dagli
+   stili di testo in :root (--t-*). */
