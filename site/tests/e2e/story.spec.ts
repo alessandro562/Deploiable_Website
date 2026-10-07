@@ -21,8 +21,8 @@ test('racconto: tre step e la chiusura, uno alla volta mentre si scorre', async 
   await openFilm(page, '', 'high');
   await seek(page, 7.3);
   await expect(page.locator('.story .act')).toHaveCount(4);
-  await expect(page.locator('.story .act-title')).toHaveText(['Mappiamo i tuoi processi.', 'Costruiamo agenti su misura.', 'Misuriamo l’impatto.']);
-  await expect(page.locator('.story .act-kicker')).toHaveText(['Analisi', 'Sviluppo', 'Misura']);
+  await expect(page.locator('.story .act-title')).toHaveText(['Partiamo dal problema.', 'Costruiamo il prodotto.', 'Lo mettiamo in produzione.']);
+  await expect(page.locator('.story .act-kicker')).toHaveText(['Analisi', 'Sviluppo', 'Adozione']);
   for (const stage of [0, 1, 2, 3]) {
     await scrollToStage(page, stage + (stage < 3 ? 0.25 : 0));
     await seek(page, 7.3);
@@ -46,8 +46,8 @@ test('racconto: tre step e la chiusura, uno alla volta mentre si scorre', async 
 test('racconto: il pulsante della chiusura riporta al modulo, in inglese con il toggle', async ({ page }) => {
   await openFilm(page, '', 'high');
   await page.click('[data-lang="en"]');
-  await expect(page.locator('.story .act-title').first()).toHaveText('We map your processes.');
-  await expect(page.locator('.story .act-kicker')).toHaveText(['Discovery', 'Build', 'Measure']);
+  await expect(page.locator('.story .act-title').first()).toHaveText('We start from the problem.');
+  await expect(page.locator('.story .act-kicker')).toHaveText(['Assessment', 'Build', 'Adoption']);
   await expect(page.locator('.story .act-cta')).toHaveText('Book your AI process review');
   await scrollToStage(page, 3);
   await seek(page, 7.3);

@@ -47,7 +47,7 @@ export async function start(caps: Capabilities) {
   );
   const slotEl = document.querySelector<HTMLElement>('.logo-slot')!;
 
-  // Macchina da scrivere su "work.": ogni lettera è uno <span>; quelle "cancellate" restano al loro posto
+  // Macchina da scrivere su "companies run on.": ogni lettera è uno <span>; quelle "cancellate" restano al loro posto
   // (visibility: hidden), così la parola non si ricentra a ogni lettera. Il testo intero resta per i lettori di schermo.
   const twLine = document.querySelector<HTMLElement>('.line--black')!;
   const word = twLine.textContent ?? '';
