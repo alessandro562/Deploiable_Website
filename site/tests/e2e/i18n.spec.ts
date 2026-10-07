@@ -23,7 +23,7 @@ test('italiano predefinito, inglese col toggle: testi, lang, title e meta', asyn
   await expect(page.locator('[data-lang="en"]')).toHaveAttribute('aria-pressed', 'true');
   expect(await meta(page, 'meta[name="description"]')).toMatch(/measure their impact\. Coming soon\./);
   expect(await meta(page, 'meta[property="og:description"]')).toMatch(/We map your processes/);
-  await expect(page).toHaveTitle('Deploiable · We make AI deployable.');
+  await expect(page).toHaveTitle('Deploiable · We make AI work.');
 
   // la scelta vale per la sessione
   await page.reload();
