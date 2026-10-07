@@ -892,15 +892,15 @@ p {
 .act-cta {
   display: inline-flex;
   align-items: center;
-  height: 56px;
-  padding: 0 30px;
-  border-radius: 10px;
+  height: 44px;
+  padding: 0 22px;
+  border-radius: 8px;
   background: var(--forest);
   color: var(--lime);
-  font: 700 15px/1 var(--sans);
+  font: 700 14px/1 var(--sans);
   letter-spacing: 0.01em;
   text-decoration: none;
-  box-shadow: 0 18px 40px -18px rgb(16 38 27 / 0.6);
+  box-shadow: 0 12px 26px -14px rgb(16 38 27 / 0.55);
   transform: skewX(-8deg);
   transition: transform 0.2s cubic-bezier(0.2, 0.7, 0.3, 1), box-shadow 0.2s ease;
 }
@@ -943,11 +943,43 @@ p {
 }
 .is-webgl .act {
   position: absolute;
-  left: var(--pad-x);
+  /* colonna di testo vicina al simbolo: insieme formano un blocco centrato, largo al massimo 1080 px */
+  left: max(var(--pad-x), calc(50vw - 540px));
   top: 50%;
   width: min(40vw, 560px);
   transform: translate3d(0, calc(-50% + var(--y, 0px)), 0);
   visibility: hidden;
+}
+/* step su fondo Forest (1 e 3): testi chiari, come vuole il brand su Forest (Mist e Lime) */
+.is-webgl .act[data-tone='dark'] .act-num {
+  color: var(--lime);
+}
+.is-webgl .act[data-tone='dark'] .act-title {
+  color: var(--mist);
+}
+.is-webgl .act[data-tone='dark'] .act-sub {
+  color: var(--sage);
+}
+/* sopra la fascia scura l'header è vetro scuro, logo e lingua chiari */
+.is-dark-under .top::before {
+  opacity: 1;
+  background: linear-gradient(180deg, rgb(16 38 27 / 0.62), rgb(16 38 27 / 0.4));
+  border-bottom-color: rgb(241 243 234 / 0.14);
+  box-shadow: none;
+}
+.is-dark-under .logo-slot,
+.is-dark-under .lang [aria-pressed='true'] {
+  color: var(--mist); /* come i titoli sul Forest */
+}
+.is-dark-under .lang,
+.is-dark-under .lang [aria-pressed='false'] {
+  color: var(--sage);
+}
+.top::before,
+.logo-slot,
+.lang {
+  transition-property: opacity, background, color, border-color;
+  transition-duration: 0.3s;
 }
 /* la chiusura è centrata: il simbolo sopra, frase e pulsante sotto */
 .is-webgl .act--end {
@@ -959,7 +991,7 @@ p {
   transform: translate3d(-50%, var(--y, 0px), 0);
 }
 .act--end .act-claim {
-  margin-bottom: 28px;
+  margin-bottom: 22px;
 }
 @media (max-width: 759px) {
   .is-webgl .act {

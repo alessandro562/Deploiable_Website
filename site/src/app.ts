@@ -36,6 +36,7 @@ export async function start(caps: Capabilities) {
   // il racconto a scorrimento sotto l'hero (la sezione è nell'HTML: senza 3D resta una pagina statica)
   const storyEl = document.querySelector<HTMLElement>('.story');
   const story = storyEl ? new Story(storyEl, testMode) : null;
+  let darkUnder = false;
 
   const claim = Array.from(document.querySelectorAll<HTMLElement>('.claim .line'));
   const sweep = document.querySelector<HTMLElement>('.sweep')!;
@@ -163,6 +164,8 @@ export async function start(caps: Capabilities) {
     const lightT = time < LOCK[0] ? time : time < SILENZIO_A ? LOCK[0] : time - (SILENZIO_A - LOCK[0]);
     stage.setChrome(1, Math.sin(lightT * 0.35) * 0.5);
     story?.update(time, engine.width, engine.height);
+    // sopra la fascia scura del racconto l'header passa al vetro scuro
+    if (story && story.dark !== darkUnder) document.documentElement.classList.toggle('is-dark-under', (darkUnder = story.dark));
     // camera cinematografica nell'intro: giri più ampi, che rientrano prima dell'incastro
     const amp = 1 + 0.7 * (1 - Math.min(1, Math.max(0, (time - (LOCK[2] - 0.6)) / 0.6)));
     state.az *= amp;

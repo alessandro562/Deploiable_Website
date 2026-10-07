@@ -32,6 +32,14 @@ const WALL_Z = -13;
 const COVE = 9;
 const DEPTH = 1.6; // barre spesse: il volume si legge anche di fronte
 
+// Colori: per tutti e tre gli step lo sfondo è Forest e i blocchi diventano Lime metallico (Lime su Forest,
+// come vuole il brand). Alla chiusura il Lime sale come un'onda dal basso e riempie lo schermo; i blocchi
+// passano a Forest metallico e i testi a Forest.
+const FOREST = new Color(COLORS.forest);
+const LIME = new Color(COLORS.lime);
+/** Avanzamento dell'onda Lime della chiusura (0 → 1). */
+const waveAt = (s: number) => smooth(2.5, 2.86, s);
+
 const smooth = (a: number, b: number, x: number) => {
   const k = Math.min(1, Math.max(0, (x - a) / (b - a)));
   return k * k * (3 - 2 * k);
@@ -104,6 +112,13 @@ export class Story {
   private rect = { top: 0, bottom: 0 };
   private visible = false;
   private readonly tmp = new Vector3();
+  private readonly bg = new Color(COLORS.forest); // sfondo dello studio (per i riflessi e le ombre)
+  private readonly barColor = new Color(COLORS.lime);
+  private readonly shadowColor = new Color();
+  private readonly symShadow: Mesh[];
+  private readonly header: HTMLElement | null;
+  /** Lo sfondo del racconto è scuro in questo momento (l'header passa al vetro scuro). */
+  dark = false;
   private pointer = { x: 0, y: 0, tx: 0, ty: 0 };
   // lo scorrimento arriva a scatti (rotellina, trackpad): il racconto lo insegue con una molla smorzata,
   // così ogni movimento parte e si ferma morbido; in modalità test segue lo scorrimento all'istante
@@ -114,13 +129,13 @@ export class Story {
     this.section = section;
     this.steps = Array.from(section.querySelectorAll<HTMLElement>('.act'));
     const lime = new Color(COLORS.lime);
-    const limeDeep = new Color(COLORS.limeDeep);
     this.roomMat = new ShaderMaterial({
       side: DoubleSide,
       depthWrite: false,
       uniforms: {
         uLime: { value: lime },
-        uLimeDeep: { value: limeDeep },
+        uForest: { value: FOREST },
+        uWave: { value: 0 },
         uTop: { value: 0 },
         uBottom: { value: 0 },
         uVh: { value: 1 },
@@ -130,8 +145,8 @@ export class Story {
         void main() { vec4 w = modelMatrix * vec4(position, 1.0); vW = w.xyz; gl_Position = projectionMatrix * viewMatrix * w; }
       `,
       fragmentShader: /* glsl */ `
-        uniform vec3 uLime, uLimeDeep;
-        uniform float uTop, uBottom, uVh;
+        uniform vec3 uLime, uForest;
+        uniform float uTop, uBottom, uVh, uWave;
         varying vec3 vW;
         void main() {
           // pavimento più chiaro (la luce cade dall'alto), parete un tono sotto, raccordo in leggera ombra:
@@ -140,12 +155,17 @@ export class Story {
           float wall = smoothstep(0.5, ${COVE.toFixed(1)} * 0.9, h);
           float pool = exp(-(vW.x * vW.x * 0.6 + (vW.z + 1.0) * (vW.z + 1.0)) / (2.0 * 15.0 * 15.0));
           float side = exp(-vW.x * vW.x / (2.0 * 55.0 * 55.0));
-          vec3 col = mix(uLime * (0.97 + 0.06 * pool), mix(uLimeDeep, uLime, 0.55), wall * 0.8);
+          // l'onda Lime della chiusura sale dal basso dello schermo, con un bordo morbido di pochi pixel
+          float edge = uWave * uVh * 1.12 - uVh * 0.04;
+          float lime = 1.0 - smoothstep(edge - 3.0, edge + 3.0, gl_FragCoord.y);
+          vec3 bg = mix(uForest, uLime, lime);
+          vec3 col = mix(bg * (0.97 + 0.06 * pool), bg * mix(0.86, 1.0, 0.55), wall * 0.8);
           col *= mix(0.94, 1.0, side);
           float cove = exp(-pow((h - ${COVE.toFixed(1)} * 0.35) / 2.2, 2.0)) * smoothstep(${(WALL_Z + COVE).toFixed(1)}, ${(WALL_Z + COVE * 0.3).toFixed(1)}, vW.z);
           col *= 1.0 - 0.06 * cove;
-          // in alto e in basso la fascia si fonde con il Lime pieno della pagina: nessuno stacco
-          float fade = smoothstep(uTop - uVh * 0.32, uTop - uVh * 0.02, gl_FragCoord.y)
+          // in basso la fascia si fonde con il Lime pieno della pagina
+          // in alto un bordo netto: il racconto è un capitolo nuovo, con il suo colore
+          float fade = smoothstep(uTop - uVh * 0.004, uTop, gl_FragCoord.y)
                      + 1.0 - smoothstep(uBottom + uVh * 0.02, uBottom + uVh * 0.3, gl_FragCoord.y);
           gl_FragColor = vec4(mix(col, uLime, clamp(fade, 0.0, 1.0)), 1.0);
           #include <colorspace_fragment>
@@ -161,6 +181,8 @@ export class Story {
       const geo = new BarGeometry(i);
       geo.update(REST, true);
       const mat = createStudioMaterial();
+      mat.uniforms.uBase.value = this.barColor;
+      mat.uniforms.uLime.value = this.bg; // il pavimento che si riflette nel metallo è lo sfondo dello step
       const mesh = new Mesh(geo.geometry, mat);
       mesh.frustumCulled = false;
       this.group.add(mesh);
@@ -168,6 +190,7 @@ export class Story {
       const contact = new Mesh(plane, shadowMaterial(2.4));
       const penumbra = new Mesh(plane, shadowMaterial(1.2));
       for (const m of [penumbra, contact]) {
+        (m.material as ShaderMaterial).uniforms.uColor.value = this.shadowColor;
         m.frustumCulled = false;
         this.room.add(m);
       }
@@ -175,6 +198,16 @@ export class Story {
       const bb = geo.geometry.boundingBox!;
       this.bars.push({ mesh, mat, contact, penumbra, center: bb.getCenter(new Vector3()), size: bb.getSize(new Vector3()) });
     }
+    // l'ombra del simbolo intero, per la chiusura: centrata sotto il simbolo e dritta
+    this.symShadow = [shadowMaterial(1.2), shadowMaterial(2.4)].map((m) => {
+      m.uniforms.uColor.value = this.shadowColor;
+      const mesh = new Mesh(plane, m);
+      mesh.rotation.x = -Math.PI / 2;
+      mesh.frustumCulled = false;
+      this.room.add(mesh);
+      return mesh;
+    });
+    this.header = document.querySelector('.top');
     this.group.scale.z = DEPTH;
     this.scene.add(this.group);
 
@@ -221,11 +254,19 @@ export class Story {
     }
     const s = sp.x;
     this.progress = s;
+    const wave = waveAt(s);
+    this.roomMat.uniforms.uWave.value = wave;
+    this.bg.copy(FOREST).lerp(LIME, wave);
+    this.barColor.copy(LIME).lerp(FOREST, smooth(2.55, 2.86, s));
+    this.shadowColor.copy(FOREST).multiplyScalar(0.3).lerp(FOREST, wave);
+    this.dark = this.visible && r.top <= 40 && wave < 0.5;
 
     // testi: entrano e restano fermi per buona parte dello step, poi escono salendo
     this.steps.forEach((a, i) => {
-      const inn = smooth(i - 0.42, i - 0.08, s);
-      const out = i < STAGES - 1 ? smooth(i + 0.6, i + 0.9, s) : 0;
+      // il testo vecchio esce prima del cambio di colore, il nuovo entra subito dopo: mai due testi insieme
+      // la chiusura entra quando l'onda Lime ha quasi riempito lo schermo
+      const inn = i < STAGES - 1 ? smooth(i - 0.33, i - 0.12, s) : smooth(2.8, 2.95, s);
+      const out = i < STAGES - 1 ? smooth(i + 0.42, i + 0.52, s) : 0;
       const o = inn * (1 - out);
       a.style.opacity = o.toFixed(3);
       a.style.setProperty('--y', `${((1 - inn) * 32 - out * 32).toFixed(1)}px`);
@@ -234,7 +275,7 @@ export class Story {
     if (!this.visible) return;
 
     // ogni barra entra da fuori scena (in alto a destra, dal fondo), avvitandosi, poi diventa metallo
-    const envRot = Math.sin(time * 0.35) * 0.5;
+    const envRot = Math.sin(time * 0.3) * 0.3;
     const metals: number[] = [];
     ORDER.forEach((b, i) => {
       const k = smooth(i - 0.85, i - 0.25, s);
@@ -253,9 +294,22 @@ export class Story {
     const click = smooth(1.75, 1.85, s) * (1 - smooth(1.85, 2.15, s)); // il simbolo si chiude: un piccolo colpo
     const breathe = Math.sin(time * 0.5) * 0.035 * (1 - front);
     const yaw = -0.6 * (1 - front) + breathe;
-    this.group.rotation.set(0.1 * (1 - front), yaw, 0);
+    // fluttuazione della chiusura: due frequenze non multiple (niente altalena meccanica), un leggero dondolio
+    // sugli assi che fa scorrere i riflessi sul metallo, e il simbolo che segue appena il puntatore
+    const float = Math.sin(time * 0.9) * 0.72 + Math.sin(time * 0.37 + 1.1) * 0.28;
+    this.group.rotation.set(
+      0.1 * (1 - front) + front * (0.05 * Math.sin(time * 0.53 + 0.4) + this.pointer.y * 0.08),
+      yaw + front * (0.08 * Math.sin(time * 0.41) + this.pointer.x * 0.14),
+      0,
+    );
     // nella chiusura il simbolo, di fronte, fluttua piano su e giù (l'ombra respira con lui)
-    this.group.position.y = front * Math.sin(time * 0.9) * SYMBOL_H * 0.045;
+    this.group.position.y = front * float * SYMBOL_H * 0.05; // stesso ritmo dell'ombra
+    // respiro: salendo le tre barre si separano appena lungo il passo del simbolo, poi si richiudono
+    const sep = front * SYMBOL_H * 0.03 * (float + 1) * 0.5;
+    for (let b = 0; b < 3; b++) {
+      this.bars[b].mesh.position.y += (1 - b) * sep;
+      this.bars[b].mesh.position.x += (1 - b) * sep * 0.14;
+    }
     const g = 1 + 0.035 * click;
     this.group.scale.set(g, g, DEPTH * g);
     this.group.updateMatrixWorld();
@@ -272,7 +326,7 @@ export class Story {
       const lift = h / SYMBOL_H;
       const sx = this.tmp.x - (LIGHT.x / LIGHT.y) * h * SHADOW_DRIFT;
       const sz = this.tmp.z - (LIGHT.z / LIGHT.y) * h * SHADOW_DRIFT;
-      const strength = k * (0.35 + 0.65 * metals[b]);
+      const strength = k * (0.35 + 0.65 * metals[b]) * (1 - front); // nella chiusura: un'ombra sola, centrata
       const turn = yaw + mesh.rotation.y;
       const across = Math.max(0.45, Math.abs(Math.cos(mesh.rotation.x)));
       const len = size.x * g;
@@ -287,24 +341,58 @@ export class Story {
       (penumbra.material as ShaderMaterial).uniforms.uOpacity.value = (strength * 0.14) / (1 + lift);
     });
 
+    // ombra della chiusura: centrata sotto il simbolo; respira con la fluttuazione (più su, più chiara e larga)
+    const [symPen, symCon] = this.symShadow;
+    symPen.position.set(0, FLOOR + 0.02, 0);
+    symPen.scale.set(SYMBOL_W * 1.15 * (1 + 0.05 * float), SYMBOL_H * 0.42, 1);
+    (symPen.material as ShaderMaterial).uniforms.uOpacity.value = front * 0.16 * (1 - 0.15 * float);
+    symCon.position.set(0, FLOOR + 0.03, 0);
+    symCon.scale.set(SYMBOL_W * 0.8 * (1 + 0.04 * float), SYMBOL_H * 0.16, 1);
+    (symCon.material as ShaderMaterial).uniforms.uOpacity.value = front * 0.3 * (1 - 0.2 * float);
+
     const narrow = width < 760;
     const aspect = width / height;
     // negli step la camera guarda appena dall'alto (si leggono pavimento, ombre e curva dello studio); nella
     // chiusura scende all'altezza del simbolo e lo guarda dritto, con un obiettivo più lungo (prospettiva piatta)
     this.camera.fov = 28 - 12 * front;
     const tan = Math.tan((this.camera.fov * Math.PI) / 360);
-    const fitH = SYMBOL_H / ((narrow ? 0.32 : 0.52 - 0.1 * front) * 2 * tan);
-    const fitW = SYMBOL_W / ((narrow ? 0.62 : 0.4) * 2 * tan * aspect);
-    const d = Math.max(fitH, fitW);
+    // negli step: simbolo alto metà schermo, a destra del testo (sopra, su telefono)
+    const dStep = Math.max(SYMBOL_H / ((narrow ? 0.32 : 0.58) * 2 * tan), SYMBOL_W / ((narrow ? 0.62 : 0.4) * 2 * tan * aspect));
+    // nella chiusura: il simbolo sta nello spazio libero fra l'header e la frase, misurato sulla pagina,
+    // così non tocca mai il testo, a qualsiasi dimensione dello schermo (lascia posto anche all'ombra)
+    const top = (this.header?.offsetHeight ?? 64) + 20;
+    const textTop = this.steps[STAGES - 1].getBoundingClientRect().top;
+    const room = Math.max(80, textTop - 14 - top);
+    const symH = Math.min(height * 0.42, room * 0.8);
+    const dEnd = Math.max(SYMBOL_H / ((symH / height) * 2 * tan), SYMBOL_W / ((narrow ? 0.66 : 0.5) * 2 * tan * aspect));
+    // il simbolo (con la sua ombra sotto) si appoggia subito sopra la frase, senza vuoti in mezzo
+    const centerY = Math.max(top + symH / 2, textTop - 14 - symH * 0.74);
+    const d = dStep + (dEnd - dStep) * front;
     this.pointer.x += (this.pointer.tx - this.pointer.x) * 0.05;
     this.pointer.y += (this.pointer.ty - this.pointer.y) * 0.05;
     const tilt = 1 - front;
-    this.camera.position.set(this.pointer.x * d * 0.06, d * (0.14 * tilt - this.pointer.y * 0.04), d);
-    this.camera.lookAt(0, -SYMBOL_H * 0.2 * tilt, 0);
+    // appena sopra il simbolo negli step; quasi dritta nella chiusura (resta un filo d'altezza per l'ombra)
+    const camY = d * (0.14 * tilt + 0.05 * front);
+    const lookY = -SYMBOL_H * 0.2 * tilt;
     this.camera.aspect = aspect;
+    // dove cade il centro del simbolo sullo schermo con questa camera (senza spostamenti né puntatore)
+    this.camera.position.set(0, camY, d);
+    this.camera.lookAt(0, lookY, 0);
+    this.camera.clearViewOffset();
+    this.camera.updateMatrixWorld();
+    const centerPx = ((1 - this.tmp.set(0, 0, 0).project(this.camera).y) / 2) * height;
+    // dove deve stare: negli step all'altezza del centro del testo (un filo sopra, l'ombra sta sotto); su
+    // telefono nella metà alta, sopra il testo; nella chiusura nello spazio libero sopra la frase
+    const active = this.steps[Math.min(STAGES - 2, Math.max(0, Math.round(s)))].getBoundingClientRect();
+    const textMid = active.height > 0 ? (active.top + active.bottom) / 2 : height * 0.5;
+    const stepY = narrow ? height * 0.33 : textMid - height * 0.02;
+    const targetY = stepY + (centerY - stepY) * front;
+    this.camera.position.set(this.pointer.x * d * 0.06, camY - this.pointer.y * d * 0.04, d);
+    this.camera.lookAt(0, lookY, 0);
     // composizione: negli step simbolo a destra del testo; nella chiusura al centro, sopra la frase e il pulsante
-    const shiftX = narrow ? 0 : -width * 0.2 * tilt;
-    const shiftY = narrow ? height * 0.17 : height * 0.17 * front;
+    // testo e simbolo formano un blocco unico centrato: il simbolo sta appena a destra della colonna di testo
+    const shiftX = narrow ? 0 : -Math.min(width * 0.14, 230) * tilt;
+    const shiftY = centerPx - targetY;
     this.camera.setViewOffset(width, height, shiftX, shiftY, width, height);
     this.camera.updateMatrixWorld();
     for (const { mat } of this.bars) mat.uniforms.uCam.value.copy(this.camera.position);
