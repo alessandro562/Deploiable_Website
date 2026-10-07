@@ -363,7 +363,8 @@ export class Story {
     this.camera.lookAt(0, -SYMBOL_H * 0.2 * tilt, 0);
     this.camera.aspect = aspect;
     // composizione: negli step simbolo a destra del testo; nella chiusura al centro, sopra la frase e il pulsante
-    const shiftX = narrow ? 0 : -width * 0.2 * tilt;
+    // testo e simbolo formano un blocco unico centrato: il simbolo sta appena a destra della colonna di testo
+    const shiftX = narrow ? 0 : -Math.min(width * 0.14, 230) * tilt;
     const shiftY = (narrow ? height * 0.17 : 0) * tilt + (height / 2 - centerY) * front;
     this.camera.setViewOffset(width, height, shiftX, shiftY, width, height);
     this.camera.updateMatrixWorld();

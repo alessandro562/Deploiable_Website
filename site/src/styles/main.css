@@ -943,7 +943,8 @@ p {
 }
 .is-webgl .act {
   position: absolute;
-  left: var(--pad-x);
+  /* colonna di testo vicina al simbolo: insieme formano un blocco centrato, largo al massimo 1080 px */
+  left: max(var(--pad-x), calc(50vw - 540px));
   top: 50%;
   width: min(40vw, 560px);
   transform: translate3d(0, calc(-50% + var(--y, 0px)), 0);
@@ -966,15 +967,13 @@ p {
   border-bottom-color: rgb(241 243 234 / 0.14);
   box-shadow: none;
 }
-.is-dark-under .logo-slot {
-  color: var(--lime);
+.is-dark-under .logo-slot,
+.is-dark-under .lang [aria-pressed='true'] {
+  color: var(--mist); /* come i titoli sul Forest */
 }
 .is-dark-under .lang,
 .is-dark-under .lang [aria-pressed='false'] {
   color: var(--sage);
-}
-.is-dark-under .lang [aria-pressed='true'] {
-  color: var(--lime);
 }
 .top::before,
 .logo-slot,
