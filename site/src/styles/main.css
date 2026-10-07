@@ -17,6 +17,7 @@
   --ink-hover: var(--lime-deep);
   --field-bg: var(--pine); /* fondo dei campi del modulo */
   --sans: 'Satoshi', 'Helvetica Neue', Arial, sans-serif;
+  --text: 'Geist', 'Helvetica Neue', Arial, sans-serif; /* testi piccoli */
 
   /* Il protagonista è la frase "We make AI deployable.": il suo corpo è la misura di tutto il resto.
      Dipende da larghezza e altezza, così l'hero sta sempre in una schermata con aria sopra e sotto. */
@@ -1167,4 +1168,42 @@ p {
 :focus-visible {
   outline: 2px solid var(--ink-strong);
   outline-offset: 4px;
+}
+
+/* ---------- Testi piccoli in Geist ----------
+   Satoshi resta per logo, titoli e frase principale; tutto ciò che è piccolo (sottotitoli, modulo, etichette,
+   righe degli step, footer) usa Geist, più nitido a queste dimensioni. Pesi: 400 testo, 500 enfasi, 600 pulsanti. */
+.sub,
+.offer,
+.soon,
+.signup-note,
+.signup-done,
+.consent,
+.proof-line,
+.lang,
+.lang button,
+.foot,
+.act-sub,
+.doc-body,
+.doc-draft,
+.doc-back {
+  font-family: var(--text);
+}
+.signup-field input,
+.signup button,
+.act-cta {
+  font-family: var(--text);
+  letter-spacing: -0.005em;
+}
+.signup button,
+.act-cta {
+  font-weight: 600;
+}
+.soon {
+  font-weight: 400;
+  letter-spacing: 0.2em;
+}
+.sub,
+.act-sub {
+  font-weight: 400;
 }

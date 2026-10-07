@@ -388,7 +388,7 @@ test('modulo: link all\'informativa, casella non spuntata, su telefono in colonn
   await expect(page.locator('#signup-email')).toHaveAttribute('placeholder', 'name@company.com');
 });
 
-test('dettagli: testo secondario in Moss scurito pieno, un solo carattere (Satoshi)', async ({ page }) => {
+test('dettagli: testo secondario in Moss scurito pieno, Satoshi per i titoli e Geist per i testi piccoli', async ({ page }) => {
   await openFilm(page);
   await seek(page, END);
   const css = (sel: string, prop: string, pseudo?: string) =>
@@ -397,10 +397,13 @@ test('dettagli: testo secondario in Moss scurito pieno, un solo carattere (Satos
   expect(await css('.signup-note', 'color')).toBe(MOSS);
   expect(await css('#signup-email', 'color', '::placeholder')).toBe(MOSS);
   expect(await css('.signup-note', 'opacity')).toBe('1');
-  for (const sel of ['.soon', '.signup-note', '.sub', '.signup button', '#signup-email'])
+  // Satoshi per titoli e frase principale, Geist per i testi piccoli
+  for (const sel of ['.line--black'])
     expect(await css(sel, 'font-family'), sel).toMatch(/^"?Satoshi/);
+  for (const sel of ['.soon', '.signup-note', '.sub', '.signup button', '#signup-email'])
+    expect(await css(sel, 'font-family'), sel).toMatch(/^"?Geist/);
   expect(await css('.soon', 'text-transform')).toBe('uppercase');
-  expect(await css('.soon', 'font-weight')).toBe('300');
+  expect(await css('.soon', 'font-weight')).toBe('400');
 });
 
 test('hero: il blocco dei testi è centrato in altezza (centro ottico appena sopra la metà)', async ({ page }) => {

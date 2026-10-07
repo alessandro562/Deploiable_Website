@@ -19,3 +19,12 @@
   font-style: normal;
   font-display: swap;
 }
+/* Geist (Vercel, licenza OFL): il carattere dei testi piccoli. Satoshi resta per logo, titoli e frase principale.
+   Un solo file variabile (pesi 300–700), solo alfabeto latino: copre italiano e inglese. */
+@font-face {
+  font-family: 'Geist';
+  src: url('../assets/fonts/geist-latin-var.woff2') format('woff2');
+  font-weight: 300 700;
+  font-style: normal;
+  font-display: swap;
+}
