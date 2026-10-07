@@ -53,11 +53,10 @@
           <form class="signup" novalidate>
             <div class="signup-row">
               <label class="sr-only" for="signup-email" data-i18n="form.email.label">Email aziendale</label>
-              <input id="signup-email" name="email" type="email" required autocomplete="email" inputmode="email" enterkeyhint="next" spellcheck="false" placeholder="nome@azienda.it" data-i18n-attr="placeholder:form.email.placeholder" />
-              <i class="signup-divider" aria-hidden="true"></i>
+              <span class="signup-field signup-field--email"><input id="signup-email" name="email" type="email" required autocomplete="email" inputmode="email" enterkeyhint="next" spellcheck="false" placeholder="nome@azienda.it" data-i18n-attr="placeholder:form.email.placeholder" /></span>
               <label class="sr-only" for="signup-company" data-i18n="form.company.label">Azienda</label>
-              <input id="signup-company" name="company" type="text" required autocomplete="organization" enterkeyhint="send" placeholder="Azienda" data-i18n-attr="placeholder:form.company.placeholder" />
-              <button type="submit"><span data-i18n="form.submit">Prenota la tua AI process review</span><svg class="arrow" viewBox="0 0 12 12" aria-hidden="true"><path d="M1 6h9M6.5 2.5 10 6l-3.5 3.5" /></svg></button>
+              <span class="signup-field"><input id="signup-company" name="company" type="text" required autocomplete="organization" enterkeyhint="send" placeholder="Azienda" data-i18n-attr="placeholder:form.company.placeholder" /></span>
+              <button type="submit"><span class="btn-in"><span data-i18n="form.submit">Prenota la tua AI process review</span><svg class="arrow" viewBox="0 0 12 12" aria-hidden="true"><path d="M1 6h9M6.5 2.5 10 6l-3.5 3.5" /></svg></span></button>
             </div>
             <label class="consent">
               <input id="signup-consent" name="consent" type="checkbox" value="si" required />
@@ -116,7 +115,7 @@
           </article>
           <article class="act act--end">
             <p class="act-claim" lang="en"><span>We make AI </span><strong>deployable.</strong></p>
-            <a class="act-cta" href="#signup-email" data-i18n="form.submit">Prenota la tua AI process review</a>
+            <a class="act-cta" href="#signup-email"><span data-i18n="form.submit">Prenota la tua AI process review</span></a>
           </article>
         </div>
       </section>
