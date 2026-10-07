@@ -32,14 +32,10 @@ export const STUDIO_GLSL = /* glsl */ `
     float lum = dot(env, vec3(0.2126, 0.7152, 0.0722));
     vec3 col = B * (0.72 + 0.43 * smoothstep(0.0, 1.0, lum));
     col += B * fres * 0.6;
-    // su un colore scuro la sola modulazione non basta a far leggere il metallo: le parti luminose dello
-    // studio (strisce, orizzonte, softbox) passano come fasce di luce nella stessa tinta, più chiare
-    float dark = 1.0 - smoothstep(0.02, 0.4, dot(B, vec3(0.2126, 0.7152, 0.0722)));
-    float band = smoothstep(0.55, 1.5, lum);
-    col += (B * 4.2 + vec3(0.025, 0.06, 0.03)) * band * dark;
-    col += uLime * 0.12 * fres * dark;
+    // riflessi: solo le luci più forti dello studio passano come lampi netti nella vernice (più vivi di
+    // taglio); nessuna fascia di colore sulle facce
     vec3 lamps = max(env - vec3(1.0), 0.0);
-    return col + lamps * (0.18 + 0.5 * fres);
+    return col + lamps * (0.3 + 0.6 * fres) + vec3(1.0) * fres * 0.05;
   }
 `;
 
