@@ -28,7 +28,46 @@
   --logo-w: clamp(116px, 10vw, 156px);
   --pad-x: clamp(16px, 4vw, 48px);
   --pad-top: clamp(18px, 3.2vw, 32px);
+
+  /* ---------- Sistema: una sola scala per testi, spazi, raggi e movimento ----------
+     Ogni testo del sito usa uno di questi stili; ogni distanza è un passo della scala. */
+  /* titoli di sezione (step del racconto, chiusura); sui tablet in verticale cresce con l'altezza */
+  --t-h2: 700 clamp(34px, max(4vw, 4.4svh), 56px) / 1.04 var(--sans);
+  --track-h2: -0.03em;
+  /* testo introduttivo, un passo sopra il testo corrente */
+  --t-lead: 400 clamp(17px, 1.3vw, 20px) / 1.5 var(--text);
+  /* testo corrente */
+  --t-body: 400 17px / 1.55 var(--text);
+  /* note, consenso, dati del footer */
+  --t-small: 400 13px / 1.5 var(--text);
+  /* etichette: maiuscolo spaziato */
+  --t-label: 500 12px / 1 var(--text);
+  --track-label: 0.14em;
+  /* pulsanti */
+  --t-button: 600 14px / 1 var(--text);
+  /* spazi: 4 · 8 · 12 · 16 · 24 · 32 · 48 · 64 · 96 */
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 24px;
+  --s-6: 32px;
+  --s-7: 48px;
+  --s-8: 64px;
+  --s-9: 96px;
+  /* un solo raggio per campi e pulsanti; contenuto largo al massimo 1120 px */
+  --radius: 10px;
+  --content: 1120px;
+  /* movimento: 160 ms per l'interfaccia, 300 ms per i cambi di stato, una sola curva */
+  --dur-ui: 160ms;
+  --dur-state: 300ms;
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
   color-scheme: dark;
+}
+@media (max-width: 640px) {
+  :root {
+    --t-body: 400 16px / 1.55 var(--text);
+  }
 }
 
 /* Su Lime solo Forest: logo, frase e linea diventano tutti Forest. */
@@ -843,47 +882,57 @@ p {
   display: none;
 }
 
-/* La linea del finale: stessa inclinazione di 8° delle barre, alla quota del centro del simbolo.
-   La testa e la coda si regolano con clip-path (src/app.ts). Sulle barre Lime non si vede: le attraversa. */
 /* ---------- Racconto: tre step e la chiusura (src/gl/story.ts) ----------
-   Senza 3D è una sezione statica, i testi uno sotto l'altro. Con il 3D è una fascia alta cinque schermate:
-   i testi restano fermi a sinistra, il simbolo a destra nello studio Lime disegnato dal canvas. */
+   Senza 3D è una sezione statica su Lime, i testi uno sotto l'altro. Con il 3D è una fascia alta cinque
+   schermate su Forest: la colonna di testo resta ferma a sinistra, il simbolo a destra nello studio disegnato
+   dal canvas; insieme formano un blocco centrato, largo quanto la griglia della pagina. */
 .story {
   position: relative;
   z-index: 10;
-  padding: 12svh var(--pad-x) 14svh;
+  padding: var(--s-9) var(--pad-x);
 }
 .story-pin {
   display: grid;
-  gap: 10svh;
-  max-width: 1100px;
+  gap: var(--s-9);
+  max-width: var(--content);
   margin: 0 auto;
 }
-.act-num {
-  margin: 0 0 20px;
-  font: 500 12px/1 var(--sans);
-  letter-spacing: 0.26em;
-  font-variant-numeric: tabular-nums;
-  color: var(--moss-ink);
+.story-acts {
+  display: grid;
+  gap: var(--s-8);
+}
+/* ogni step: etichetta, titolo, testo (su Lime solo Forest, il testo in Moss scurito) */
+.act-kicker {
+  margin: 0 0 var(--s-4);
+  font: var(--t-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--forest);
 }
 .act-title {
   margin: 0;
-  font: 900 clamp(38px, 5vw, 76px)/0.98 var(--sans);
-  letter-spacing: -0.035em;
+  font: var(--t-h2);
+  letter-spacing: var(--track-h2);
   text-wrap: balance;
   color: var(--forest);
 }
 .act-sub {
-  margin: 22px 0 0;
-  max-width: 25em;
-  font: 500 clamp(16px, 1.3vw, 20px)/1.45 var(--sans);
-  color: var(--moss-ink);
+  margin: var(--s-5) 0 0;
+  max-width: 36ch;
+  font: var(--t-body);
   text-wrap: pretty;
+  color: var(--moss-ink);
 }
+/* l'avanzamento serve solo mentre si scorre il racconto in 3D */
+.story-meter {
+  display: none;
+}
+/* la chiusura: la frase del brand, con i due pesi dell'hero, e il pulsante */
 .act-claim {
-  margin: 0 0 36px;
-  font: 300 clamp(38px, 5vw, 76px)/1 var(--sans);
-  letter-spacing: -0.035em;
+  margin: 0 0 var(--s-6);
+  font: var(--t-h2);
+  font-weight: 300;
+  letter-spacing: var(--track-h2);
   color: var(--forest);
 }
 .act-claim strong {
@@ -894,16 +943,15 @@ p {
   display: inline-flex;
   align-items: center;
   height: 44px;
-  padding: 0 22px;
-  border-radius: 8px;
+  padding: 0 var(--s-5);
+  border-radius: var(--radius);
   background: var(--forest);
   color: var(--lime);
-  font: 700 14px/1 var(--sans);
-  letter-spacing: 0.01em;
+  font: var(--t-button);
   text-decoration: none;
-  box-shadow: 0 12px 26px -14px rgb(16 38 27 / 0.55);
+  box-shadow: 0 12px 24px -12px rgb(16 38 27 / 0.55);
   transform: skewX(-8deg);
-  transition: transform 0.2s cubic-bezier(0.2, 0.7, 0.3, 1), box-shadow 0.2s ease;
+  transition: transform var(--dur-ui) var(--ease), box-shadow var(--dur-ui) var(--ease);
 }
 /* stessa forma del pulsante del modulo: parallelogramma a 8°, testo controinclinato */
 .act-cta > span {
@@ -913,13 +961,13 @@ p {
 }
 .act-cta > span::after {
   content: '→';
-  margin-left: 10px;
-  transition: transform 0.2s cubic-bezier(0.2, 0.7, 0.3, 1);
+  margin-left: var(--s-3);
+  transition: transform var(--dur-ui) var(--ease);
 }
 @media (hover: hover) {
   .act-cta:hover {
     transform: skewX(-8deg) translateY(-2px);
-    box-shadow: 0 24px 44px -18px rgb(16 38 27 / 0.7);
+    box-shadow: 0 24px 48px -16px rgb(16 38 27 / 0.7);
   }
   .act-cta:hover > span::after {
     transform: translateX(4px);
@@ -942,24 +990,55 @@ p {
   height: 100svh;
   overflow: hidden;
 }
-.is-webgl .act {
+/* la colonna di testo: all'inizio della griglia, centrata in altezza */
+.is-webgl .story-copy {
   position: absolute;
-  /* colonna di testo vicina al simbolo: insieme formano un blocco centrato, largo al massimo 1080 px */
-  left: max(var(--pad-x), calc(50vw - 540px));
+  left: max(var(--pad-x), calc(50vw - var(--content) / 2));
   top: 50%;
-  width: min(40vw, 560px);
-  transform: translate3d(0, calc(-50% + var(--y, 0px)), 0);
+  width: min(40vw, 480px);
+  transform: translateY(-50%);
+}
+/* i tre step nello stesso posto: la colonna è alta quanto il più alto, etichette e titoli sempre alla stessa quota */
+.is-webgl .story-acts {
+  gap: 0;
+}
+.is-webgl .story-acts > .act {
+  grid-area: 1 / 1;
+  transform: translate3d(0, var(--y, 0px), 0);
   visibility: hidden;
 }
-/* step su fondo Forest (1 e 3): testi chiari, come vuole il brand su Forest (Mist e Lime) */
-.is-webgl .act[data-tone='dark'] .act-num {
+/* su Forest: etichette Lime, titoli Mist, testo Mist all'80% (brand: su Forest, Lime o Mist) */
+.is-webgl .act-kicker {
   color: var(--lime);
 }
-.is-webgl .act[data-tone='dark'] .act-title {
+.is-webgl .act-title {
   color: var(--mist);
 }
-.is-webgl .act[data-tone='dark'] .act-sub {
-  color: var(--sage);
+.is-webgl .act-sub {
+  color: rgb(241 243 234 / 0.8);
+}
+/* tre segmenti: pieni gli step fatti, quello corrente si riempie scorrendo (--fill da src/gl/story.ts) */
+.is-webgl .story-meter {
+  display: flex;
+  gap: var(--s-2);
+  margin-top: var(--s-7);
+  visibility: hidden;
+}
+.story-meter i {
+  position: relative;
+  width: 48px;
+  height: 2px;
+  border-radius: 1px;
+  overflow: hidden;
+  background: rgb(241 243 234 / 0.2);
+}
+.story-meter i::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--lime);
+  transform: scaleX(var(--fill, 0));
+  transform-origin: left;
 }
 /* sopra la fascia scura l'header è vetro scuro, logo e lingua chiari */
 .is-dark-under .top::before {
@@ -980,42 +1059,53 @@ p {
 .logo-slot,
 .lang {
   transition-property: opacity, background, color, border-color;
-  transition-duration: 0.3s;
+  transition-duration: var(--dur-state);
 }
 /* la chiusura è centrata: il simbolo sopra, frase e pulsante sotto */
 .is-webgl .act--end {
+  position: absolute;
   left: 50%;
-  top: auto;
-  bottom: max(9svh, 56px);
+  bottom: max(9svh, var(--s-8));
   width: min(92vw, 900px);
   text-align: center;
   transform: translate3d(-50%, var(--y, 0px), 0);
+  visibility: hidden;
 }
-.act--end .act-claim {
-  margin-bottom: 22px;
-}
-@media (max-width: 759px) {
-  .is-webgl .act {
+/* telefono e tablet in verticale: simbolo sopra, testo sotto (stessa regola di src/gl/story.ts) */
+@media (max-width: 759px), (max-aspect-ratio: 4/5) {
+  .is-webgl .story-copy {
     left: var(--pad-x);
     right: var(--pad-x);
     top: auto;
-    bottom: max(7svh, calc(env(safe-area-inset-bottom) + 24px));
+    bottom: max(var(--s-7), calc(env(safe-area-inset-bottom) + var(--s-5)));
     width: auto;
-    transform: translate3d(0, var(--y, 0px), 0);
+    max-width: 560px;
+    transform: none;
+  }
+}
+@media (max-width: 759px) {
+  .act-kicker {
+    margin-bottom: var(--s-3);
+  }
+  .act-sub {
+    margin-top: var(--s-4);
+  }
+  .is-webgl .story-meter {
+    margin-top: var(--s-6);
   }
   .is-webgl .act--end {
     left: var(--pad-x);
     right: var(--pad-x);
+    width: auto;
     transform: translate3d(0, var(--y, 0px), 0);
   }
-  .act-sub {
-    margin-top: 14px;
-  }
   .act-claim {
-    margin-bottom: 26px;
+    margin-bottom: var(--s-5);
   }
 }
 
+/* La linea del finale: stessa inclinazione di 8° delle barre, alla quota del centro del simbolo.
+   La testa e la coda si regolano con clip-path (src/app.ts). Sulle barre Lime non si vede: le attraversa. */
 .is-webgl .sweep {
   display: block;
   position: fixed;
@@ -1183,27 +1273,23 @@ p {
 .lang,
 .lang button,
 .foot,
-.act-sub,
 .doc-body,
 .doc-draft,
 .doc-back {
   font-family: var(--text);
 }
 .signup-field input,
-.signup button,
-.act-cta {
+.signup button {
   font-family: var(--text);
   letter-spacing: -0.005em;
 }
-.signup button,
-.act-cta {
+.signup button {
   font-weight: 600;
 }
 .soon {
   font-weight: 400;
   letter-spacing: 0.2em;
 }
-.sub,
-.act-sub {
+.sub {
   font-weight: 400;
 }

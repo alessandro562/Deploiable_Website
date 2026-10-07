@@ -98,18 +98,28 @@
            scorrendo (src/gl/story.ts); senza, è una sezione statica. -->
       <section class="story" aria-label="Come lavoriamo" data-i18n-attr="aria-label:story.label">
         <div class="story-pin">
-          <article class="act" data-tone="dark">
-            <h2 class="act-title" data-i18n="story.1">Mappiamo i tuoi processi.</h2>
-            <p class="act-sub" data-i18n="story.1s">Troviamo dove l’AI ti rende più efficiente e riduce l’errore umano.</p>
-          </article>
-          <article class="act" data-tone="dark">
-            <h2 class="act-title" data-i18n="story.2">Costruiamo agenti su misura.</h2>
-            <p class="act-sub" data-i18n="story.2s">Agenti e skill progettati per te, testati e messi in produzione sui tuoi sistemi.</p>
-          </article>
-          <article class="act" data-tone="dark">
-            <h2 class="act-title" data-i18n="story.3">Misuriamo l’impatto.</h2>
-            <p class="act-sub" data-i18n="story.3s">Governance e KPI per vedere ogni giorno cosa cambia davvero.</p>
-          </article>
+          <!-- colonna di testo: i tre step occupano lo stesso posto (con il 3D ne compare uno alla volta),
+               sotto la barra di avanzamento -->
+          <div class="story-copy">
+            <div class="story-acts">
+              <article class="act">
+                <p class="act-kicker" data-i18n="story.1k">Analisi</p>
+                <h2 class="act-title" data-i18n="story.1">Mappiamo i tuoi processi.</h2>
+                <p class="act-sub" data-i18n="story.1s">Troviamo dove l’AI ti rende più efficiente e riduce l’errore umano.</p>
+              </article>
+              <article class="act">
+                <p class="act-kicker" data-i18n="story.2k">Sviluppo</p>
+                <h2 class="act-title" data-i18n="story.2">Costruiamo agenti su misura.</h2>
+                <p class="act-sub" data-i18n="story.2s">Agenti e skill progettati per te, testati e messi in produzione sui tuoi sistemi.</p>
+              </article>
+              <article class="act">
+                <p class="act-kicker" data-i18n="story.3k">Misura</p>
+                <h2 class="act-title" data-i18n="story.3">Misuriamo l’impatto.</h2>
+                <p class="act-sub" data-i18n="story.3s">Governance e KPI per vedere ogni giorno cosa cambia davvero.</p>
+              </article>
+            </div>
+            <div class="story-meter" aria-hidden="true"><i></i><i></i><i></i></div>
+          </div>
           <article class="act act--end">
             <p class="act-claim" lang="en"><span>We make AI </span><strong>deployable.</strong></p>
             <a class="act-cta" href="#signup-email"><span data-i18n="form.submit">Prenota la tua AI process review</span></a>

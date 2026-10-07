@@ -24,19 +24,30 @@ for (const path of pages) {
       const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p);
       return (x + 0.05) / (y + 0.05);
     };
+    // colore con trasparenza (es. Mist all'80%) composto sul suo fondo
+    const flat = (fg, bg) => {
+      const f = fg.match(/[\d.]+/g).map(Number);
+      if (f.length < 4 || f[3] >= 1) return fg;
+      const b = bg.match(/[\d.]+/g).map(Number);
+      return `rgb(${[0, 1, 2].map((i) => Math.round(f[i] * f[3] + b[i] * (1 - f[3]))).join(', ')})`;
+    };
     const bgOf = (el) => {
       for (let e = el; e; e = e.parentElement) {
         const c = getComputedStyle(e).backgroundColor;
         if (c && !c.endsWith(', 0)') && c !== 'transparent') return c;
+        // nel racconto in 3D il fondo lo disegna il canvas: Forest negli step, Lime nella chiusura
+        if (e.classList.contains('story') && document.documentElement.classList.contains('is-webgl')) {
+          return el.closest('.act--end') ? 'rgb(200, 242, 90)' : 'rgb(16, 38, 27)';
+        }
       }
       return getComputedStyle(document.body).backgroundColor;
     };
     const out = [];
-    const sel = '.lang button, .sub, .soon, .signup-row input, .signup button, .consent-text, .consent a, .signup-note, .proof-line, .client-ph, .foot p, .foot dt, .foot dd, .foot a, .claim .line, .doc-body p, .doc-body h2, .doc-draft, .doc-updated, .doc-back a';
+    const sel = '.lang button, .sub, .soon, .signup-row input, .signup button, .consent-text, .consent a, .signup-note, .proof-line, .client-ph, .foot p, .foot dt, .foot dd, .foot a, .claim .line, .act-kicker, .act-title, .act-sub, .act-claim, .act-cta span, .doc-body p, .doc-body h2, .doc-draft, .doc-updated, .doc-back a';
     for (const el of document.querySelectorAll(sel)) {
       const cs = getComputedStyle(el);
-      const fg = cs.color;
       const bg = bgOf(el);
+      const fg = flat(cs.color, bg);
       const name = el.className || el.tagName.toLowerCase();
       out.push({ el: `${el.tagName.toLowerCase()}.${String(name).split(' ')[0]}`, size: cs.fontSize, weight: cs.fontWeight, fg, bg, ratio: +ratio(fg, bg).toFixed(2) });
       // segnaposto dei campi

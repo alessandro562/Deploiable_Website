@@ -49,6 +49,11 @@ export class BarGeometry {
     this.update(REST, true);
   }
 
+  /** Il contorno attuale della faccia (centrato sul perno) e il suo verso: serve a disegnare gli spigoli. */
+  contour(): { pts: Vec2[]; ccw: boolean } {
+    return { pts: this.pts.map((p) => [p[0], p[1]] as Vec2), ccw: this.ccw };
+  }
+
   private compute(d: Deform) {
     const tmp: Vec2 = [0, 0];
     this.outline.forEach((v, i) => {
