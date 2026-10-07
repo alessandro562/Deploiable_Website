@@ -67,7 +67,7 @@ export function createBarMaterial() {
           col += uRim * rim * uRimAmount;
           col = min(col, uCap);
         }
-        // Luce da studio (solo con uLit > 0, nella prova ?story=1): luce chiave dall'alto a sinistra,
+        // Luce da studio (solo con uLit > 0): luce chiave dall'alto a sinistra,
         // riempimento da destra, un riflesso morbido e un bordo di Fresnel. Con uLit = 0 il colore resta esatto.
         if (uLit > 0.0) {
           // le ombre vanno verso il verde scuro (uShade), non verso l'oliva: il Lime resta pulito
@@ -88,7 +88,7 @@ export function createBarMaterial() {
           lit += vec3(1.0) * pow(max(dot(R, normalize(vec3(0.85, 0.25, 0.45))), 0.0), 140.0) * 0.8;
           col = mix(col, lit, uLit);
         }
-        // Metallo nel colore del brand (prova ?story=1): Lime sul Forest dell'apertura, Forest dopo il passaggio al Lime
+        // Metallo nel colore del brand: Lime sul Forest dell'apertura, Forest dopo il passaggio al Lime
         if (uChrome > 0.0) col = mix(col, brandMetal(n, V, uFront), uChrome);
         gl_FragColor = vec4(col, 1.0);
         #include <colorspace_fragment>

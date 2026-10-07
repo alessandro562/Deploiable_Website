@@ -64,12 +64,7 @@ export class Stage {
     this.slot = slot;
   }
 
-  /** Luce da studio sulle barre (0 colori esatti del brand, 1 luce piena). */
-  setLit(v: number) {
-    for (const b of this.bars) b.mat.uniforms.uLit.value = v;
-  }
-
-  /** Forest metallico sulle barre (prova ?story=1). */
+  /** Metallo nel colore del brand sulle barre; envRot fa ruotare le luci dello studio nei riflessi. */
   setChrome(v: number, envRot = 0) {
     for (const b of this.bars) {
       b.mat.uniforms.uChrome.value = v;

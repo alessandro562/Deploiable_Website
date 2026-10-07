@@ -1,7 +1,7 @@
 import { Color, ShaderMaterial, Vector3 } from 'three';
 import { COLORS } from '../../config/brand';
 
-// Materiale delle barre nel racconto (?story=1): da vetro smerigliato a Forest metallico (uMetal 0 → 1).
+// Materiale delle barre nel racconto: da vetro smerigliato a Forest metallico (uMetal 0 → 1).
 // Nessuna mappa d'ambiente da scaricare: lo studio Lime che le circonda è descritto qui come luce
 // (pavimento e parete Lime, due softbox bianchi), così i riflessi del metallo sono coerenti con la scena.
 
@@ -36,8 +36,8 @@ export const STUDIO_GLSL = /* glsl */ `
     // studio (strisce, orizzonte, softbox) passano come fasce di luce nella stessa tinta, più chiare
     float dark = 1.0 - smoothstep(0.02, 0.4, dot(B, vec3(0.2126, 0.7152, 0.0722)));
     float band = smoothstep(0.55, 1.5, lum);
-    col += (B * 3.2 + vec3(0.02, 0.05, 0.025)) * band * dark;
-    col += uLime * 0.08 * fres * dark;
+    col += (B * 4.2 + vec3(0.025, 0.06, 0.03)) * band * dark;
+    col += uLime * 0.12 * fres * dark;
     vec3 lamps = max(env - vec3(1.0), 0.0);
     return col + lamps * (0.18 + 0.5 * fres);
   }

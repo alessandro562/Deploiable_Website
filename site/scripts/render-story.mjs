@@ -1,4 +1,4 @@
-// Video della prova ?story=1: intro e poi scorrimento di tutto il racconto.
+// Video dell'animazione: intro e poi scorrimento di tutto il racconto.
 //   node scripts/render-story.mjs <larghezza> <altezza> <uscita.mp4>   (serve npm run preview attivo)
 import { chromium } from '@playwright/test';
 import { execFileSync } from 'node:child_process';
@@ -8,7 +8,7 @@ const FPS = 30, dir = `artifacts/sf-${W}`;
 rmSync(dir, { recursive: true, force: true }); mkdirSync(dir, { recursive: true });
 const b = await chromium.launch({ args: ['--use-angle=swiftshader', '--use-gl=angle', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
 const p = await b.newPage({ viewport: { width: W, height: H } });
-await p.goto('http://localhost:4173/?__test=1&tier=high&story=1' + (process.env.EXTRA ?? ''));
+await p.goto('http://localhost:4173/?__test=1&tier=high' + (process.env.EXTRA ?? ''));
 await p.waitForFunction(() => window.__DEPLOIABLE__?.ready === true);
 const heroH = await p.evaluate(() => document.querySelector('.hero').offsetHeight);
 const end = heroH + 4 * H; // fine della fascia

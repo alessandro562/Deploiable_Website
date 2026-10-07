@@ -52,19 +52,10 @@ export class Engine {
     return true;
   }
 
-  /** pre: passaggio fra il fondo e il simbolo (lo spazio di punti); post: sopra a tutto (il racconto). */
-  render(extra?: () => void, pre?: () => void) {
-    const bg = this.bgScene.background as Color;
-    if (pre) {
-      // il fondo si disegna con la pulizia dello schermo, così lo spazio sta fra il fondo e la supergrafica
-      this.renderer.setClearColor(bg, 1);
-      this.bgScene.background = null;
-    }
+  /** extra: un passaggio disegnato sopra a tutto (il racconto a scorrimento sotto l'hero). */
+  render(extra?: () => void) {
     this.renderer.clear();
-    pre?.();
-    this.renderer.clearDepth();
     this.renderer.render(this.bgScene, this.bgCamera);
-    if (pre) this.bgScene.background = bg;
     this.renderer.clearDepth();
     this.renderer.render(this.scene, this.camera);
     extra?.();
