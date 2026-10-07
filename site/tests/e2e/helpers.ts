@@ -127,3 +127,22 @@ export async function maxChannels(page: Page) {
     return m;
   });
 }
+
+/** Colore medio di un insieme di pixel. */
+export const meanColor = (px: number[][]) => [0, 1, 2].map((k) => px.reduce((a, p) => a + p[k], 0) / Math.max(1, px.length));
+
+/** Quota di pixel quasi bianchi nel canvas (i lampi delle luci sul metallo). */
+export async function whiteShare(page: Page) {
+  return page.evaluate(() => {
+    const src = document.querySelector<HTMLCanvasElement>('canvas.gl')!;
+    const c = document.createElement('canvas');
+    c.width = src.width;
+    c.height = src.height;
+    const ctx = c.getContext('2d')!;
+    ctx.drawImage(src, 0, 0);
+    const d = ctx.getImageData(0, 0, c.width, c.height).data;
+    let n = 0;
+    for (let i = 0; i < d.length; i += 4) if (d[i] > 235 && d[i + 1] > 235 && d[i + 2] > 225) n++;
+    return n / (d.length / 4);
+  });
+}

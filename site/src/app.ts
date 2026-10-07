@@ -8,6 +8,8 @@ import { PALETTES, type PaletteName } from './config/brand';
 import { Color } from 'three';
 import { Backdrop } from './gl/backdrop';
 import { onLangChange } from './i18n';
+import { Story } from './gl/story';
+import { SILENZIO_A } from './gl/timeline';
 
 // Tre livelli, come nella skill web3d-integration-patterns (Pattern 1):
 //  · 3D      Three.js: renderer, barre, scintille (src/gl)
@@ -31,6 +33,9 @@ export async function start(caps: Capabilities) {
   const engine = new Engine(canvas, quality, testMode);
   const stage = new Stage(engine.scene);
   const backdrop = new Backdrop(engine.bgScene);
+  // il racconto a scorrimento sotto l'hero (la sezione è nell'HTML: senza 3D resta una pagina statica)
+  const storyEl = document.querySelector<HTMLElement>('.story');
+  const story = storyEl ? new Story(storyEl) : null;
 
   const claim = Array.from(document.querySelectorAll<HTMLElement>('.claim .line'));
   const sweep = document.querySelector<HTMLElement>('.sweep')!;
@@ -152,6 +157,16 @@ export async function start(caps: Capabilities) {
       twCaret = tw.caret;
     }
     applyPalette(paletteAt(time));
+    // il simbolo è metallo nel colore del brand (Lime sul Forest dell'apertura, Forest dopo); le luci dello
+    // studio ruotano piano, così i riflessi scorrono anche a simbolo fermo
+    // (nel silenzio fra il clic e la linea anche le luci si fermano: il fotogramma resta immobile)
+    const lightT = time < LOCK[0] ? time : time < SILENZIO_A ? LOCK[0] : time - (SILENZIO_A - LOCK[0]);
+    stage.setChrome(1, Math.sin(lightT * 0.35) * 0.5);
+    story?.update(time, engine.width, engine.height);
+    // camera cinematografica nell'intro: giri più ampi, che rientrano prima dell'incastro
+    const amp = 1 + 0.7 * (1 - Math.min(1, Math.max(0, (time - (LOCK[2] - 0.6)) / 0.6)));
+    state.az *= amp;
+    state.el *= amp;
     stage.apply(state, engine.camera, engine.width, engine.height);
     backdrop.apply(state, engine.bgCamera, engine.width, engine.height, scrollY);
     claim.forEach((el, i) => {
@@ -171,7 +186,7 @@ export async function start(caps: Capabilities) {
     });
     // la linea: testa e coda sono percentuali della sua lunghezza
     sweep.style.clipPath = `inset(0 ${((1 - state.sweepHead) * 100).toFixed(2)}% 0 ${(state.sweepTail * 100).toFixed(2)}%)`;
-    engine.render();
+    engine.render(story ? () => story.render(engine.renderer, engine.width, engine.height, engine.dpr) : undefined);
   };
 
   measureSlot();

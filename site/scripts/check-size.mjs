@@ -9,7 +9,7 @@ const sum = (re) => files.filter((f) => re.test(f)).reduce((s, f) => s + gz(f), 
 
 const checks = [
   ['JS delle pagine (landing, privacy, comune)', sum(/^(main|privacy|i18n)-.*\.js$/), 60],
-  ['JS animazione (three + gsap)', sum(/^app-.*\.js$/), 190],
+  ['JS animazione (three + gsap)', sum(/^app-.*\.js$/), 200],
   ['CSS', sum(/\.css$/), 20],
 ];
 let ok = true;

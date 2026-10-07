@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import { PNG } from 'pngjs';
 import { DURATION as END, LOCK, LOOP_PERIOD, LOOP_START, SILENZIO_A, TIMES, TW_ERASE, TW_HOLD, TW_START } from '../../src/gl/timeline';
-import { brightPixels, brightness, canvasHash, darkPixels, maxChannels, openFilm, peakColumn, sample, seek } from './helpers';
+import { brightPixels, brightness, canvasHash, darkPixels, meanColor, openFilm, peakColumn, sample, seek, whiteShare } from './helpers';
 
 const LIME = [200, 242, 90];
 const FOREST = [16, 38, 27];
@@ -49,21 +49,24 @@ test('ogni atto disegna qualcosa', async ({ page }) => {
   }
 });
 
-test('colori del brand esatti: barre Lime su Forest, poi al clic logo Forest su Lime', async ({ page }) => {
+test('colori del brand: barre Lime metallico su Forest, poi al clic logo Forest metallico su Lime', async ({ page }) => {
   await openFilm(page);
-  await seek(page, TIMES.deploy); // prima del clic: fondo Forest, barre Lime
+  await seek(page, TIMES.deploy); // prima del clic: fondo Forest esatto, barre Lime metallico
   near(await sample(page, 0.03, 0.03, 8), FOREST, 2);
+  // il metallo modula il colore ma non lo cambia: in media le barre restano Lime
+  const bars = await brightPixels(page, 0.02, 0.05, 0.98, 0.95);
+  expect(bars.length).toBeGreaterThan(200);
+  near(meanColor(bars), LIME, 30);
   await seek(page, LOCK_T - 0.05);
   near(await sample(page, 0.03, 0.03, 8), FOREST, 2);
   await seek(page, LOCK_T + 0.05); // il clic dell'ultima barra: lo schermo passa al Lime
   near(await sample(page, 0.03, 0.03, 8), LIME, 2);
   await seek(page, END);
-  // finale: fondo Lime al valore, logo tutto Forest esatto (nessuna sfumatura rimasta)
+  // finale: fondo Lime al valore, logo Forest metallico: in media resta Forest
   near(await sample(page, 0.03, 0.5, 8), LIME, 2);
-  // il logo ora è piccolo, nell'header: si conta pixel per pixel
   const ink = await darkPixels(page, 0, 0, 0.5, 0.2, 1);
   expect(ink.length).toBeGreaterThan(150);
-  for (const px of ink) near(px, FOREST, 2);
+  near(meanColor(ink), FOREST, 14);
 });
 
 test('il tempo fermo dà sempre lo stesso fotogramma (anche tornando indietro)', async ({ page }) => {
@@ -142,12 +145,11 @@ test('supergrafica: entra con la linea del finale e continua a muoversi, Lime De
   expect(await canvasHash(page)).not.toBe(h1);
 });
 
-test('nessun bagliore: neppure un pixel supera il Lime del brand, in nessun momento', async ({ page }) => {
+test('nessun bagliore: i lampi bianchi del metallo restano piccoli riflessi, in nessun momento', async ({ page }) => {
   await openFilm(page);
   for (const t of [TIMES.linea, TIMES.segreto, TIMES.deploy, LOCK_T + 0.05, TIMES.silenzio, TIMES.linea_finale, TIMES.logo, END]) {
     await seek(page, t);
-    const m = await maxChannels(page);
-    LIME.forEach((v, i) => expect(m[i], `t=${t} canale ${i}`).toBeLessThanOrEqual(v));
+    expect(await whiteShare(page), `t=${t}`).toBeLessThan(0.005);
   }
 });
 
@@ -202,16 +204,14 @@ for (const tier of ['high', 'mid', 'mobile']) {
     await seek(page, TIMES.deploy);
     const lit = await brightPixels(page, 0.02, 0.05, 0.98, 0.95);
     expect(lit.length).toBeGreaterThan(200);
-    // con l'antialiasing i bordi sono sfumature più scure del Lime: niente è più chiaro
-    for (const px of lit) LIME.forEach((v, i) => expect(px[i]).toBeLessThanOrEqual(v + 3));
+    // Lime metallico: in media il colore resta quello del brand
+    near(meanColor(lit), LIME, 30);
     near(await sample(page, 0.03, 0.03, 8), FOREST, 3);
     await seek(page, END);
-    // finale: il logo è Forest esatto (i bordi sfumano verso il Lime del fondo)
+    // finale: il logo è Forest metallico, in media Forest (piccolo: i bordi sfumati verso il Lime pesano di più)
     const ink = await darkPixels(page, 0, 0, 0.5, 0.2, 1);
     expect(ink.length).toBeGreaterThan(150);
-    const exact = ink.filter((px) => px.every((v, i) => Math.abs(v - FOREST[i]) <= 3));
-    // il logo è piccolo: i bordi sfumati pesano di più, ma il Forest esatto resta la maggioranza
-    expect(exact.length / ink.length, 'quota di Forest esatto').toBeGreaterThan(0.6);
+    near(meanColor(ink), FOREST, 20);
     near(await sample(page, 0.03, 0.5, 8), LIME, 3);
     expect(errors).toEqual([]);
   });

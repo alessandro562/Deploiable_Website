@@ -52,11 +52,13 @@ export class Engine {
     return true;
   }
 
-  render() {
+  /** extra: un passaggio disegnato sopra a tutto (il racconto a scorrimento sotto l'hero). */
+  render(extra?: () => void) {
     this.renderer.clear();
     this.renderer.render(this.bgScene, this.bgCamera);
     this.renderer.clearDepth();
     this.renderer.render(this.scene, this.camera);
+    extra?.();
   }
 
   /** Attende che la GPU abbia finito di disegnare: serve ai test e al render del video, mai nel ciclo normale. */

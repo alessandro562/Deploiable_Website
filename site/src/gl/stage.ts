@@ -64,6 +64,14 @@ export class Stage {
     this.slot = slot;
   }
 
+  /** Metallo nel colore del brand sulle barre; envRot fa ruotare le luci dello studio nei riflessi. */
+  setChrome(v: number, envRot = 0) {
+    for (const b of this.bars) {
+      b.mat.uniforms.uChrome.value = v;
+      b.mat.uniforms.uEnvRot.value = envRot;
+    }
+  }
+
   /** A pagina scorsa il logo dell'header lo mostra l'SVG sopra la barra di vetro: il 3D si nasconde. */
   setHidden(hidden: boolean) {
     this.hidden = hidden;

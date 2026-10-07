@@ -14,8 +14,8 @@ export const LAUNCH = 'Coming soon';
 
 const TAGLINE = 'We make AI deployable.'; // resta in inglese in entrambe le lingue: il gioco di parole vive solo così
 const SUB = {
-  it: 'Troviamo dove l’AI ripaga, costruiamo il prodotto e misuriamo il risultato.',
-  en: 'We find where AI pays off, build the product, and measure the result.',
+  it: 'Mappiamo i processi, costruiamo agenti AI su misura e ne misuriamo l’impatto.',
+  en: 'We map your processes, build tailored AI agents and measure their impact.',
 };
 
 const DICT = {
@@ -45,6 +45,13 @@ const DICT = {
     'msg.error': 'Invio non riuscito: controlla la connessione e riprova.',
     'msg.closed': 'Le richieste si aprono a brevissimo.',
     'proof.line': 'clienti dal 2021',
+    'story.label': 'Come lavoriamo',
+    'story.1': 'Mappiamo i tuoi processi.',
+    'story.1s': 'Troviamo dove l’AI ti rende più efficiente e riduce l’errore umano.',
+    'story.2': 'Costruiamo agenti su misura.',
+    'story.2s': 'Agenti e skill progettati per te, testati e messi in produzione sui tuoi sistemi.',
+    'story.3': 'Misuriamo l’impatto.',
+    'story.3s': 'Governance e KPI per vedere ogni giorno cosa cambia davvero.',
     'foot.mark': 'Deploiable è un marchio di WDA srl',
     'foot.vat': 'P.IVA e C.F.',
     'foot.pec': 'PEC',
@@ -81,6 +88,13 @@ const DICT = {
     'msg.error': 'Sending failed: check your connection and try again.',
     'msg.closed': 'Requests open very soon.',
     'proof.line': 'clients since 2021',
+    'story.label': 'How we work',
+    'story.1': 'We map your processes.',
+    'story.1s': 'We find where AI makes you more efficient and cuts human error.',
+    'story.2': 'We build tailored agents.',
+    'story.2s': 'Agents and skills designed for you, tested and deployed on your systems.',
+    'story.3': 'We measure the impact.',
+    'story.3s': 'Governance and KPIs to see, every day, what really changes.',
     'foot.mark': 'Deploiable is a trademark of WDA srl',
     'foot.vat': 'VAT no. & tax code',
     'foot.pec': 'Certified email',
