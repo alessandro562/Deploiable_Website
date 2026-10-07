@@ -319,7 +319,7 @@ test('richiesta review: validazione, avviso email personale, invio ad Apps Scrip
   await expect(page.locator('#signup-email')).toHaveAttribute('aria-invalid', 'true');
   await expect(page.locator('#signup-email')).toBeFocused();
   // il bordo spesso è sulla capsula (desktop) o sul campo stesso (telefono, campi in colonna)
-  const errSel = page.viewportSize()!.width <= 640 ? '#signup-email' : '.signup-row';
+  const errSel = '.signup-field:has(#signup-email)';
   await expect.poll(() => page.locator(errSel).evaluate((el) => getComputedStyle(el).boxShadow)).toContain('2.5px');
   expect(await note.evaluate((el) => getComputedStyle(el).color)).toBe('rgb(16, 38, 27)');
 
@@ -467,7 +467,10 @@ test('la supergrafica non tocca mai un testo, a nessuna larghezza', async ({ pag
         expect(overlap, `${w}x${h} t=${t}: supergrafica sopra un testo`).toBe(false);
       }
       // e sui pixel: dentro i riquadri dei testi non c'è la faccia Lime Deep della supergrafica
+      // (i campi del modulo sono Lime Deep di loro: si nascondono per la misura)
+      await page.addStyleTag({ content: '.signup-field { visibility: hidden !important; }' });
       const png = PNG.sync.read(await page.screenshot());
+      await page.evaluate(() => document.querySelectorAll('style').forEach((s) => s.textContent?.includes('.signup-field { visibility') && s.remove()));
       let deep = 0;
       for (const r of texts)
         for (let y = Math.max(0, Math.floor(r.y0)); y < Math.min(png.height, Math.ceil(r.y1)); y++)

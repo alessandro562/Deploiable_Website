@@ -35,7 +35,7 @@ export async function start(caps: Capabilities) {
   const backdrop = new Backdrop(engine.bgScene);
   // il racconto a scorrimento sotto l'hero (la sezione è nell'HTML: senza 3D resta una pagina statica)
   const storyEl = document.querySelector<HTMLElement>('.story');
-  const story = storyEl ? new Story(storyEl) : null;
+  const story = storyEl ? new Story(storyEl, testMode) : null;
 
   const claim = Array.from(document.querySelectorAll<HTMLElement>('.claim .line'));
   const sweep = document.querySelector<HTMLElement>('.sweep')!;

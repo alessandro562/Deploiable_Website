@@ -36,7 +36,7 @@ test('tastiera: ordine di tabulazione logico e focus sempre visibile', async ({ 
       const id = el.dataset.lang ? `lang-${el.dataset.lang}` : el.id || (el.closest('.foot') ? 'foot-link' : el.tagName.toLowerCase() + (el.closest('.consent') ? '-consent' : ''));
       // focus visibile: un contorno sull'elemento, sulla capsula del modulo o sulla casella del consenso
       const ring = (e: Element | null) => !!e && getComputedStyle(e).outlineStyle !== 'none' && parseFloat(getComputedStyle(e).outlineWidth) >= 2 && getComputedStyle(e).outlineColor !== 'rgba(0, 0, 0, 0)';
-      const visible = ring(el) || ring(el.closest('.signup-row')) || ring(el.parentElement?.querySelector('.consent-box') ?? null);
+      const visible = ring(el) || ring(el.closest('.signup-field')) || ring(el.parentElement?.querySelector('.consent-box') ?? null);
       return { id, visible };
     });
     seen.push(info.id);

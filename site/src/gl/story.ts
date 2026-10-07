@@ -78,7 +78,19 @@ function shadowMaterial(sharp: number) {
   });
 }
 
-type Bar = { mesh: Mesh; mat: ShaderMaterial; contact: Mesh; penumbra: Mesh };
+type Bar = {
+  mesh: Mesh;
+  mat: ShaderMaterial;
+  contact: Mesh;
+  penumbra: Mesh;
+  center: Vector3; // centro visivo della barra, nelle sue coordinate (la mesh è centrata sul perno)
+  size: Vector3; // ingombro della barra
+};
+
+// Luce principale dello studio (dall'alto, da sinistra e da davanti): le ombre cadono dalla parte opposta.
+// Lo studio ha una luce morbida e alta, quindi lo spostamento è ridotto rispetto a una luce puntiforme.
+const LIGHT = new Vector3(-0.55, 0.75, 0.45).normalize();
+const SHADOW_DRIFT = 0.45;
 
 export class Story {
   private readonly scene = new Scene();
@@ -93,9 +105,12 @@ export class Story {
   private visible = false;
   private readonly tmp = new Vector3();
   private pointer = { x: 0, y: 0, tx: 0, ty: 0 };
+  // lo scorrimento arriva a scatti (rotellina, trackpad): il racconto lo insegue con una molla smorzata,
+  // così ogni movimento parte e si ferma morbido; in modalità test segue lo scorrimento all'istante
+  private spring = { x: NaN, v: 0, last: 0 };
   progress = -1;
 
-  constructor(section: HTMLElement) {
+  constructor(section: HTMLElement, private readonly instant = false) {
     this.section = section;
     this.steps = Array.from(section.querySelectorAll<HTMLElement>('.act'));
     const lime = new Color(COLORS.lime);
@@ -156,7 +171,9 @@ export class Story {
         m.frustumCulled = false;
         this.room.add(m);
       }
-      this.bars.push({ mesh, mat, contact, penumbra });
+      geo.geometry.computeBoundingBox();
+      const bb = geo.geometry.boundingBox!;
+      this.bars.push({ mesh, mat, contact, penumbra, center: bb.getCenter(new Vector3()), size: bb.getSize(new Vector3()) });
     }
     this.group.scale.z = DEPTH;
     this.scene.add(this.group);
@@ -184,7 +201,25 @@ export class Story {
     const r = this.section.getBoundingClientRect();
     this.rect = { top: r.top, bottom: r.bottom };
     this.visible = r.bottom > 0 && r.top < height;
-    const s = (-r.top / Math.max(1, r.height - height)) * (STAGES - 1);
+    const target = (-r.top / Math.max(1, r.height - height)) * (STAGES - 1);
+    const now = performance.now();
+    const sp = this.spring;
+    const dt = Math.min(0.05, (now - sp.last) / 1000);
+    sp.last = now;
+    if (this.instant || Number.isNaN(sp.x) || Math.abs(target - sp.x) > 2.5) {
+      sp.x = target;
+      sp.v = 0;
+    } else {
+      // molla smorzata criticamente (circa 0,25 s per assestarsi): niente rimbalzi, niente scatti
+      const k = 70;
+      const c = 2 * Math.sqrt(k);
+      for (let t = dt; t > 0; t -= 1 / 240) {
+        const h = Math.min(t, 1 / 240);
+        sp.v += (k * (target - sp.x) - c * sp.v) * h;
+        sp.x += sp.v * h;
+      }
+    }
+    const s = sp.x;
     this.progress = s;
 
     // testi: entrano e restano fermi per buona parte dello step, poi escono salendo
@@ -219,43 +254,58 @@ export class Story {
     const breathe = Math.sin(time * 0.5) * 0.035 * (1 - front);
     const yaw = -0.6 * (1 - front) + breathe;
     this.group.rotation.set(0.1 * (1 - front), yaw, 0);
+    // nella chiusura il simbolo, di fronte, fluttua piano su e giù (l'ombra respira con lui)
+    this.group.position.y = front * Math.sin(time * 0.9) * SYMBOL_H * 0.045;
     const g = 1 + 0.035 * click;
     this.group.scale.set(g, g, DEPTH * g);
     this.group.updateMatrixWorld();
 
-    // ombre: seguono la barra e la sua rotazione; più alta è la barra, più l'ombra si allarga e si schiarisce;
-    // il vetro ne fa una leggera, il metallo una piena
+    // ombre: sotto il centro reale di ogni barra, spostate dalla parte opposta alla luce quanto più la barra è
+    // alta, allungate come la barra e ruotate con lei; più è alta, più si allargano e si schiariscono.
+    // Il vetro ne fa una leggera, il metallo una piena.
     ORDER.forEach((b, i) => {
-      const { mesh, contact, penumbra } = this.bars[b];
-      mesh.getWorldPosition(this.tmp);
+      const { mesh, contact, penumbra, center, size } = this.bars[b];
+      this.tmp.copy(center);
+      mesh.localToWorld(this.tmp);
       const k = smooth(i - 0.85, i - 0.25, s);
-      const lift = Math.max(0, this.tmp.y - FLOOR) / SYMBOL_H; // distanza dal pavimento, in altezze di simbolo
+      const h = Math.max(0, this.tmp.y - FLOOR); // altezza dal pavimento
+      const lift = h / SYMBOL_H;
+      const sx = this.tmp.x - (LIGHT.x / LIGHT.y) * h * SHADOW_DRIFT;
+      const sz = this.tmp.z - (LIGHT.z / LIGHT.y) * h * SHADOW_DRIFT;
       const strength = k * (0.35 + 0.65 * metals[b]);
       const turn = yaw + mesh.rotation.y;
-      const across = Math.max(0.4, Math.abs(Math.cos(mesh.rotation.x)));
+      const across = Math.max(0.45, Math.abs(Math.cos(mesh.rotation.x)));
+      const len = size.x * g;
+      const depth = size.z * DEPTH * g;
       contact.rotation.set(-Math.PI / 2, 0, -turn);
-      contact.position.set(this.tmp.x + SYMBOL_W * 0.04, FLOOR + 0.03, this.tmp.z + 0.6);
-      contact.scale.set(SYMBOL_W * 0.62 * (1 + lift * 0.3), SYMBOL_H * 0.2 * across * (1 + lift * 0.4), 1);
-      (contact.material as ShaderMaterial).uniforms.uOpacity.value = strength * 0.34 / (1 + lift * 1.6);
+      contact.position.set(sx, FLOOR + 0.03, sz);
+      contact.scale.set(len * 1.0 * (1 + lift * 0.25), depth * 1.5 * across * (1 + lift * 0.35), 1);
+      (contact.material as ShaderMaterial).uniforms.uOpacity.value = (strength * 0.32) / (1 + lift * 1.4);
       penumbra.rotation.set(-Math.PI / 2, 0, -turn);
-      penumbra.position.set(this.tmp.x + SYMBOL_W * 0.1, FLOOR + 0.02, this.tmp.z + 1.4);
-      penumbra.scale.set(SYMBOL_W * 1.05 * (1 + lift * 0.5), SYMBOL_H * 0.55 * (1 + lift * 0.5), 1);
-      (penumbra.material as ShaderMaterial).uniforms.uOpacity.value = strength * 0.16 / (1 + lift);
+      penumbra.position.set(sx, FLOOR + 0.02, sz);
+      penumbra.scale.set(len * 1.45 * (1 + lift * 0.4), depth * 3.2 * (1 + lift * 0.5), 1);
+      (penumbra.material as ShaderMaterial).uniforms.uOpacity.value = (strength * 0.14) / (1 + lift);
     });
 
     const narrow = width < 760;
     const aspect = width / height;
+    // negli step la camera guarda appena dall'alto (si leggono pavimento, ombre e curva dello studio); nella
+    // chiusura scende all'altezza del simbolo e lo guarda dritto, con un obiettivo più lungo (prospettiva piatta)
+    this.camera.fov = 28 - 12 * front;
     const tan = Math.tan((this.camera.fov * Math.PI) / 360);
-    const fitH = SYMBOL_H / ((narrow ? 0.32 : 0.52) * 2 * tan);
+    const fitH = SYMBOL_H / ((narrow ? 0.32 : 0.52 - 0.1 * front) * 2 * tan);
     const fitW = SYMBOL_W / ((narrow ? 0.62 : 0.4) * 2 * tan * aspect);
-    const d = Math.max(fitH, fitW) * (1 + 0.16 * front);
+    const d = Math.max(fitH, fitW);
     this.pointer.x += (this.pointer.tx - this.pointer.x) * 0.05;
     this.pointer.y += (this.pointer.ty - this.pointer.y) * 0.05;
-    // camera appena sopra il simbolo: si vedono il pavimento, le ombre e la curva dello studio
-    this.camera.position.set(this.pointer.x * d * 0.08, d * (0.14 - this.pointer.y * 0.05), d);
-    this.camera.lookAt(0, -SYMBOL_H * 0.2, 0);
+    const tilt = 1 - front;
+    this.camera.position.set(this.pointer.x * d * 0.06, d * (0.14 * tilt - this.pointer.y * 0.04), d);
+    this.camera.lookAt(0, -SYMBOL_H * 0.2 * tilt, 0);
     this.camera.aspect = aspect;
-    this.camera.setViewOffset(width, height, narrow ? 0 : -width * 0.2, narrow ? height * 0.17 : 0, width, height);
+    // composizione: negli step simbolo a destra del testo; nella chiusura al centro, sopra la frase e il pulsante
+    const shiftX = narrow ? 0 : -width * 0.2 * tilt;
+    const shiftY = narrow ? height * 0.17 : height * 0.17 * front;
+    this.camera.setViewOffset(width, height, shiftX, shiftY, width, height);
     this.camera.updateMatrixWorld();
     for (const { mat } of this.bars) mat.uniforms.uCam.value.copy(this.camera.position);
   }
