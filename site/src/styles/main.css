@@ -291,6 +291,8 @@ p {
   display: flex;
   flex-direction: column;
   align-items: center;
+  /* larga quanto la colonna dell'hero (mai più dello schermo): il modulo dentro si adatta */
+  width: min(100%, 760px);
   visibility: hidden;
   /* stesso spazio "a inchiostro" fra logo e frase e fra sottotitolo e blocco (misurato con scripts/align.mjs) */
   margin-top: calc(var(--claim-fs) * 0.13);
@@ -341,7 +343,6 @@ p {
   gap: 14px;
   width: min(100%, 760px);
 }
-/* Desktop: una capsula sola con i due campi e il pulsante. */
 /* Il modulo ha la forma del simbolo: tre parallelogrammi stondati inclinati di 8°, in fila e incastrati;
    i due campi in Lime Deep pieno, il pulsante in Forest. Il contenuto è controinclinato e resta dritto. */
 .signup-row {
