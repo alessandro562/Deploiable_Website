@@ -42,7 +42,7 @@ export async function start(caps: Capabilities) {
   const sweep = document.querySelector<HTMLElement>('.sweep')!;
   const outro = document.querySelector<HTMLElement>('.outro')!;
   // la pillola di conferma prende il posto del modulo: entra con lui
-  const outroItems = [['.sub'], ['.soon'], ['.offer'], ['.signup', '.signup-done'], ['.signup-note'], ['.proof']].map((sel) =>
+  const outroItems = [['.sub'], ['.soon'], ['.offer-title', '.offer'], ['.signup', '.signup-done'], ['.signup-note'], ['.proof']].map((sel) =>
     sel.map((q) => document.querySelector<HTMLElement>(q)!),
   );
   const slotEl = document.querySelector<HTMLElement>('.logo-slot')!;
@@ -90,7 +90,7 @@ export async function start(caps: Capabilities) {
   let paused = false;
 
   // I testi che la supergrafica non deve mai toccare (in coordinate della pagina, non della finestra).
-  const textSel = '.lang, .claim .line, .sub, .soon, .offer, .signup, .signup-done, .signup-note, .proof, .clients, .foot';
+  const textSel = '.lang, .claim .line, .sub, .soon, .offer-title, .offer, .signup, .signup-done, .signup-note, .proof, .clients, .foot';
   let scrollY = window.scrollY;
   let moved = true; // la pagina si è mossa dall'ultimo disegno: il segnaposto del logo va rimisurato
   const measureSlot = () => {
