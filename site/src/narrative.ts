@@ -26,11 +26,13 @@ const ANCHOR_TALL = 0.94;
 
 /** Avanzamento di un capitolo che ne attraversa uno o due stati: il passaggio avviene mentre il testo entra, e
  *  lo stato resta fermo mentre lo si legge. */
-function chapterP(range: [number, number], c: number) {
+function chapterP(range: [number, number], c: number, tall: boolean) {
   const [a, b] = range;
   if (b - a === 0) return a;
   if (b - a === 1) return a + smooth(clamp((c - 0.08) / 0.42));
-  // due passaggi: il primo entrando, il secondo mentre si legge
+  // due passaggi: il primo entrando, il secondo mentre si legge. Su telefono il testo passa sotto la scena dopo
+  // metà capitolo: entrambi i passaggi finiscono prima, mentre il testo è ancora visibile
+  if (tall) return a + smooth(clamp(c / 0.2)) + smooth(clamp((c - 0.24) / 0.22));
   return a + smooth(clamp((c - 0.02) / 0.3)) + smooth(clamp((c - 0.46) / 0.34));
 }
 
@@ -115,7 +117,7 @@ export function initNarrative(opts: { reduced: boolean; test: boolean }) {
     for (let i = 0; i < chaps.length; i++) {
       const c = (anchor - chapTops[i]) / Math.max(1, chapHs[i]);
       if (c < 0) break;
-      p = chapterP(RANGE[i], Math.min(c, 1));
+      p = chapterP(RANGE[i], Math.min(c, 1), tall);
     }
     return p;
   };

@@ -37,7 +37,7 @@ export async function start(caps: Capabilities) {
   const sweep = document.querySelector<HTMLElement>('.sweep')!;
   const outro = document.querySelector<HTMLElement>('.outro')!;
   // sottotitolo, etichetta, pulsanti, prova sociale e navigazione entrano uno dopo l'altro
-  const outroItems = [['.sub'], ['.soon'], ['.hero-ctas', '.nav'], ['.proof']].map((sel) => sel.map((q) => document.querySelector<HTMLElement>(q)!));
+  const outroItems = [['.sub'], ['.soon'], ['.hero-ctas'], ['.proof']].map((sel) => sel.map((q) => document.querySelector<HTMLElement>(q)!));
   const navEl = document.querySelector<HTMLElement>('.nav')!;
   const heroEl = document.querySelector<HTMLElement>('.hero')!;
   const slotEl = document.querySelector<HTMLElement>('.logo-slot')!;
@@ -195,6 +195,9 @@ export async function start(caps: Capabilities) {
         el.style.opacity = e.toFixed(3);
         el.style.transform = `translate3d(0, ${((1 - e) * 10).toFixed(2)}px, 0)`;
       }
+      // la navigazione entra con i pulsanti, solo in dissolvenza: una trasformazione farebbe da riferimento al
+      // pannello del menu (position: fixed) e lo stringerebbe nella navigazione
+      if (i === 2) navEl.style.opacity = e.toFixed(3);
     });
     // la linea: testa e coda sono percentuali della sua lunghezza
     sweep.style.clipPath = `inset(0 ${((1 - state.sweepHead) * 100).toFixed(2)}% 0 ${(state.sweepTail * 100).toFixed(2)}%)`;

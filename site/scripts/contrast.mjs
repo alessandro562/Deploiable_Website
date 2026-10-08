@@ -31,19 +31,31 @@ for (const path of pages) {
       const b = bg.match(/[\d.]+/g).map(Number);
       return `rgb(${[0, 1, 2].map((i) => Math.round(f[i] * f[3] + b[i] * (1 - f[3]))).join(', ')})`;
     };
+    // fondo reale: il primo fondo non trasparente risalendo; i fondi semitrasparenti (le schede degli esempi) si
+    // compongono su quello che c'è sotto
     const bgOf = (el) => {
+      const layers = [];
       for (let e = el; e; e = e.parentElement) {
         const c = getComputedStyle(e).backgroundColor;
-        if (c && !c.endsWith(', 0)') && c !== 'transparent') return c;
-        // nel racconto in 3D il fondo lo disegna il canvas: Forest negli step, Lime nella chiusura
-        if (e.classList.contains('story') && document.documentElement.classList.contains('is-webgl')) {
-          return el.closest('.act--end') ? 'rgb(200, 242, 90)' : 'rgb(16, 38, 27)';
-        }
+        if (!c || c === 'transparent' || c.endsWith(', 0)')) continue;
+        layers.push(c);
+        const a = c.match(/[\d.]+/g).map(Number);
+        if (a.length < 4 || a[3] >= 1) break;
       }
-      return getComputedStyle(document.body).backgroundColor;
+      let bg = layers.pop() ?? 'rgb(255, 255, 255)';
+      while (layers.length) bg = flat(layers.pop(), bg);
+      return bg;
     };
     const out = [];
-    const sel = '.lang button, .sub, .soon, .signup-row input, .signup button, .consent-text, .consent a, .signup-note, .proof-line, .client-ph, .foot p, .foot dt, .foot dd, .foot a, .claim .line, .act-kicker, .act-title, .act-sub, .act-claim, .act-cta span, .doc-body p, .doc-body h2, .doc-draft, .doc-updated, .doc-back a';
+    const sel = [
+      '.lang button, .nav-list a, .soon, .claim .line, .sub, .hero-ctas .btn span, .proof-line',
+      '.kicker, .chap-title, .chap-text, .chap-paths li, .chap-claim span, .chap-claim strong, .chap-big, .chap-link span',
+      '.sec-title, .sec-lead, .sec-note, .cap-title, .cap-text, .step-num, .step-title, .step-text',
+      '.case-tag, .case-title, .case-text, .flow-step, .flow-arrow, .flow-plus',
+      '.contact-title, .contact-lead, .offer-title, .offer, .paths-legend, .path-num, .path-title, .path-text',
+      '.signup-row input, .signup button, .consent-text, .consent a, .signup-note, .foot p, .foot dt, .foot dd, .foot a',
+      '.doc-body p, .doc-body h2, .doc-draft, .doc-updated, .doc-back a',
+    ].join(', ');
     for (const el of document.querySelectorAll(sel)) {
       const cs = getComputedStyle(el);
       const bg = bgOf(el);

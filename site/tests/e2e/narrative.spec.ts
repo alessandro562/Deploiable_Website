@@ -100,6 +100,9 @@ test('header: vetro scuro sopra le sezioni Forest, chiaro sopra il contatto; i l
     await page.click('.nav-toggle');
     await expect(page.locator('.nav-toggle')).toHaveAttribute('aria-expanded', 'true');
     await expect(page.locator('#nav-list')).toBeVisible();
+    // il pannello è largo quanto lo schermo (nessun antenato trasformato lo stringe)
+    const box = (await page.locator('#nav-list').boundingBox())!;
+    expect(box.width).toBeGreaterThan(page.viewportSize()!.width - 40);
     await page.keyboard.press('Escape');
     await expect(page.locator('#nav-list')).toBeHidden();
     await page.click('.nav-toggle');

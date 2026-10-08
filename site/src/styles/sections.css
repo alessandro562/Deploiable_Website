@@ -136,6 +136,7 @@
     box-shadow: 0 24px 48px -24px rgb(0 0 0 / 0.5), inset 0 0 0 1px rgb(241 243 234 / 0.08);
   }
   .nav-open .nav-list a {
+    display: flex;
     height: 56px;
     padding: 0 var(--s-2);
     border-bottom: 1px solid rgb(241 243 234 / 0.08);

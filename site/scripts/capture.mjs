@@ -25,12 +25,13 @@ const browser = await chromium.launch({ args: ['--use-angle=swiftshader', '--use
 const ctx = await browser.newContext(
   mobile
     ? { viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true }
-    : { viewport: { width: 1920, height: 1080 }, deviceScaleFactor: 1 },
+    : { viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1 },
 );
 const page = await ctx.newPage();
 const errors = [];
 page.on('pageerror', (e) => errors.push(e.message));
 page.on('console', (m) => m.type() === 'error' && errors.push(m.text()));
+// l'intro è disegnata con seek() a ogni fotogramma; il resto (racconto, frammenti, scorrimenti) segue page.clock
 // il modulo invia a un indirizzo finto, intercettato qui: nessuna richiesta arriva a sistemi veri
 await page.route('https://form.mock/**', (r) => r.fulfill({ status: 200, body: 'ok' }));
 await page.addInitScript((mobile) => {
@@ -65,14 +66,27 @@ for (let i = 0; i < 600; i++) {
 }
 
 let frame = 0;
-let ptr = { x: mobile ? 195 : 960, y: mobile ? 600 : 700, o: 0 };
+let ptr = { x: mobile ? 195 : 720, y: mobile ? 600 : 600, o: 0 };
 const walls = [];
 let lastWall = Date.now();
+const prof = { clock: 0, seek: 0, shot: 0 };
 async function shot() {
+  let t = Date.now();
   await page.clock.runFor(1000 / FPS);
-  await page.evaluate(([x, y, o]) => window.__pointer?.(x, y, o), [ptr.x, ptr.y, ptr.o]);
+  prof.clock += Date.now() - t;
+  t = Date.now();
+  // l'intro 3D segue il tempo del video esattamente (seek disegna quel fotogramma e attende la GPU)
+  await page.evaluate(([s, x, y, o]) => (window.__DEPLOIABLE__?.seek?.(s), window.__pointer?.(x, y, o)), [frame / FPS, ptr.x, ptr.y, ptr.o]);
+  prof.seek += Date.now() - t;
+  t = Date.now();
   await page.screenshot({ path: `${dir}/${String(frame).padStart(5, '0')}.jpg`, type: 'jpeg', quality: 92 });
+  prof.shot += Date.now() - t;
   frame++;
+  if (frame % 30 === 0 && process.env.PROF) {
+    console.log(`  ${frame}: clock ${(prof.clock / 30) | 0} ms, seek ${(prof.seek / 30) | 0} ms, screenshot ${(prof.shot / 30) | 0} ms`);
+    prof.clock = prof.seek = prof.shot = 0;
+  }
+  if (process.env.MAX_FRAMES && frame >= Number(process.env.MAX_FRAMES)) process.exit(0);
   // le animazioni CSS vanno al ritmo del video: 1/30 s per fotogramma, qualunque sia il tempo reale
   const now = Date.now();
   walls.push(now - lastWall);
@@ -165,23 +179,30 @@ const maxY = () => page.evaluate(() => document.documentElement.scrollHeight - i
 async function narrative(speed = 1) {
   const two = [false, false, true, true, false, false];
   for (let i = 0; i < 6; i++) {
-    const sway = (k) => (mobile ? null : { x: 1180 + Math.sin((i + k) * 2.1) * 260, y: 560 + Math.cos((i + k) * 1.7) * 140, o: 1 });
-    if (two[i]) {
+    const sway = (k) => (mobile ? null : { x: 1000 + Math.sin((i + k) * 2.1) * 200, y: 470 + Math.cos((i + k) * 1.7) * 110, o: 1 });
+    if (two[i] && mobile) {
+      // su telefono i due passaggi finiscono entro metà capitolo (src/narrative.ts)
+      await scroll(await yFor(i, 0.21), 2.0 * speed, ease, sway);
+      await scroll(await yFor(i, 0.25), 0.8 * speed, (k) => k, sway);
+      await scroll(await yFor(i, 0.47), 2.6 * speed, ease, sway);
+      await scroll(await yFor(i, 0.55), 1.8 * speed, (k) => k, sway);
+    } else if (two[i]) {
       await scroll(await yFor(i, 0.36), 2.4 * speed, ease, sway);
       await scroll(await yFor(i, 0.42), 1.0 * speed, (k) => k, sway);
       await scroll(await yFor(i, 0.86), 2.6 * speed, ease, sway);
       await scroll(await yFor(i, 0.93), 1.4 * speed, (k) => k, sway);
     } else {
-      await scroll(await yFor(i, i === 0 ? 0.5 : 0.56), 2.8 * speed, ease, sway);
-      await scroll(await yFor(i, i === 0 ? 0.6 : 0.66), 1.8 * speed, (k) => k, sway);
+      const a = mobile ? 0.48 : i === 0 ? 0.5 : 0.56;
+      await scroll(await yFor(i, a), 2.8 * speed, ease, sway);
+      await scroll(await yFor(i, a + (mobile ? 0.06 : 0.1)), 1.8 * speed, (k) => k, sway);
     }
   }
 }
 
 if (!mobile) {
-  // ---------------------------------------------------------------- desktop, 1920 × 1080
+  // ---------------------------------------------------------------- desktop, 1440 × 900
   await hold(8.4); // intro: il logo 3D, il passaggio al Lime, la frase che si scrive, i pulsanti
-  await move(960, 700, 0.2);
+  await move(720, 600, 0.2);
   const cta = await center('.hero-ctas .btn--solid');
   await move(cta.x, cta.y, 1.2); // passaggio sul pulsante principale
   await hold(1.0);
@@ -225,7 +246,7 @@ if (!mobile) {
   await press('.signup button[type=submit]');
   await hold(2.2);
   await scroll(await maxY(), 1.4);
-  await move(1700, 980, 0.8);
+  await move(1280, 820, 0.8);
   await hold(1.6);
 } else {
   // ---------------------------------------------------------------- telefono, 390 × 844
