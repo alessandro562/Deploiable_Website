@@ -11,7 +11,7 @@ test.describe('versione statica', () => {
     expect(await page.evaluate(() => window.__DEPLOIABLE__!.mode)).toBe('static');
     expect(scripts.some((u) => /\/app-.*\.js/.test(u))).toBe(false);
     await expect(page.locator('.logo-slot svg')).toBeVisible();
-    await expect(page.getByRole('heading', { name: /Building the AI products/ })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /Stop doing/ })).toBeVisible();
     // il logo completo sta sopra la frase, e tutto dentro lo schermo
     const sym = (await page.locator('.logo-slot svg').boundingBox())!;
     const txt = (await page.locator('.claim').boundingBox())!;

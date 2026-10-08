@@ -12,10 +12,10 @@ export type Lang = 'it' | 'en';
 /** Etichetta del lancio: niente data per ora, solo "Coming soon" (in maiuscolo dal CSS), uguale nelle due lingue. */
 export const LAUNCH = 'Coming soon';
 
-const TAGLINE = 'Building the AI products companies run on.'; // resta in inglese in entrambe le lingue: breve e diretta, è la firma del brand
+const TAGLINE = 'Stop doing what AI can do.'; // resta in inglese in entrambe le lingue: breve e diretta, è la firma del brand
 const SUB = {
-  it: 'Progettiamo, sviluppiamo e integriamo prodotti AI nei tuoi processi.',
-  en: 'We design, build and integrate AI products into your processes.',
+  it: 'Individuiamo i processi ripetitivi, li ridisegniamo con AI e automazione e li integriamo nei sistemi che già usi. Passo dopo passo, da manuali ad autonomi.',
+  en: 'We identify repetitive processes, redesign them around AI and automation and integrate them with the systems you already use. Step by step, from manual to autonomous.',
 };
 
 const DICT = {
@@ -48,14 +48,15 @@ const DICT = {
     'proof.line': 'clienti dal 2021',
     'story.label': 'Come lavoriamo',
     'story.1k': 'Analisi',
-    'story.2k': 'Sviluppo',
-    'story.3k': 'Adozione',
-    'story.1': 'Partiamo dal problema.',
-    'story.1s': 'Analizziamo i processi e individuiamo dove l’AI porta un beneficio misurabile: tempo, errori, qualità delle decisioni.',
-    'story.2': 'Costruiamo il prodotto.',
-    'story.2s': 'Lo sviluppiamo su misura per te, oppure partiamo da un nostro prodotto già validato sul mercato.',
-    'story.3': 'Lo mettiamo in produzione.',
-    'story.3s': 'Integrato nei tuoi sistemi, con KPI per misurarne l’impatto e regole chiare per farlo crescere in sicurezza.',
+    'story.2k': 'Riprogettazione',
+    'story.3k': 'Autonomia',
+    'story.1': 'Troviamo il lavoro ripetitivo.',
+    'story.1s': 'Mappiamo i processi e individuiamo quelli dove AI e automazione fanno risparmiare più tempo ed errori.',
+    'story.2': 'Lo ridisegniamo con l’AI.',
+    'story.2s': 'Ripensiamo il processo attorno ad AI e automazione e lo colleghiamo ai sistemi che già usi: ERP, CRM, email, documenti.',
+    'story.3': 'Lo rendiamo autonomo, un passo alla volta.',
+    'story.3s': 'Prima l’AI assiste le persone, poi esegue da sola dove è sicuro farlo. Ogni passaggio è misurato con i KPI.',
+    'end.note': 'Dai bisogni che troviamo nelle aziende nascono anche i nostri prodotti AI-native.',
     'foot.mark': 'Deploiable è un marchio di WDA srl',
     'foot.vat': 'P.IVA e C.F.',
     'foot.pec': 'PEC',
@@ -94,15 +95,16 @@ const DICT = {
     'msg.closed': 'Requests open very soon.',
     'proof.line': 'clients since 2021',
     'story.label': 'How we work',
-    'story.1k': 'Assessment',
-    'story.2k': 'Build',
-    'story.3k': 'Adoption',
-    'story.1': 'We start from the problem.',
-    'story.1s': 'We analyse your processes and pinpoint where AI brings a measurable gain: time, errors, quality of decisions.',
-    'story.2': 'We build the product.',
-    'story.2s': 'Custom-built for you, or starting from one of our products already proven on the market.',
-    'story.3': 'We put it into production.',
-    'story.3s': 'Integrated into your systems, with KPIs to measure its impact and clear rules to scale it safely.',
+    'story.1k': 'Discovery',
+    'story.2k': 'Redesign',
+    'story.3k': 'Autonomy',
+    'story.1': 'We find the repetitive work.',
+    'story.1s': 'We map your processes and pinpoint where AI and automation save the most time and errors.',
+    'story.2': 'We redesign it around AI.',
+    'story.2s': 'We rebuild the process around AI and automation and connect it to the systems you already use: ERP, CRM, email, documents.',
+    'story.3': 'We make it autonomous, step by step.',
+    'story.3s': 'First AI assists your people, then it runs on its own where it’s safe. Every step is measured with KPIs.',
+    'end.note': 'From the needs we find in companies, we also build our own AI-native products.',
     'foot.mark': 'Deploiable is a trademark of WDA srl',
     'foot.vat': 'VAT no. & tax code',
     'foot.pec': 'Certified email',
