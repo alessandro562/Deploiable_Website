@@ -287,7 +287,7 @@ test('sul telefono le barre non escono mai dallo schermo', async ({ page }) => {
   }
 });
 
-test('coming soon e modulo: compaiono per ultimi, dentro lo schermo, sotto la frase', async ({ page }) => {
+test('coming soon e pulsanti: compaiono per ultimi, dentro lo schermo, sotto la frase', async ({ page }) => {
   await openFilm(page);
   const outro = page.locator('.outro');
   for (const t of [TIMES.deploy, TIMES.silenzio, END - 0.5]) {
@@ -305,7 +305,7 @@ test('coming soon e modulo: compaiono per ultimi, dentro lo schermo, sotto la fr
   expect(box.x + box.width).toBeLessThanOrEqual(vp.width);
 });
 
-test('richiesta review: validazione, avviso email personale, invio ad Apps Script, conferma', async ({ page }) => {
+test('contatto: strada scelta, validazione, avviso email personale, invio ad Apps Script, conferma', async ({ page }) => {
   await openFilm(page);
   await seek(page, END);
   const note = page.locator('.signup-note');
@@ -315,7 +315,7 @@ test('richiesta review: validazione, avviso email personale, invio ad Apps Scrip
   await page.fill('#signup-email', 'non-una-email');
   await submit();
   await expect(note).toHaveText(/email valido/);
-  await expect(page.locator('.outro')).toHaveAttribute('data-state', 'error');
+  await expect(page.locator('.signup-box')).toHaveAttribute('data-state', 'error');
   await expect(page.locator('#signup-email')).toHaveAttribute('aria-invalid', 'true');
   await expect(page.locator('#signup-email')).toBeFocused();
   // il bordo spesso è sulla capsula (desktop) o sul campo stesso (telefono, campi in colonna)
@@ -327,7 +327,7 @@ test('richiesta review: validazione, avviso email personale, invio ad Apps Scrip
   await page.fill('#signup-email', 'mario.rossi@gmail.com');
   await page.locator('#signup-email').blur();
   await expect(note).toHaveText(/email aziendale/);
-  await expect(page.locator('.outro')).toHaveAttribute('data-state', 'warn');
+  await expect(page.locator('.signup-box')).toHaveAttribute('data-state', 'warn');
 
   // azienda mancante, poi consenso mancante
   await submit();
@@ -340,6 +340,12 @@ test('richiesta review: validazione, avviso email personale, invio ad Apps Scrip
   // la casella non è pre-spuntata e si spunta cliccando il testo
   await page.click('.consent-text span >> nth=0');
   await expect(page.locator('#signup-consent')).toBeChecked();
+
+  // la strada: un link del racconto la preseleziona, nel modulo si può cambiare
+  await page.click('.chap-link[data-interest="transform"]');
+  await expect(page.locator('input[name="interest"][value="transform"]')).toBeChecked();
+  await page.click('.path:has(input[value="build"])');
+  await expect(page.locator('input[name="interest"][value="build"]')).toBeChecked();
 
   // invio: prima la rete fallisce, poi va
   let body = '';
@@ -357,13 +363,14 @@ test('richiesta review: validazione, avviso email personale, invio ad Apps Scrip
   await submit();
   await expect(page.locator('.signup-done')).toBeVisible();
   await expect(page.locator('.signup-done')).toHaveText(/Richiesta ricevuta/);
-  await expect(note).toHaveText('Ti contattiamo entro 3 giorni lavorativi per fissare la review.');
+  await expect(note).toHaveText('Ti ricontattiamo entro 3 giorni lavorativi.');
   await expect(page.locator('.signup')).toBeHidden();
   const sent = new URLSearchParams(body);
   expect(sent.get('email')).toBe('mario.rossi@acme.it');
   expect(sent.get('company')).toBe('Acme Srl');
   expect(sent.get('consent')).toBe('si');
   expect(sent.get('lang')).toBe('it');
+  expect(sent.get('interest')).toBe('build');
 });
 
 test('modulo: link all\'informativa, casella non spuntata, su telefono in colonna con bersagli ≥ 44 px', async ({ page }) => {
@@ -384,7 +391,7 @@ test('modulo: link all\'informativa, casella non spuntata, su telefono in colonn
     expect(b.width).toBeGreaterThan(vp.width - 2 * 48); // a tutta larghezza
   }
   await page.click('[data-lang="en"]');
-  await expect(page.locator('.signup button[type="submit"]')).toHaveText(/Book your AI process review/);
+  await expect(page.locator('.signup button[type="submit"]')).toHaveText(/Let’s talk/);
   await expect(page.locator('#signup-email')).toHaveAttribute('placeholder', 'name@company.com');
 });
 
@@ -567,7 +574,7 @@ test('header fisso: in cima trasparente col logo 3D, scorrendo barra di vetro co
   expect(await svgOpacity()).toBe('0');
 });
 
-test('prova sociale: riga di credibilità e loghi dei clienti in loop sotto il modulo', async ({ page }) => {
+test('prova sociale: riga di credibilità e loghi dei clienti in loop sotto i pulsanti', async ({ page }) => {
   const logoResponses: number[] = [];
   page.on('response', (r) => r.url().includes('/assets/clients/') && logoResponses.push(r.status()));
   await openFilm(page, '', 'high');
@@ -578,7 +585,7 @@ test('prova sociale: riga di credibilità e loghi dei clienti in loop sotto il m
   await expect(named).toHaveCount(4);
   await expect(page.locator('.clients')).not.toContainText('[CLIENTE_');
   await expect(page.locator('.clients')).not.toContainText(/green ?stone/i);
-  const form = (await page.locator('.signup').boundingBox())!;
+  const form = (await page.locator('.hero-ctas').boundingBox())!;
   const proof = (await page.locator('.proof').boundingBox())!;
   expect(proof.y).toBeGreaterThan(form.y + form.height);
   // la traccia scorre
@@ -592,29 +599,31 @@ test('prova sociale: riga di credibilità e loghi dei clienti in loop sotto il m
   await expect(page.locator('.proof-line')).toHaveText('70+ clients since 2021');
 });
 
-test('macchina da scrivere: "what AI can do." si cancella e si riscrive in ciclo, senza spostare la riga', async ({ page }) => {
+test('macchina da scrivere: la seconda riga si cancella e si riscrive in ciclo, senza spostarsi, in tutte e due le lingue', async ({ page }) => {
   await openFilm(page, '', 'high');
   const st = () => page.evaluate(() => window.__DEPLOIABLE__!.state!());
   const visible = () => page.locator('.tw .ch:not(.off)').count();
-  // il titolo resta "Stop doing what AI can do." per i lettori di schermo, qualunque cosa mostri la macchina da scrivere
-  await expect(page.getByRole('heading', { level: 1 })).toHaveAccessibleName(/Stop doing\s*what AI can do\./);
+  // il titolo resta intero per i lettori di schermo, qualunque cosa mostri la macchina da scrivere
+  await expect(page.getByRole('heading', { level: 1 })).toHaveAccessibleName(/Dai problemi di business\s*all’AI in produzione\./);
   await seek(page, END);
-  expect(await visible()).toBe(15);
+  const n = 'all’AI in produzione.'.length; // 21
+  expect(await visible()).toBe(n);
   const full = (await page.locator('.tw').boundingBox())!;
   await seek(page, TW_START + TW_HOLD + TW_ERASE * 2.5);
-  expect((await st()).tw).toBe(12);
+  expect((await st()).tw).toBe(n - 3);
   expect((await st()).caret).toBe(true);
-  expect(await visible()).toBe(12);
+  expect(await visible()).toBe(n - 3);
   await expect(page.locator('.tw-caret')).toHaveClass(/on/);
-  // la parola non si ricentra mentre si cancella
+  // la riga non si ricentra mentre si cancella
   const mid = (await page.locator('.tw').boundingBox())!;
   expect(Math.abs(mid.x - full.x)).toBeLessThanOrEqual(0.5);
-  await seek(page, TW_START + TW_HOLD + TW_ERASE * 15 + 0.2);
+  await seek(page, TW_START + TW_HOLD + TW_ERASE * n + 0.2);
   expect((await st()).tw).toBe(0);
-  // e torna intera
-  await seek(page, TW_START + 20 * 3);
-  const back = await st();
-  expect(back.tw).toBeGreaterThanOrEqual(0);
+  // cambiando lingua la riga si ridivide in lettere
+  await page.click('[data-lang="en"]');
+  await seek(page, END);
+  expect(await visible()).toBe('to production AI.'.length);
+  await expect(page.getByRole('heading', { level: 1 })).toHaveAccessibleName(/From business problems\s*to production AI\./);
 });
 
 test('il simbolo nell\'header gira quando ci si passa sopra col mouse', async ({ page }) => {

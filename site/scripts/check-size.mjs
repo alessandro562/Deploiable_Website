@@ -10,6 +10,8 @@ const sum = (re) => files.filter((f) => re.test(f)).reduce((s, f) => s + gz(f), 
 const checks = [
   ['JS delle pagine (landing, privacy, comune)', sum(/^(main|privacy|i18n)-.*\.js$/), 60],
   ['JS animazione (three + gsap)', sum(/^app-.*\.js$/), 200],
+  // il racconto e le sezioni (motore SVG, stati, frammenti): tutto il resto del JavaScript
+  ['JS racconto e sezioni (SVG)', sum(/^(?!(main|privacy|i18n|app)-).*\.js$/), 40],
   ['CSS', sum(/\.css$/), 20],
 ];
 let ok = true;

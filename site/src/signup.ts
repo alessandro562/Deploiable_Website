@@ -1,4 +1,5 @@
-// Richiesta della AI process review: email aziendale, nome azienda, consenso privacy.
+// Richiesta di contatto: la strada scelta (trasformare un processo o costruire un prodotto AI, facoltativa),
+// email aziendale, nome azienda, consenso privacy.
 //
 // Invio: Google Apps Script pubblicato come web app (vedi integrations/apps-script/README.md). L'URL arriva al
 // momento della build da VITE_SIGNUP_ENDPOINT (variabile di repository SIGNUP_ENDPOINT nel workflow di deploy).
@@ -16,10 +17,10 @@ export const isPersonalEmail = (email: string) => {
 };
 
 export function initSignup() {
-  const outro = document.querySelector<HTMLElement>('.outro');
+  const box = document.querySelector<HTMLElement>('.signup-box');
   const form = document.querySelector<HTMLFormElement>('.signup');
   const note = document.querySelector<HTMLElement>('.signup-note');
-  if (!outro || !form || !note) return;
+  if (!box || !form || !note) return;
   const email = form.querySelector<HTMLInputElement>('[name="email"]')!;
   const company = form.querySelector<HTMLInputElement>('[name="company"]')!;
   const consent = form.querySelector<HTMLInputElement>('[name="consent"]')!;
@@ -34,8 +35,8 @@ export function initSignup() {
   onLangChange(() => say(shown));
 
   const setState = (state?: 'error' | 'warn' | 'done') => {
-    if (state) outro.dataset.state = state;
-    else delete outro.dataset.state;
+    if (state) box.dataset.state = state;
+    else delete box.dataset.state;
   };
 
   // Errore: bordo più spesso e una vibrazione (CSS) sul campo da correggere, che riceve il focus.
@@ -43,7 +44,7 @@ export function initSignup() {
     for (const f of [email, company, consent]) f.toggleAttribute('aria-invalid', f === field);
     field.setAttribute('aria-invalid', 'true');
     setState();
-    void outro!.offsetWidth; // fa ripartire la vibrazione anche al secondo errore di fila
+    void box!.offsetWidth; // fa ripartire la vibrazione anche al secondo errore di fila
     setState('error');
     say(key);
     field.focus();
@@ -51,11 +52,11 @@ export function initSignup() {
 
   // Avviso morbido: email personale. Non blocca nulla.
   const warnIfPersonal = () => {
-    if (outro.dataset.state === 'error' || !email.checkValidity() || !email.value) return;
+    if (box.dataset.state === 'error' || !email.checkValidity() || !email.value) return;
     if (isPersonalEmail(email.value)) {
       setState('warn');
       say('msg.personal');
-    } else if (outro.dataset.state === 'warn') {
+    } else if (box.dataset.state === 'warn') {
       setState();
       say(null);
     }
@@ -99,6 +100,8 @@ export function initSignup() {
       consent_text: `${t('form.consent.pre')}${t('form.consent.link')}${t('form.consent.post')}`,
       lang: document.documentElement.lang,
       page: location.href,
+      // la strada scelta: "transform", "build" o vuoto (vedi integrations/apps-script/Code.gs)
+      interest: form.querySelector<HTMLInputElement>('[name="interest"]:checked')?.value ?? '',
     });
     form.setAttribute('aria-busy', 'true');
     say('msg.sending');
@@ -115,7 +118,7 @@ export function initSignup() {
 
   function finish() {
     setState('done');
-    outro!.querySelector('.signup-done')?.removeAttribute('aria-hidden');
+    box!.querySelector('.signup-done')?.removeAttribute('aria-hidden');
     say('msg.done');
   }
 }

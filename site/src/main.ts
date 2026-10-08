@@ -1,5 +1,6 @@
 import './styles/fonts.css';
 import './styles/main.css';
+import './styles/sections.css';
 import { detect } from './core/capabilities';
 import { initI18n } from './i18n';
 import { initSignup } from './signup';
@@ -8,6 +9,12 @@ initI18n();
 initSignup();
 const caps = detect();
 const root = document.documentElement;
+const q = new URLSearchParams(location.search);
+// movimento ridotto: racconto e sezioni fermi (immagini statiche dello stesso sistema); ?motion=reduced per la QA
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches || q.get('motion') === 'reduced';
+// il racconto (src/narrative.ts) e le sezioni (src/sections.ts) non dipendono dal 3D: si caricano sempre
+import('./sections').then((m) => m.initSections({ reduced }));
+import('./narrative').then((m) => m.initNarrative({ reduced, test: q.has('__test') }));
 
 function startStatic(reason?: string) {
   root.classList.remove('is-webgl');

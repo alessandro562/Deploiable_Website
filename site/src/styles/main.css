@@ -19,9 +19,10 @@
   --sans: 'Satoshi', 'Helvetica Neue', Arial, sans-serif;
   --text: 'Geist', 'Helvetica Neue', Arial, sans-serif; /* testi piccoli */
 
-  /* Il protagonista è la frase "Stop doing what AI can do.": il suo corpo è la misura di tutto il resto.
-     Dipende da larghezza e altezza, così l'hero sta sempre in una schermata con aria sopra e sotto. */
-  --claim-fs: clamp(36px, min(9vw, 9.5svh), 132px);
+  /* Il protagonista è la frase dell'hero ("Dai problemi di business / all'AI in produzione."): il suo corpo è la
+     misura di tutto il resto. Dipende da larghezza e altezza, così l'hero sta sempre in una schermata con aria
+     sopra e sotto; le righe sono lunghe, quindi resta sotto i 100 px anche sugli schermi grandi. */
+  --claim-fs: clamp(34px, min(6.1vw, 8.4svh), 100px);
   /* spazio fra frase, sottotitolo e blocco iscrizione */
   --gap: calc(var(--claim-fs) * 0.42);
   /* il logo nell'header: piccolo, in alto a sinistra (la camera 3D finale lo inquadra qui, src/gl/stage.ts) */
@@ -72,8 +73,8 @@
 @media (max-width: 640px) {
   :root {
     --t-body: 400 16px / 1.55 var(--text);
-    /* su telefono la frase occupa quasi tutta la larghezza (le due righe sono lunghe uguali) */
-    --claim-fs: clamp(34px, min(12.5vw, 11svh), 140px);
+    /* su telefono le righe vanno a capo (bilanciate): quattro righe brevi, corpo grande */
+    --claim-fs: clamp(34px, min(11.4vw, 7.4svh), 64px);
   }
 }
 
@@ -231,11 +232,25 @@ p {
   /* la frase è centrata sulla pagina */
   text-align: center;
 }
+@media (max-width: 640px) {
+  .claim {
+    white-space: normal;
+    max-width: 9.5em;
+  }
+  /* le maschere delle righe sporgono di mezzo em ai lati: su telefono non devono allargare la pagina */
+  .hero {
+    overflow-x: clip;
+  }
+  .claim .line {
+    text-wrap: balance;
+  }
+}
 .line--light {
   font-weight: 300;
   color: var(--ink-light);
-  /* centratura ottica (misurata sui pixel con scripts/align.mjs) */
-  margin-left: 0;
+  /* centratura ottica (misurata sui pixel con scripts/align.mjs): la riga leggera finisce in una "s" stretta e
+     la spaziatura negativa accorcia il riquadro a destra, così l'inchiostro cadeva ~0,045 em a destra del centro */
+  margin-left: -0.09em;
 }
 .line--black {
   font-weight: 900;
@@ -372,17 +387,12 @@ p {
   font: var(--t-body);
   font-weight: 600;
   letter-spacing: -0.01em;
-  text-align: center;
   color: var(--ink-strong);
 }
 .offer {
-  margin-bottom: var(--s-4);
-  font: var(--t-body);
-  letter-spacing: -0.005em;
-  line-height: 1.3; /* una riga sola: interlinea stretta, come un sottotitolo */
-  text-align: center;
-  text-wrap: balance;
-  color: var(--ink-light);
+  font: var(--t-small);
+  text-wrap: pretty;
+  color: var(--ink-soft);
 }
 .soon-dot {
   width: 6px;
@@ -400,9 +410,9 @@ p {
 .signup {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
   gap: var(--s-4);
-  width: min(100%, 760px);
+  width: 100%;
 }
 /* Il modulo ha la forma del simbolo: tre parallelogrammi stondati inclinati di 8°, in fila e incastrati;
    i due campi in Lime Deep pieno, il pulsante in Forest. Il contenuto è controinclinato e resta dritto. */
@@ -619,7 +629,7 @@ p {
 }
 
 /* Errore: bordo più spesso e una breve vibrazione orizzontale sul campo da correggere. */
-.outro[data-state='error'] .signup-field:has([aria-invalid='true']) {
+.signup-box[data-state='error'] .signup-field:has([aria-invalid='true']) {
   box-shadow: inset 0 0 0 2.5px var(--ink-strong);
   animation: shake-field 0.36s var(--ease);
 }
@@ -629,7 +639,7 @@ p {
   60% { transform: skewX(-8deg) translateX(-3px); }
   80% { transform: skewX(-8deg) translateX(2px); }
 }
-.outro[data-state='error'] .consent:has([aria-invalid='true']) {
+.signup-box[data-state='error'] .consent:has([aria-invalid='true']) {
   animation: shake 0.36s var(--ease);
 }
 @keyframes shake {
@@ -638,19 +648,24 @@ p {
   60% { transform: translateX(-3px); }
   80% { transform: translateX(2px); }
 }
-.outro[data-state='error'] .signup-note,
-.outro[data-state='warn'] .signup-note {
+.signup-box[data-state='error'] .signup-note,
+.signup-box[data-state='warn'] .signup-note {
   color: var(--ink-strong);
 }
 
 .signup-note {
   min-height: 1.5em; /* lo spazio del messaggio è già riservato: il layout non salta quando compare */
   margin-top: var(--s-3);
+  padding-left: calc(var(--s-1) + var(--s-5));
   font: var(--t-small);
-  text-align: center;
-  max-width: min(92vw, 440px);
-  text-wrap: balance;
+  max-width: 34em;
+  text-wrap: pretty;
   color: var(--ink-soft);
+}
+@media (max-width: 640px) {
+  .signup-note {
+    padding-left: var(--s-1);
+  }
 }
 
 /* Iscritto: il modulo lascia il posto a un blocco Forest con la spunta, stessa forma del pulsante (8°). */
@@ -670,14 +685,14 @@ p {
 .signup-done > * {
   transform: skewX(8deg);
 }
-.outro[data-state='done'] .signup {
+.signup-box[data-state='done'] .signup {
   display: none;
 }
-.outro[data-state='done'] .signup-done {
+.signup-box[data-state='done'] .signup-done {
   display: inline-flex;
   animation: pop-in 0.42s var(--ease) both;
 }
-.outro[data-state='done'] .check path {
+.signup-box[data-state='done'] .check path {
   stroke-dasharray: 14;
   animation: draw 0.4s 0.18s var(--ease) both;
 }
@@ -782,17 +797,27 @@ p {
 /* ---------- Footer: dati societari e privacy, discreto ---------- */
 /* Footer: dati societari in colonne con etichetta, separati dalla pagina da un filo sottile */
 .foot {
+  /* il footer chiude il contatto: sempre su Lime, solo Forest (qualunque sia la palette dell'intro) */
+  --ink-strong: var(--forest);
+  --ink-soft: var(--moss-ink);
   position: relative;
   z-index: 10;
   display: grid;
   grid-template-columns: auto 1fr auto;
   align-items: start;
   gap: var(--s-5) var(--s-7);
-  margin: 0 var(--pad-x);
-  padding: var(--s-6) 0 max(var(--s-6), env(safe-area-inset-bottom));
-  border-top: 1px solid color-mix(in srgb, var(--ink-strong) 16%, transparent);
+  padding: var(--s-6) var(--pad-x) max(var(--s-6), env(safe-area-inset-bottom));
+  background: var(--lime);
   font: var(--t-small);
   color: var(--ink-soft);
+}
+.foot::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: var(--pad-x);
+  right: var(--pad-x);
+  border-top: 1px solid color-mix(in srgb, var(--forest) 16%, transparent);
 }
 .foot p,
 .foot dl,
@@ -904,241 +929,6 @@ p {
 .gl,
 .sweep {
   display: none;
-}
-
-/* ---------- Racconto: tre step e la chiusura (src/gl/story.ts) ----------
-   Senza 3D è una sezione statica su Lime, i testi uno sotto l'altro. Con il 3D è una fascia alta cinque
-   schermate su Forest: la colonna di testo resta ferma a sinistra, il simbolo a destra nello studio disegnato
-   dal canvas; insieme formano un blocco centrato, largo quanto la griglia della pagina. */
-.story {
-  position: relative;
-  z-index: 10;
-  padding: var(--s-9) var(--pad-x);
-}
-.story-pin {
-  display: grid;
-  gap: var(--s-9);
-  max-width: var(--content);
-  margin: 0 auto;
-}
-.story-acts {
-  display: grid;
-  gap: var(--s-8);
-}
-/* ogni step: etichetta, titolo, testo (su Lime solo Forest, il testo in Moss scurito) */
-.act-kicker {
-  margin: 0 0 var(--s-4);
-  font: var(--t-label);
-  letter-spacing: var(--track-label);
-  text-transform: uppercase;
-  color: var(--forest);
-}
-.act-title {
-  margin: 0;
-  font: var(--t-h2);
-  letter-spacing: var(--track-h2);
-  text-wrap: balance;
-  color: var(--forest);
-}
-.act-sub {
-  margin: var(--s-5) 0 0;
-  max-width: 36ch;
-  font: var(--t-body);
-  text-wrap: pretty;
-  color: var(--moss-ink);
-}
-/* l'avanzamento serve solo mentre si scorre il racconto in 3D */
-.story-meter {
-  display: none;
-}
-/* la chiusura: la frase del brand, con i due pesi dell'hero, e il pulsante */
-.act-claim {
-  margin: 0 0 var(--s-6);
-  font: var(--t-h2);
-  font-weight: 300;
-  letter-spacing: var(--track-h2);
-  color: var(--forest);
-}
-.act-claim strong {
-  display: block;
-  font-weight: 900;
-}
-/* il secondo pilastro: i prodotti, una riga sotto la frase */
-.act-note {
-  max-width: 36em;
-  margin: calc(-1 * var(--s-3)) auto var(--s-6);
-  font: var(--t-body);
-  text-wrap: balance;
-  color: var(--moss-ink);
-}
-.act-cta {
-  display: inline-flex;
-  align-items: center;
-  height: 44px;
-  padding: 0 var(--s-5);
-  border-radius: var(--radius);
-  background: var(--forest);
-  color: var(--lime);
-  font: var(--t-button);
-  text-decoration: none;
-  box-shadow: 0 12px 24px -12px rgb(16 38 27 / 0.55);
-  transform: skewX(-8deg);
-  transition: transform var(--dur-ui) var(--ease), box-shadow var(--dur-ui) var(--ease);
-}
-/* stessa forma del pulsante del modulo: parallelogramma a 8°, testo controinclinato */
-.act-cta > span {
-  display: inline-flex;
-  align-items: center;
-  transform: skewX(8deg);
-}
-.act-cta > span::after {
-  content: '→';
-  margin-left: var(--s-3);
-  transition: transform var(--dur-ui) var(--ease);
-}
-@media (hover: hover) {
-  .act-cta:hover {
-    transform: skewX(-8deg) translateY(-2px);
-    box-shadow: 0 24px 48px -16px rgb(16 38 27 / 0.7);
-  }
-  .act-cta:hover > span::after {
-    transform: translateX(4px);
-  }
-}
-.act-cta:active {
-  transform: skewX(-8deg) scale(0.97);
-}
-.act-cta:focus-visible {
-  outline: 2px solid var(--forest);
-  outline-offset: 4px;
-}
-
-.is-webgl .story {
-  height: 500svh;
-  padding: 0;
-}
-.is-webgl .story-pin {
-  position: sticky;
-  top: 0;
-  display: block;
-  max-width: none;
-  /* l'area visibile: su telefono segue la barra del browser, i testi in basso restano sempre sopra di lei */
-  height: 100svh;
-  height: 100dvh;
-  overflow: hidden;
-}
-/* la colonna di testo: all'inizio della griglia, centrata in altezza */
-.is-webgl .story-copy {
-  position: absolute;
-  left: max(var(--pad-x), calc(50vw - var(--content) / 2));
-  top: 50%;
-  width: min(40vw, 480px);
-  transform: translateY(-50%);
-}
-/* i tre step nello stesso posto: la colonna è alta quanto il più alto, etichette e titoli sempre alla stessa quota */
-.is-webgl .story-acts {
-  gap: 0;
-}
-.is-webgl .story-acts > .act {
-  grid-area: 1 / 1;
-  transform: translate3d(0, var(--y, 0px), 0);
-  visibility: hidden;
-}
-/* su Forest: etichette Lime, titoli Mist, testo Mist all'80% (brand: su Forest, Lime o Mist) */
-.is-webgl .act-kicker {
-  color: var(--lime);
-}
-.is-webgl .act-title {
-  color: var(--mist);
-}
-.is-webgl .act-sub {
-  color: rgb(241 243 234 / 0.8);
-}
-/* tre segmenti: pieni gli step fatti, quello corrente si riempie scorrendo (--fill da src/gl/story.ts) */
-.is-webgl .story-meter {
-  display: flex;
-  gap: var(--s-2);
-  margin-top: var(--s-7);
-  visibility: hidden;
-}
-.story-meter i {
-  position: relative;
-  width: 48px;
-  height: 2px;
-  border-radius: 1px;
-  overflow: hidden;
-  background: rgb(241 243 234 / 0.2);
-}
-.story-meter i::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: var(--lime);
-  transform: scaleX(var(--fill, 0));
-  transform-origin: left;
-}
-/* sopra la fascia scura l'header è vetro scuro, logo e lingua chiari */
-.is-dark-under .top::before {
-  opacity: 1;
-  background: linear-gradient(180deg, rgb(16 38 27 / 0.62), rgb(16 38 27 / 0.4));
-  border-bottom-color: rgb(241 243 234 / 0.14);
-  box-shadow: none;
-}
-.is-dark-under .logo-slot,
-.is-dark-under .lang [aria-pressed='true'] {
-  color: var(--mist); /* come i titoli sul Forest */
-}
-.is-dark-under .lang,
-.is-dark-under .lang [aria-pressed='false'] {
-  color: var(--sage);
-}
-.top::before,
-.logo-slot,
-.lang {
-  transition-property: opacity, background, color, border-color;
-  transition-duration: var(--dur-state);
-}
-/* la chiusura è centrata: il simbolo sopra, frase e pulsante sotto */
-.is-webgl .act--end {
-  position: absolute;
-  left: 50%;
-  bottom: max(9svh, var(--s-8));
-  width: min(92vw, 900px);
-  text-align: center;
-  transform: translate3d(-50%, var(--y, 0px), 0);
-  visibility: hidden;
-}
-/* telefono e tablet in verticale: simbolo sopra, testo sotto (stessa regola di src/gl/story.ts) */
-@media (max-width: 759px), (max-aspect-ratio: 4/5) {
-  .is-webgl .story-copy {
-    left: var(--pad-x);
-    right: var(--pad-x);
-    top: auto;
-    bottom: max(var(--s-7), calc(env(safe-area-inset-bottom) + var(--s-5)));
-    width: auto;
-    max-width: 560px;
-    transform: none;
-  }
-}
-@media (max-width: 759px) {
-  .act-kicker {
-    margin-bottom: var(--s-3);
-  }
-  .act-sub {
-    margin-top: var(--s-4);
-  }
-  .is-webgl .story-meter {
-    margin-top: var(--s-6);
-  }
-  .is-webgl .act--end {
-    left: var(--pad-x);
-    right: var(--pad-x);
-    width: auto;
-    transform: translate3d(0, var(--y, 0px), 0);
-  }
-  .act-claim {
-    margin-bottom: var(--s-5);
-  }
 }
 
 /* La linea del finale: stessa inclinazione di 8° delle barre, alla quota del centro del simbolo.
@@ -1293,8 +1083,8 @@ p {
   .is-static .sub,
   .is-static .soon,
   .is-static .proof,
-  .outro[data-state] .signup,
-  .outro[data-state] .signup-done,
+  .signup-box[data-state] .signup,
+  .signup-box[data-state] .signup-done,
   .soon-dot {
     animation: none;
   }

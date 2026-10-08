@@ -3,12 +3,12 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <title>Deploiable · Stop doing what AI can do.</title>
-    <meta name="description" content="Stop doing what AI can do. Individuiamo i processi ripetitivi, li ridisegniamo con AI e automazione e li integriamo nei sistemi che già usi. Passo dopo passo, da manuali ad autonomi. Coming soon." data-i18n-attr="content:meta.description" />
+    <title>Deploiable · Dai problemi di business all’AI in produzione.</title>
+    <meta name="description" content="Ripensiamo i processi aziendali e sviluppiamo prodotti AI-native su misura. Dall’analisi alla messa in produzione, integrati nei sistemi che la tua azienda usa già." data-i18n-attr="content:meta.description" />
     <meta name="theme-color" content="#10261B" />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="Deploiable · Stop doing what AI can do." data-i18n-attr="content:meta.title" />
-    <meta property="og:description" content="Individuiamo i processi ripetitivi, li ridisegniamo con AI e automazione e li integriamo nei sistemi che già usi. Passo dopo passo, da manuali ad autonomi. Coming soon." data-i18n-attr="content:og.description" />
+    <meta property="og:title" content="Deploiable · Dai problemi di business all’AI in produzione." data-i18n-attr="content:meta.title" />
+    <meta property="og:description" content="Ripensiamo i processi aziendali e sviluppiamo prodotti AI-native su misura. Dall’analisi alla messa in produzione, integrati nei sistemi che la tua azienda usa già." data-i18n-attr="content:og.description" />
     <meta property="og:locale" content="it_IT" />
     <meta property="og:locale:alternate" content="en_GB" />
     <meta property="og:image" content="%VITE_SITE_URL%og.jpg" />
@@ -19,8 +19,8 @@
     <noscript>
       <style>
         .line { transform: none !important; }
-        .sub, .soon, .outro > *, .proof { opacity: 1 !important; }
-        .outro { visibility: visible !important; }
+        .sub, .soon, .outro > *, .proof, .nav { opacity: 1 !important; }
+        .outro, .nav { visibility: visible !important; }
       </style>
     </noscript>
   </head>
@@ -30,9 +30,19 @@
     <!-- supergrafica della versione statica (in quella 3D la disegna il canvas) -->
     <div class="sg-frame" aria-hidden="true"><!-- symbol:supergraphic --></div>
     <!-- header: il logo piccolo in alto a sinistra. Nella versione 3D la camera finale lo inquadra esattamente
-         qui (il logo 3D "atterra" nel segnaposto); nella versione statica è il logo ufficiale. -->
+         qui (il logo 3D "atterra" nel segnaposto); nella versione statica è il logo ufficiale. A destra la
+         navigazione (su telefono dietro il pulsante Menu) e la lingua. -->
     <header class="top">
       <a class="logo-slot" href="./" aria-label="Deploiable"><!-- logo:static-logo --></a>
+      <nav class="nav" aria-label="Navigazione principale" data-i18n-attr="aria-label:nav.label">
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-list"><span data-i18n="nav.menu">Menu</span><i class="nav-toggle-icon" aria-hidden="true"></i></button>
+        <ul class="nav-list" id="nav-list">
+          <li><a href="#approach" data-i18n="nav.approach">Approccio</a></li>
+          <li><a href="#build" data-i18n="nav.build">Cosa realizziamo</a></li>
+          <li><a href="#cases" data-i18n="nav.cases">Esempi</a></li>
+          <li><a class="nav-cta" href="#contact" data-i18n="nav.contact">Contatti</a></li>
+        </ul>
+      </nav>
     </header>
     <!-- lingua: italiano predefinito, inglese a scelta (src/i18n.ts) -->
     <div class="lang" role="group" aria-label="Lingua" data-i18n-attr="aria-label:lang.group">
@@ -44,32 +54,15 @@
       <section class="hero">
         <p class="soon"><i class="soon-dot" aria-hidden="true"></i><span data-i18n="launch" lang="en">Coming soon</span></p>
         <h1 class="claim">
-          <span class="mask"><span class="line line--light" lang="en">Stop doing</span></span>
-          <span class="mask"><span class="line line--black" lang="en">what AI can do.</span></span>
+          <span class="mask"><span class="line line--light" data-i18n="claim.1">Dai problemi di business</span></span>
+          <span class="mask"><span class="line line--black" data-i18n="claim.2">all’AI in produzione.</span></span>
         </h1>
-        <p class="sub" data-i18n="sub">Individuiamo i processi ripetitivi, li ridisegniamo con AI e automazione e li integriamo nei sistemi che già usi. Passo dopo passo, da manuali ad autonomi.</p>
+        <p class="sub" data-i18n="sub">Ripensiamo i processi aziendali e sviluppiamo prodotti AI-⁠native su misura. Dall’analisi alla messa in produzione, integrati nei sistemi che la tua azienda usa già.</p>
         <div class="outro">
-          <p class="offer-title" data-i18n="form.offer.title">AI process review gratuita</p>
-          <p class="offer" data-i18n="form.offer">Per le prime 20 aziende: analizziamo i tuoi processi e ti mostriamo dove l’AI rende di più.</p>
-          <form class="signup" novalidate>
-            <div class="signup-row">
-              <label class="sr-only" for="signup-email" data-i18n="form.email.label">Email aziendale</label>
-              <span class="signup-field signup-field--email"><input id="signup-email" name="email" type="email" required autocomplete="email" inputmode="email" enterkeyhint="next" spellcheck="false" placeholder="nome@azienda.it" data-i18n-attr="placeholder:form.email.placeholder" /></span>
-              <label class="sr-only" for="signup-company" data-i18n="form.company.label">Azienda</label>
-              <span class="signup-field"><input id="signup-company" name="company" type="text" required autocomplete="organization" enterkeyhint="send" placeholder="Azienda" data-i18n-attr="placeholder:form.company.placeholder" /></span>
-              <button type="submit"><span class="btn-in"><span data-i18n="form.submit">Prenota la tua AI process review</span><svg class="arrow" viewBox="0 0 12 12" aria-hidden="true"><path d="M1 6h9M6.5 2.5 10 6l-3.5 3.5" /></svg></span></button>
-            </div>
-            <label class="consent">
-              <input id="signup-consent" name="consent" type="checkbox" value="si" required />
-              <span class="consent-box" aria-hidden="true"><svg viewBox="0 0 12 12"><path d="M2 6.3 4.8 9 10 3" /></svg></span>
-              <span class="consent-text"><span data-i18n="form.consent.pre">Ho letto l’</span><a href="privacy.html" data-i18n="form.consent.link">informativa privacy</a><span data-i18n="form.consent.post"> e acconsento al trattamento dei miei dati per essere ricontattato/a.</span></span>
-            </label>
-            <!-- trappola per i bot: invisibile alle persone -->
-            <input class="hp" name="_gotcha" type="text" tabindex="-1" autocomplete="off" aria-hidden="true" />
-          </form>
-          <p class="signup-done" aria-hidden="true"><svg class="check" viewBox="0 0 12 12"><path d="M2 6.3 4.8 9 10 3" /></svg><span data-i18n="form.done">Richiesta ricevuta.</span></p>
-          <!-- messaggi del modulo (errori, avvisi, conferma): vuoto finché non serve -->
-          <p class="signup-note" role="status" aria-live="polite"></p>
+          <div class="hero-ctas">
+            <a class="btn btn--solid" href="#contact"><span class="btn-in"><span data-i18n="cta.primary">Costruiamo ciò che serve</span><svg class="arrow" viewBox="0 0 12 12" aria-hidden="true"><path d="M1 6h9M6.5 2.5 10 6l-3.5 3.5" /></svg></span></a>
+            <a class="btn btn--line" href="#approach"><span class="btn-in"><span data-i18n="cta.secondary">Scopri il nostro approccio</span><svg class="arrow arrow--down" viewBox="0 0 12 12" aria-hidden="true"><path d="M6 1v9M2.5 6.5 6 10l3.5-3.5" /></svg></span></a>
+          </div>
         </div>
         <!-- Prova sociale: loghi dei clienti in scorrimento continuo, monocromi nel verde del brand (il file fa da
              maschera, il colore lo dà il CSS: va bene qualsiasi logo su fondo trasparente, anche bianco).
@@ -95,37 +88,179 @@
         </div>
       </section>
 
-      <!-- Il racconto: tre step e la chiusura. Con il 3D i testi restano fermi e il simbolo si costruisce
-           scorrendo (src/gl/story.ts); senza, è una sezione statica. -->
-      <section class="story" aria-label="Come lavoriamo" data-i18n-attr="aria-label:story.label">
-        <div class="story-pin">
-          <!-- colonna di testo: i tre step occupano lo stesso posto (con il 3D ne compare uno alla volta),
-               sotto la barra di avanzamento -->
-          <div class="story-copy">
-            <div class="story-acts">
-              <article class="act">
-                <p class="act-kicker" data-i18n="story.1k">Analisi</p>
-                <h2 class="act-title" data-i18n="story.1">Troviamo il lavoro ripetitivo.</h2>
-                <p class="act-sub" data-i18n="story.1s">Mappiamo i processi e individuiamo quelli dove AI e automazione fanno risparmiare più tempo ed errori.</p>
-              </article>
-              <article class="act">
-                <p class="act-kicker" data-i18n="story.2k">Riprogettazione</p>
-                <h2 class="act-title" data-i18n="story.2">Lo ridisegniamo con l’AI.</h2>
-                <p class="act-sub" data-i18n="story.2s">Ripensiamo il processo attorno ad AI e automazione e lo colleghiamo ai sistemi che già usi: ERP, CRM, email, documenti.</p>
-              </article>
-              <article class="act">
-                <p class="act-kicker" data-i18n="story.3k">Autonomia</p>
-                <h2 class="act-title" data-i18n="story.3">Lo rendiamo autonomo, un passo alla volta.</h2>
-                <p class="act-sub" data-i18n="story.3s">Prima l’AI assiste le persone, poi esegue da sola dove è sicuro farlo. Ogni passaggio è misurato con i KPI.</p>
-              </article>
+      <!-- Il racconto: un solo sistema che si divide, si trasforma, si assembla, converge e si collega.
+           La scena (src/system/journey.ts) resta ferma mentre i capitoli scorrono; con il movimento ridotto ogni
+           capitolo ha la sua immagine ferma (.chap-fig). -->
+      <section class="narr" id="approach" data-surface="dark" aria-labelledby="n0-title">
+        <div class="narr-stage" aria-hidden="true"><svg class="narr-svg"></svg></div>
+        <div class="narr-chaps">
+          <article class="chap">
+            <div class="chap-body">
+              <p class="kicker" data-i18n="n0.k">Il nostro approccio</p>
+              <h2 class="chap-title" id="n0-title" data-i18n="n0.t">Tutto parte da un problema di business.</h2>
+              <p class="chap-text" data-i18n="n0.s">Non partiamo da uno strumento AI. Partiamo da come lavorano le persone, i dati e i sistemi della tua azienda, e da ciò che serve davvero.</p>
             </div>
-            <div class="story-meter" aria-hidden="true"><i></i><i></i><i></i></div>
-          </div>
-          <article class="act act--end">
-            <p class="act-claim" lang="en"><span>Stop doing </span><strong>what AI can do.</strong></p>
-            <p class="act-note" data-i18n="end.note">Dai bisogni che troviamo nelle aziende nascono anche i nostri prodotti AI-native.</p>
-            <a class="act-cta" href="#signup-email"><span data-i18n="form.submit">Prenota la tua AI process review</span></a>
+            <div class="chap-fig" aria-hidden="true"></div>
           </article>
+          <article class="chap">
+            <div class="chap-body">
+              <p class="kicker" data-i18n="n1.k">Due strade</p>
+              <h2 class="chap-title" data-i18n="n1.t">Due modi per creare valore.</h2>
+              <p class="chap-text" data-i18n="n1.s">A volte la risposta è trasformare il modo in cui lavori oggi. A volte è costruire un prodotto che ancora non esiste. Ti aiutiamo a capire quale strada serve.</p>
+              <ul class="chap-paths">
+                <li><span class="chap-path-num">01</span><span>AI Transformation</span></li>
+                <li><span class="chap-path-num">02</span><span>AI-⁠native Product Studio</span></li>
+              </ul>
+            </div>
+            <div class="chap-fig" aria-hidden="true"></div>
+          </article>
+          <article class="chap">
+            <div class="chap-body">
+              <p class="kicker"><span class="kicker-num">01</span> AI Transformation</p>
+              <h2 class="chap-title" data-i18n="n2.t">Trasformiamo i processi esistenti.</h2>
+              <p class="chap-text" data-i18n="n2.s">Individuiamo i processi inefficienti, li riprogettiamo con AI e automazione e li integriamo nei sistemi che la tua azienda utilizza già.</p>
+              <p class="chap-claim" lang="en"><span>Stop doing </span><strong>what AI can do.</strong></p>
+              <a class="chap-link" href="#contact" data-interest="transform"><span data-i18n="n2.link">Parliamo di un tuo processo</span><svg class="arrow" viewBox="0 0 12 12" aria-hidden="true"><path d="M1 6h9M6.5 2.5 10 6l-3.5 3.5" /></svg></a>
+            </div>
+            <div class="chap-fig" aria-hidden="true"></div>
+          </article>
+          <article class="chap">
+            <div class="chap-body">
+              <p class="kicker"><span class="kicker-num">02</span> AI-⁠native Product Studio</p>
+              <h2 class="chap-title" data-i18n="n3.t">Costruiamo ciò che ancora non esiste.</h2>
+              <p class="chap-text" data-i18n="n3.s">Quando i software esistenti non bastano, progettiamo e sviluppiamo applicazioni AI-⁠native, strumenti interni e piattaforme su misura per i bisogni, i dati e le persone della tua azienda.</p>
+              <a class="chap-link" href="#contact" data-interest="build"><span data-i18n="n3.link">Parliamo di un tuo prodotto</span><svg class="arrow" viewBox="0 0 12 12" aria-hidden="true"><path d="M1 6h9M6.5 2.5 10 6l-3.5 3.5" /></svg></a>
+            </div>
+            <div class="chap-fig" aria-hidden="true"></div>
+          </article>
+          <article class="chap">
+            <div class="chap-body">
+              <p class="kicker" data-i18n="n4.k">In produzione</p>
+              <h2 class="chap-title" data-i18n="n4.t">Sfide diverse. Un unico risultato.</h2>
+              <p class="chap-big" data-i18n="n4.big">AI pronta per il mondo reale.</p>
+              <p class="chap-text" data-i18n="n4.s">Non solo prototipi. Progettiamo soluzioni AI per operare con utenti reali, dati aziendali e infrastrutture esistenti.</p>
+            </div>
+            <div class="chap-fig" aria-hidden="true"></div>
+          </article>
+          <article class="chap">
+            <div class="chap-body">
+              <p class="kicker" data-i18n="n5.k">Integrazione</p>
+              <h2 class="chap-title" data-i18n="n5.t">Integrata nel modo in cui la tua azienda lavora.</h2>
+              <p class="chap-text" data-i18n="n5.s">L’AI non richiede sempre un nuovo strumento. Integriamo le soluzioni nei software che i tuoi team usano già, oppure sviluppiamo un’applicazione dedicata quando il problema lo richiede.</p>
+            </div>
+            <div class="chap-fig" aria-hidden="true"></div>
+          </article>
+        </div>
+      </section>
+
+      <!-- Cosa realizziamo: sei forme concrete, ognuna con un frammento dello stesso sistema (src/system/minis.ts) -->
+      <section class="sec sec--build" id="build" data-surface="dark" aria-labelledby="build-title">
+        <div class="sec-head">
+          <p class="kicker" data-i18n="build.k">Cosa realizziamo</p>
+          <h2 class="sec-title" id="build-title" data-i18n="build.t">Cosa realizziamo, concretamente.</h2>
+          <p class="sec-lead" data-i18n="build.s">Dalla singola automazione al prodotto completo: scegliamo la forma giusta per il problema, poi la costruiamo e la mettiamo in produzione.</p>
+        </div>
+        <ul class="caps">
+          <li class="cap"><div class="cap-fig" data-mini="workflows" aria-hidden="true"></div><h3 class="cap-title" data-i18n="cap.1.t">AI Workflow</h3><p class="cap-text" data-i18n="cap.1.s">Automatizzano attività operative ripetitive e coordinano i sistemi esistenti.</p></li>
+          <li class="cap"><div class="cap-fig" data-mini="agents" aria-hidden="true"></div><h3 class="cap-title" data-i18n="cap.2.t">Agenti AI</h3><p class="cap-text" data-i18n="cap.2.s">Sistemi che svolgono compiti definiti usando dati, strumenti e decisioni controllate.</p></li>
+          <li class="cap"><div class="cap-fig" data-mini="tools" aria-hidden="true"></div><h3 class="cap-title" data-i18n="cap.3.t">Strumenti AI interni</h3><p class="cap-text" data-i18n="cap.3.s">Applicazioni costruite su misura per supportare i team aziendali.</p></li>
+          <li class="cap"><div class="cap-fig" data-mini="products" aria-hidden="true"></div><h3 class="cap-title" data-i18n="cap.4.t">Prodotti AI-⁠native</h3><p class="cap-text" data-i18n="cap.4.s">Prodotti software su misura, con l’AI al centro delle loro funzionalità.</p></li>
+          <li class="cap"><div class="cap-fig" data-mini="interfaces" aria-hidden="true"></div><h3 class="cap-title" data-i18n="cap.5.t">Interfacce AI</h3><p class="cap-text" data-i18n="cap.5.s">Copilot, add-in e interfacce dedicate, collegati ai software che già usi.</p></li>
+          <li class="cap"><div class="cap-fig" data-mini="systems" aria-hidden="true"></div><h3 class="cap-title" data-i18n="cap.6.t">Sistemi AI e integrazioni</h3><p class="cap-text" data-i18n="cap.6.s">Il software, le connessioni ai dati e i componenti operativi che servono a far funzionare le soluzioni AI.</p></li>
+        </ul>
+      </section>
+
+      <!-- Metodo: lo stesso stack in tre stati (da disegnare, in costruzione, in produzione) -->
+      <section class="sec sec--method" id="method" data-surface="dark" aria-labelledby="method-title">
+        <div class="sec-head">
+          <p class="kicker" data-i18n="method.k">Come lavoriamo</p>
+          <h2 class="sec-title" id="method-title" data-i18n="method.t">Comprendiamo. Costruiamo. Mettiamo in produzione.</h2>
+        </div>
+        <ol class="steps">
+          <li class="step"><div class="step-fig" data-mini="understand" aria-hidden="true"></div><p class="step-num">01</p><h3 class="step-title" data-i18n="step.1.t">Comprendiamo</h3><p class="step-text" data-i18n="step.1.s">Analizziamo processi, utenti, dati, sistemi e opportunità.</p></li>
+          <li class="step"><div class="step-fig" data-mini="construct" aria-hidden="true"></div><p class="step-num">02</p><h3 class="step-title" data-i18n="step.2.t">Costruiamo</h3><p class="step-text" data-i18n="step.2.s">Progettiamo e sviluppiamo la soluzione più adatta: workflow, agente, applicazione o prodotto AI-⁠native.</p></li>
+          <li class="step"><div class="step-fig" data-mini="deploy" aria-hidden="true"></div><p class="step-num">03</p><h3 class="step-title" data-i18n="step.3.t">Mettiamo in produzione</h3><p class="step-text" data-i18n="step.3.s">Integriamo, testiamo, rilasciamo, monitoriamo e miglioriamo nel tempo.</p></li>
+        </ol>
+      </section>
+
+      <!-- Esempi: scenari illustrativi, dichiarati come tali (nessun cliente, risultato o numero inventato) -->
+      <section class="sec sec--cases" id="cases" data-surface="dark" aria-labelledby="cases-title">
+        <div class="sec-head">
+          <p class="kicker" data-i18n="cases.k">Esempi</p>
+          <h2 class="sec-title" id="cases-title" data-i18n="cases.t">Dall’opportunità a un sistema che funziona.</h2>
+          <p class="sec-note" data-i18n="cases.note">Scenari di esempio, non casi cliente.</p>
+        </div>
+        <div class="cases">
+          <article class="case">
+            <div class="case-fig" data-mini="finance" aria-hidden="true"></div>
+            <p class="case-tag"><span data-i18n="cases.example">Esempio</span> 01 · Finance</p>
+            <h3 class="case-title" data-i18n="case.1.t">Reporting direzionale</h3>
+            <p class="case-text" data-i18n="case.1.s">Colleghiamo i dati aziendali, calcoliamo i KPI, generiamo l’analisi e prepariamo le presentazioni per il management.</p>
+            <p class="case-flow" data-flow data-i18n="case.1.f">ERP + CRM + dati finance → analisi → presentazione</p>
+          </article>
+          <article class="case">
+            <div class="case-fig" data-mini="operations" aria-hidden="true"></div>
+            <p class="case-tag"><span data-i18n="cases.example">Esempio</span> 02 · Operations</p>
+            <h3 class="case-title" data-i18n="case.2.t">Pianificazione intelligente dei turni</h3>
+            <p class="case-text" data-i18n="case.2.s">Combiniamo regole operative, disponibilità del personale ed esigenze di business per proporre turni ottimizzati, che il manager approva.</p>
+            <p class="case-flow" data-flow data-i18n="case.2.f">persone + vincoli + disponibilità → sistema AI → approvazione del manager</p>
+          </article>
+          <article class="case">
+            <div class="case-fig" data-mini="studio" aria-hidden="true"></div>
+            <p class="case-tag"><span data-i18n="cases.example">Esempio</span> 03 · Product Studio</p>
+            <h3 class="case-title" data-i18n="case.3.t">Applicazione AI su misura</h3>
+            <p class="case-text" data-i18n="case.3.s">Trasformiamo un bisogno specifico in un’applicazione AI-⁠native, con logica, interfaccia e integrazioni dedicate, fino alla messa in produzione.</p>
+            <p class="case-flow" data-flow data-i18n="case.3.f">bisogno di business → design del prodotto → applicazione AI → messa in produzione</p>
+          </article>
+        </div>
+      </section>
+
+      <!-- Contatto: due strade, un modulo. La strada scelta arriva con la richiesta (campo interest). -->
+      <section class="sec sec--contact" id="contact" data-surface="lime" aria-labelledby="contact-title">
+        <div class="contact">
+          <div class="contact-head">
+            <p class="kicker" data-i18n="contact.k">Contatti</p>
+            <h2 class="contact-title" id="contact-title" data-i18n="contact.t">Cosa vuoi trasformare?</h2>
+            <p class="contact-lead" data-i18n="contact.s">Che tu voglia migliorare un processo esistente o costruire un nuovo prodotto AI, troviamo insieme l’approccio giusto.</p>
+            <div class="offer-box">
+              <p class="offer-title" data-i18n="form.offer.title">AI process review gratuita</p>
+              <p class="offer" data-i18n="form.offer">Per le prime 20 aziende: analizziamo i tuoi processi e ti mostriamo dove l’AI rende di più.</p>
+            </div>
+          </div>
+          <div class="signup-box">
+            <form class="signup" novalidate>
+              <fieldset class="paths">
+                <legend class="paths-legend" data-i18n="contact.legend">Da dove partiamo?</legend>
+                <div class="paths-grid">
+                  <label class="path">
+                    <input type="radio" name="interest" value="transform" />
+                    <span class="path-box"><span class="path-num" aria-hidden="true">01</span><span class="path-title" data-i18n="path.transform">Trasformare un processo</span><span class="path-text" data-i18n="path.transform.s">Ridisegnare un processo esistente con AI e automazione.</span></span>
+                  </label>
+                  <label class="path">
+                    <input type="radio" name="interest" value="build" />
+                    <span class="path-box"><span class="path-num" aria-hidden="true">02</span><span class="path-title" data-i18n="path.build">Costruire un prodotto AI</span><span class="path-text" data-i18n="path.build.s">Progettare e sviluppare un’applicazione o un prodotto AI-⁠native.</span></span>
+                  </label>
+                </div>
+              </fieldset>
+              <div class="signup-row">
+                <label class="sr-only" for="signup-email" data-i18n="form.email.label">Email aziendale</label>
+                <span class="signup-field signup-field--email"><input id="signup-email" name="email" type="email" required autocomplete="email" inputmode="email" enterkeyhint="next" spellcheck="false" placeholder="nome@azienda.it" data-i18n-attr="placeholder:form.email.placeholder" /></span>
+                <label class="sr-only" for="signup-company" data-i18n="form.company.label">Azienda</label>
+                <span class="signup-field"><input id="signup-company" name="company" type="text" required autocomplete="organization" enterkeyhint="send" placeholder="Azienda" data-i18n-attr="placeholder:form.company.placeholder" /></span>
+                  <button type="submit"><span class="btn-in"><span data-i18n="form.submit">Parliamone</span><svg class="arrow" viewBox="0 0 12 12" aria-hidden="true"><path d="M1 6h9M6.5 2.5 10 6l-3.5 3.5" /></svg></span></button>
+              </div>
+              <label class="consent">
+                <input id="signup-consent" name="consent" type="checkbox" value="si" required />
+                <span class="consent-box" aria-hidden="true"><svg viewBox="0 0 12 12"><path d="M2 6.3 4.8 9 10 3" /></svg></span>
+                <span class="consent-text"><span data-i18n="form.consent.pre">Ho letto l’</span><a href="privacy.html" data-i18n="form.consent.link">informativa privacy</a><span data-i18n="form.consent.post"> e acconsento al trattamento dei miei dati per essere ricontattato/a.</span></span>
+              </label>
+              <!-- trappola per i bot: invisibile alle persone -->
+              <input class="hp" name="_gotcha" type="text" tabindex="-1" autocomplete="off" aria-hidden="true" />
+            </form>
+            <p class="signup-done" aria-hidden="true"><svg class="check" viewBox="0 0 12 12"><path d="M2 6.3 4.8 9 10 3" /></svg><span data-i18n="form.done">Richiesta ricevuta.</span></p>
+            <!-- messaggi del modulo (errori, avvisi, conferma): vuoto finché non serve -->
+            <p class="signup-note" role="status" aria-live="polite"></p>
+          </div>
         </div>
       </section>
     </main>

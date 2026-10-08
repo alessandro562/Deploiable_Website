@@ -23,26 +23,50 @@ test('nessuna violazione grave anche in inglese e nella pagina privacy', async (
   }
 });
 
-test('tastiera: ordine di tabulazione logico e focus sempre visibile', async ({ page }) => {
+test('tastiera: ordine di tabulazione logico e focus sempre visibile', async ({ page }, info) => {
   await page.goto('/');
   await page.waitForFunction(() => window.__DEPLOIABLE__?.ready === true);
   await page.waitForTimeout(2500);
+  const mobile = info.project.name === 'mobile';
+  // logo, navigazione (su telefono il pulsante Menu), lingua, i due pulsanti dell'hero, i due link dei capitoli,
+  // la scelta della strada, il modulo, il consenso con il link all'informativa, il footer
+  const expected = [
+    'a./',
+    ...(mobile ? ['button.nav-toggle'] : ['a#approach', 'a#build', 'a#cases', 'a#contact']),
+    'lang-it',
+    'lang-en',
+    'a#contact',
+    'a#approach',
+    'a#contact',
+    'a#contact',
+    'input-interest',
+    'signup-email',
+    'signup-company',
+    'button',
+    'signup-consent',
+    'aprivacy.html',
+    'aprivacy.html',
+  ];
   const seen: string[] = [];
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < expected.length; i++) {
     await page.keyboard.press('Tab');
     await page.waitForTimeout(250); // il contorno del modulo compare con una transizione di 0,16 s
     const info = await page.evaluate(() => {
       const el = document.activeElement as HTMLElement;
-      const id = el.dataset.lang ? `lang-${el.dataset.lang}` : el.id || (el.closest('.foot') ? 'foot-link' : el.tagName.toLowerCase() + (el.closest('.consent') ? '-consent' : ''));
-      // focus visibile: un contorno sull'elemento, sulla capsula del modulo o sulla casella del consenso
+      const tag = el.tagName.toLowerCase();
+      const id = el.dataset.lang
+        ? `lang-${el.dataset.lang}`
+        : el.id || (tag === 'a' ? `a${el.getAttribute('href')}` : tag === 'input' ? `input-${(el as HTMLInputElement).name}` : tag + (el.classList[0] ? `.${el.classList[0]}` : ''));
+      // focus visibile: un contorno sull'elemento, sulla capsula del modulo, sulla casella del consenso o sulla
+      // scheda della strada
       const ring = (e: Element | null) => !!e && getComputedStyle(e).outlineStyle !== 'none' && parseFloat(getComputedStyle(e).outlineWidth) >= 2 && getComputedStyle(e).outlineColor !== 'rgba(0, 0, 0, 0)';
-      const visible = ring(el) || ring(el.closest('.signup-field')) || ring(el.parentElement?.querySelector('.consent-box') ?? null);
+      const visible = ring(el) || ring(el.closest('.signup-field')) || ring(el.parentElement?.querySelector('.consent-box') ?? null) || ring(el.closest('.path')?.querySelector('.path-box') ?? null);
       return { id, visible };
     });
     seen.push(info.id);
     expect(info.visible, `focus non visibile su ${info.id}`).toBe(true);
   }
-  expect(seen).toEqual(['a', 'lang-it', 'lang-en', 'signup-email', 'signup-company', 'button', 'signup-consent', 'a-consent', 'a', 'foot-link']); // 'a' dopo il consenso: il pulsante della chiusura del racconto
+  expect(seen).toEqual(expected);
 });
 
 test('movimento ridotto: niente 3D, niente animazioni in loop', async ({ page }) => {
@@ -65,7 +89,7 @@ test('telefono: ogni comando ha un’area di tocco di almeno 44 px in altezza e 
   await page.waitForFunction(() => window.__DEPLOIABLE__?.ready === true);
   await page.waitForTimeout(2500);
   // i link dentro una frase (consenso) hanno la riga come area: restano fuori, come vuole WCAG 2.5.8
-  const sel = ['.logo-slot', '.lang button', '#signup-email', '#signup-company', '.signup button[type=submit]', '.foot-link'];
+  const sel = ['.logo-slot', '.nav-toggle', '.lang button', '.hero-ctas .btn', '.chap-link', '.path', '#signup-email', '#signup-company', '.signup button[type=submit]', '.foot-link'];
   for (const s of sel) {
     for (const el of await page.locator(s).all()) {
       await el.scrollIntoViewIfNeeded();
@@ -91,7 +115,8 @@ test('tipografia: ogni testo piccolo usa una misura della scala (12, 13, 14, 16,
     const off = await page.evaluate(() => {
       const scale = [12, 13, 14, 16, 17];
       // titoli e frasi grandi hanno misure fluide (clamp) e stanno fuori da questo controllo
-      const big = '.claim, .claim *, .sub, .act-title, .act-claim, .act-claim *, .doc-body h1, .doc-lead, .doc-body h2';
+      const big =
+        '.claim, .claim *, .sub, h2, h3, .chap-text, .chap-paths, .chap-claim, .chap-claim *, .chap-big, .sec-lead, .contact-lead, .path-title, .nav-open .nav-list, .doc-body h1, .doc-lead, .doc-body h2';
       const out: string[] = [];
       for (const el of document.querySelectorAll<HTMLElement>('body *')) {
         if (el.closest(big) || el.closest('script, style, svg, noscript')) continue;

@@ -1,0 +1,913 @@
+/* Sezioni della landing dopo l'hero: navigazione, racconto, cosa realizziamo, metodo, esempi, contatto.
+   Superficie principale Forest con il Lime solo come accento (percorsi attivi, stati, pulsanti); il contatto
+   chiude su Lime pieno. Testi, spazi e movimento usano i token di main.css. */
+
+/* ---------- Superfici: ogni sezione porta i suoi colori, indipendenti dalla palette dell'intro ---------- */
+[data-surface='dark'] {
+  --bg: var(--forest);
+  --ink-light: var(--mist);
+  --ink-strong: var(--lime);
+  --ink-soft: var(--sage);
+  --ink-body: rgb(241 243 234 / 0.78);
+  --hair: rgb(241 243 234 / 0.1);
+  background: var(--forest);
+  color: var(--mist);
+  color-scheme: dark;
+}
+[data-surface='lime'] {
+  --bg: var(--lime);
+  --ink-light: var(--forest);
+  --ink-strong: var(--forest);
+  --ink-soft: var(--moss-ink);
+  --ink-body: var(--forest);
+  --ink-hover: var(--pine);
+  --field-bg: var(--lime-deep);
+  --hair: rgb(16 38 27 / 0.18);
+  background: var(--lime);
+  color: var(--forest);
+  color-scheme: light;
+}
+
+/* ---------- Navigazione: a destra nell'header, prima della lingua ---------- */
+.nav {
+  --nav-ink: var(--ink-strong);
+  position: fixed;
+  z-index: 20;
+  top: max(calc(var(--pad-top) + var(--logo-w) * 0.095 - 22px), env(safe-area-inset-top));
+  right: calc(max(calc(var(--pad-x) - 8px), env(safe-area-inset-right)) + 104px);
+  display: flex;
+  align-items: center;
+  height: 44px;
+}
+.is-webgl .nav {
+  visibility: hidden; /* entra con i testi dell'hero (src/app.ts) */
+}
+.is-dark-under .nav {
+  --nav-ink: var(--mist);
+}
+.is-lime-under .nav {
+  --nav-ink: var(--forest);
+}
+.nav-list {
+  display: flex;
+  align-items: center;
+  gap: var(--s-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.nav-list a {
+  display: inline-flex;
+  align-items: center;
+  height: 44px;
+  padding: 0 var(--s-3);
+  font: 500 14px / 1 var(--text);
+  letter-spacing: -0.005em;
+  color: var(--nav-ink);
+  text-decoration: none;
+  opacity: 0.86;
+  transition: opacity var(--dur-ui) var(--ease), color var(--dur-state) var(--ease);
+}
+@media (hover: hover) {
+  .nav-list a:hover {
+    opacity: 1;
+  }
+}
+/* Contatti: la stessa forma del modulo (parallelogramma a 8°), solo il contorno */
+.nav-list .nav-cta {
+  position: relative;
+  margin-left: var(--s-2);
+  opacity: 1;
+}
+.nav-list .nav-cta::before {
+  content: '';
+  position: absolute;
+  inset: 6px 0;
+  border-radius: 8px;
+  box-shadow: inset 0 0 0 1.5px currentColor;
+  transform: skewX(-8deg);
+}
+.nav-toggle {
+  display: none;
+  font: var(--t-label);
+}
+@media (max-width: 900px) {
+  .nav-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-2);
+    min-height: 44px;
+    padding: 0 var(--s-2);
+    border: 0;
+    background: none;
+    font: var(--t-label);
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    color: var(--nav-ink);
+    cursor: pointer;
+  }
+  .nav-toggle-icon {
+    position: relative;
+    width: 16px;
+    height: 10px;
+    border-top: 1.5px solid currentColor;
+    border-bottom: 1.5px solid currentColor;
+    transition: transform var(--dur-ui) var(--ease);
+  }
+  .nav-open .nav-toggle-icon {
+    transform: scaleY(0.4);
+  }
+  .nav-list {
+    display: none;
+  }
+  /* il menu aperto: un pannello Forest sotto l'header, voci grandi */
+  .nav-open .nav-list {
+    position: fixed;
+    top: calc(max(var(--pad-top), env(safe-area-inset-top)) + var(--logo-w) * 0.19 + var(--s-5));
+    left: var(--s-3);
+    right: var(--s-3);
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    padding: var(--s-3) var(--s-4) var(--s-4);
+    border-radius: 14px;
+    background: var(--forest);
+    box-shadow: 0 24px 48px -24px rgb(0 0 0 / 0.5), inset 0 0 0 1px rgb(241 243 234 / 0.08);
+  }
+  .nav-open .nav-list a {
+    height: 56px;
+    padding: 0 var(--s-2);
+    border-bottom: 1px solid rgb(241 243 234 / 0.08);
+    font: 700 24px / 1 var(--sans);
+    letter-spacing: -0.02em;
+    color: var(--mist);
+    opacity: 1;
+  }
+  .nav-open .nav-list li:last-child a {
+    border-bottom: 0;
+    color: var(--lime);
+  }
+  .nav-open .nav-list .nav-cta {
+    margin: 0;
+  }
+  .nav-open .nav-list .nav-cta::before {
+    display: none;
+  }
+}
+/* logo e lingua sopra le fasce scure e sopra il contatto */
+.is-dark-under .top::before {
+  opacity: 1;
+  background: linear-gradient(180deg, rgb(16 38 27 / 0.72), rgb(16 38 27 / 0.5));
+  border-bottom-color: rgb(241 243 234 / 0.1);
+  box-shadow: none;
+}
+.is-dark-under .logo-slot,
+.is-dark-under .lang [aria-pressed='true'] {
+  color: var(--mist);
+}
+.is-dark-under .lang,
+.is-dark-under .lang [aria-pressed='false'] {
+  color: var(--sage);
+}
+.is-lime-under .logo-slot,
+.is-lime-under .lang [aria-pressed='true'] {
+  color: var(--forest);
+}
+.is-lime-under .lang {
+  color: var(--moss-ink);
+}
+.top::before,
+.logo-slot,
+.lang {
+  transition-property: opacity, background, color, border-color;
+  transition-duration: var(--dur-state);
+}
+/* con il 3D, sopra le sezioni il logo è sempre l'SVG (il canvas è coperto) */
+.is-webgl.is-dark-under .logo-slot svg,
+.is-webgl.is-lime-under .logo-slot svg {
+  opacity: 1;
+}
+
+/* ---------- Hero: i due pulsanti ---------- */
+.hero-ctas {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--s-3) var(--s-4);
+}
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 52px;
+  padding: 0 var(--s-5);
+  border-radius: var(--radius);
+  font: var(--t-button);
+  letter-spacing: -0.005em;
+  white-space: nowrap;
+  text-decoration: none;
+  transform: skewX(-8deg);
+  transition: background-color var(--dur-ui) var(--ease), transform var(--dur-ui) var(--ease), box-shadow var(--dur-ui) var(--ease);
+}
+.btn--solid {
+  background: var(--ink-strong);
+  color: var(--bg);
+}
+.btn--line {
+  color: var(--ink-strong);
+  box-shadow: inset 0 0 0 1.5px var(--ink-strong);
+}
+@media (hover: hover) {
+  .btn--solid:hover {
+    background: var(--ink-hover);
+  }
+  .btn--line:hover {
+    background: color-mix(in srgb, var(--ink-strong) 8%, transparent);
+  }
+  .btn:hover .arrow {
+    transform: translateX(2px);
+  }
+  .btn:hover .arrow--down {
+    transform: translateY(2px);
+  }
+}
+.btn:active {
+  transform: skewX(-8deg) scale(0.97);
+}
+@media (max-width: 640px) {
+  .hero-ctas {
+    flex-direction: column;
+    align-self: stretch;
+    gap: var(--s-2);
+  }
+  .btn {
+    width: 100%;
+  }
+}
+
+/* ---------- Testi delle sezioni ---------- */
+.kicker {
+  margin: 0;
+  font: var(--t-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink-strong);
+}
+.kicker-num {
+  margin-right: var(--s-2);
+  color: var(--ink-soft);
+}
+h2,
+h3 {
+  margin: 0;
+}
+
+/* ---------- Il racconto (src/narrative.ts) ---------- */
+.narr {
+  position: relative;
+  z-index: 10;
+  scroll-margin-top: 0;
+}
+.narr-stage {
+  display: none;
+}
+.narr-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.chap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: var(--s-8) var(--pad-x);
+}
+.chap-body {
+  position: relative;
+  width: min(100%, 560px);
+  margin-left: max(0px, calc((100vw - var(--content)) / 2 - var(--pad-x)));
+}
+.chap-title {
+  margin-top: var(--s-4);
+  font: var(--t-h2);
+  letter-spacing: var(--track-h2);
+  text-wrap: balance;
+  color: var(--mist);
+}
+.chap-text {
+  margin-top: var(--s-5);
+  max-width: 34em;
+  font: var(--t-lead);
+  text-wrap: pretty;
+  color: var(--ink-body);
+}
+/* le due strade, numerate come nei capitoli che seguono */
+.chap-paths {
+  display: grid;
+  margin: var(--s-6) 0 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--hair);
+}
+.chap-paths li {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s-4);
+  padding: var(--s-4) 0;
+  border-bottom: 1px solid var(--hair);
+  font: 700 20px / 1.2 var(--sans);
+  letter-spacing: -0.015em;
+  color: var(--mist);
+}
+.chap-path-num {
+  font: var(--t-label);
+  letter-spacing: var(--track-label);
+  color: var(--lime);
+}
+/* la firma del processo trasformato: i due pesi dell'hero */
+.chap-claim {
+  margin-top: var(--s-6);
+  font: 300 clamp(22px, 2vw, 28px) / 1.1 var(--sans);
+  letter-spacing: -0.03em;
+  color: var(--mist);
+}
+.chap-claim strong {
+  font-weight: 900;
+  color: var(--lime);
+}
+.chap-big {
+  margin-top: var(--s-5);
+  font: 900 clamp(40px, 4.4vw, 66px) / 1 var(--sans);
+  letter-spacing: -0.04em;
+  text-wrap: balance;
+  color: var(--lime);
+}
+.chap-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  min-height: 44px;
+  margin-top: var(--s-4);
+  font: var(--t-button);
+  color: var(--lime);
+  text-decoration: underline;
+  text-decoration-color: rgb(200 242 90 / 0.4);
+  text-underline-offset: 4px;
+  text-decoration-thickness: 1px;
+  transition: text-decoration-color var(--dur-ui) var(--ease);
+}
+@media (hover: hover) {
+  .chap-link:hover {
+    text-decoration-color: currentColor;
+  }
+  .chap-link:hover .arrow {
+    transform: translateX(3px);
+  }
+}
+.chap-fig {
+  display: none;
+}
+
+/* con il movimento: la scena resta ferma, i capitoli le scorrono accanto */
+.narr-live .narr-stage {
+  display: block;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100svh;
+  overflow: hidden;
+}
+/* a sinistra la scena sfuma nel Forest: ciò che passa dietro la colonna di testo non disturba la lettura */
+.narr-live .narr-stage::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(90deg, var(--forest) 0, var(--forest) calc(max(0px, (100vw - var(--content)) / 2) + 300px), rgb(16 38 27 / 0) calc(max(0px, (100vw - var(--content)) / 2) + 620px));
+}
+.narr-live .narr-chaps {
+  position: relative;
+  margin-top: -100vh;
+  margin-top: -100svh;
+}
+.narr-live .chap {
+  min-height: 100vh;
+  min-height: 100svh;
+  padding-block: var(--s-9);
+}
+.narr-live .chap-body {
+  width: min(36vw, 450px);
+}
+.narr-live .chap:last-child {
+  min-height: 115svh;
+}
+/* telefono e tablet in verticale: schermo diviso. La scena resta ferma in alto, i testi scorrono sotto e le
+   passano dietro: la scena non viene mai coperta (stessa regola di src/narrative.ts) */
+@media (max-width: 759px), (max-aspect-ratio: 9/10) {
+  .narr-live .narr-stage {
+    z-index: 2;
+    height: 58vh;
+    height: 58svh;
+    background: var(--forest);
+  }
+  .narr-live .narr-stage::after {
+    background: linear-gradient(180deg, rgb(16 38 27 / 0) 86%, var(--forest) 100%);
+  }
+  .narr-live .narr-chaps {
+    z-index: 1;
+    margin-top: 0;
+  }
+  .narr-live .chap {
+    align-items: flex-start;
+    min-height: 80vh;
+    min-height: 80svh;
+    padding: var(--s-3) var(--pad-x) 0;
+  }
+  .narr-live .chap:last-child {
+    min-height: 60svh;
+  }
+  .narr-live .chap-body {
+    width: 100%;
+    max-width: 560px;
+    margin: 0 auto;
+  }
+  .narr-live .chap-title {
+    margin-top: var(--s-3);
+    font-size: clamp(26px, 7vw, 36px);
+  }
+  .narr-live .chap-text {
+    margin-top: var(--s-3);
+    font: var(--t-body);
+  }
+  .narr-live .chap-big {
+    margin-top: var(--s-3);
+    font-size: clamp(30px, 8.4vw, 44px);
+  }
+  .narr-live .chap-paths {
+    margin-top: var(--s-4);
+  }
+  .narr-live .chap-paths li {
+    padding: var(--s-3) 0;
+    font-size: 17px;
+  }
+  .narr-live .chap-claim {
+    margin-top: var(--s-3);
+    font-size: 20px;
+  }
+  .narr-live .chap-link {
+    margin-top: var(--s-2);
+  }
+}
+
+/* movimento ridotto: ogni capitolo con la sua immagine ferma accanto */
+.narr-still .chap {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+  gap: var(--s-7);
+  max-width: calc(var(--content) + 2 * var(--pad-x));
+  margin: 0 auto;
+  padding-block: var(--s-8);
+  border-top: 1px solid var(--hair);
+}
+.narr-still .chap:first-child {
+  border-top: 0;
+}
+.narr-still .chap-body {
+  margin: 0;
+  width: auto;
+}
+.narr-still .chap-fig {
+  display: block;
+  aspect-ratio: 4 / 3;
+}
+.chap-fig svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+@media (max-width: 759px) {
+  .narr-still .chap {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--s-5);
+  }
+  .narr-still .chap-fig {
+    order: -1;
+  }
+}
+
+/* ---------- Sezioni dopo il racconto ---------- */
+.sec {
+  position: relative;
+  z-index: 10;
+  padding: clamp(88px, 13vh, 152px) var(--pad-x);
+  scroll-margin-top: 0;
+}
+.sec--method,
+.sec--cases {
+  padding-top: clamp(64px, 9vh, 112px);
+}
+/* filo sottile fra due sezioni scure, largo quanto il contenuto */
+.sec--method::before,
+.sec--cases::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: max(var(--pad-x), calc((100vw - var(--content)) / 2));
+  right: max(var(--pad-x), calc((100vw - var(--content)) / 2));
+  border-top: 1px solid var(--hair);
+}
+.sec-head {
+  max-width: var(--content);
+  margin: 0 auto var(--s-8);
+}
+.sec-title {
+  margin-top: var(--s-4);
+  max-width: 17em;
+  font: var(--t-h2);
+  letter-spacing: var(--track-h2);
+  text-wrap: balance;
+  color: var(--mist);
+}
+.sec-lead {
+  margin-top: var(--s-5);
+  max-width: 38em;
+  font: var(--t-lead);
+  text-wrap: pretty;
+  color: var(--ink-body);
+}
+.sec-note {
+  margin-top: var(--s-4);
+  font: var(--t-small);
+  color: var(--sage);
+}
+
+/* Cosa realizziamo: una griglia di sei celle che condividono i fili, come una tavola tecnica */
+.caps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  max-width: var(--content);
+  margin: 0 auto;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--hair);
+  border-left: 1px solid var(--hair);
+}
+.cap {
+  padding: var(--s-5) var(--s-5) var(--s-6);
+  border-right: 1px solid var(--hair);
+  border-bottom: 1px solid var(--hair);
+  transition: background-color var(--dur-state) var(--ease);
+}
+@media (hover: hover) {
+  .cap:hover {
+    background: rgb(28 58 42 / 0.45);
+  }
+}
+.cap-fig {
+  aspect-ratio: 16 / 10;
+  margin: 0 calc(-1 * var(--s-2)) var(--s-4);
+}
+.cap-fig svg,
+.step-fig svg,
+.case-fig svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.cap-title {
+  font: var(--t-h3);
+  letter-spacing: -0.01em;
+  color: var(--mist);
+}
+.cap-text {
+  margin-top: var(--s-2);
+  font: var(--t-body);
+  font-size: 16px;
+  text-wrap: pretty;
+  color: var(--ink-body);
+}
+@media (max-width: 980px) {
+  .caps {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 640px) {
+  /* telefono: una colonna, il frammento largo e basso sopra il testo */
+  .caps {
+    grid-template-columns: minmax(0, 1fr);
+    border-left: 0;
+  }
+  .cap {
+    padding: var(--s-4) 0 var(--s-5);
+    border-right: 0;
+  }
+  .cap-fig {
+    aspect-ratio: 16 / 7;
+    margin: 0 0 var(--s-3);
+  }
+  .cap-title {
+    font-size: 19px;
+  }
+  .cap-text {
+    font-size: 16px;
+  }
+}
+
+/* Metodo: tre stati dello stesso stack */
+.steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--s-6);
+  max-width: var(--content);
+  margin: 0 auto;
+  padding: 0;
+  list-style: none;
+}
+.step-fig {
+  aspect-ratio: 4 / 3;
+  border-radius: 14px;
+  background: radial-gradient(120% 90% at 50% 60%, rgb(28 58 42 / 0.55), rgb(28 58 42 / 0) 70%);
+  box-shadow: inset 0 0 0 1px var(--hair);
+}
+.step-num {
+  margin-top: var(--s-5);
+  font: var(--t-label);
+  letter-spacing: var(--track-label);
+  color: var(--lime);
+}
+.step-title {
+  margin-top: var(--s-2);
+  font: 700 clamp(24px, 2.2vw, 30px) / 1.1 var(--sans);
+  letter-spacing: -0.025em;
+  color: var(--mist);
+}
+.step-text {
+  margin-top: var(--s-3);
+  max-width: 26em;
+  font: var(--t-body);
+  font-size: 16px;
+  text-wrap: pretty;
+  color: var(--ink-body);
+}
+@media (max-width: 760px) {
+  .steps {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--s-7);
+  }
+  .step-fig {
+    aspect-ratio: 16 / 10;
+  }
+}
+
+/* Esempi: tre schede con la catena dei passaggi */
+.cases {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--s-4);
+  max-width: var(--content);
+  margin: 0 auto;
+}
+.case {
+  display: flex;
+  flex-direction: column;
+  padding: var(--s-4) var(--s-5) var(--s-5);
+  border-radius: 16px;
+  background: rgb(28 58 42 / 0.5);
+  box-shadow: inset 0 0 0 1px var(--hair);
+}
+.case-fig {
+  aspect-ratio: 16 / 10;
+  margin: 0 calc(-1 * var(--s-3)) var(--s-3);
+}
+.case-tag {
+  font: var(--t-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--lime);
+}
+.case-title {
+  margin-top: var(--s-3);
+  font: 700 22px / 1.2 var(--sans);
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+  color: var(--mist);
+}
+.case-text {
+  margin-top: var(--s-3);
+  font: var(--t-body);
+  font-size: 16px;
+  text-wrap: pretty;
+  color: var(--ink-body);
+}
+.case-flow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: auto;
+  padding-top: var(--s-5);
+  font: var(--t-label);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--mist);
+}
+.flow-step {
+  padding: 6px 8px;
+  border-radius: 6px;
+  background: rgb(241 243 234 / 0.07);
+}
+.flow-step--out {
+  background: var(--lime);
+  color: var(--forest);
+}
+.flow-plus,
+.flow-arrow {
+  color: var(--sage);
+}
+@media (max-width: 980px) {
+  .cases {
+    grid-template-columns: minmax(0, 1fr);
+    max-width: 640px;
+  }
+}
+
+/* ---------- Contatto: su Lime, solo Forest ---------- */
+.sec--contact {
+  /* insieme al footer riempie almeno lo schermo: arrivando qui il contatto sta sotto l'header */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: calc(100vh - 120px);
+  min-height: calc(100svh - 120px);
+  padding-bottom: clamp(72px, 11vh, 128px);
+}
+.sec--contact .contact {
+  width: 100%;
+}
+.contact {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+  gap: var(--s-8);
+  align-items: start;
+  max-width: var(--content);
+  margin: 0 auto;
+}
+.contact-title {
+  margin-top: var(--s-4);
+  font: 900 clamp(40px, 5vw, 72px) / 1 var(--sans);
+  letter-spacing: -0.045em;
+  text-wrap: balance;
+  color: var(--forest);
+}
+.contact-lead {
+  margin-top: var(--s-5);
+  max-width: 28em;
+  font: var(--t-lead);
+  text-wrap: pretty;
+  color: var(--forest);
+}
+.offer-box {
+  max-width: 28em;
+  margin-top: var(--s-7);
+  padding-top: var(--s-4);
+  border-top: 1px solid var(--hair);
+}
+.paths {
+  margin: 0 0 var(--s-2);
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+.paths-legend {
+  margin-bottom: var(--s-3);
+  padding: 0;
+  font: var(--t-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--moss-ink);
+}
+.paths-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--s-3);
+}
+.path {
+  position: relative;
+  display: block;
+  cursor: pointer;
+}
+.path input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.path-box {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+  height: 100%;
+  padding: var(--s-4) var(--s-4) var(--s-5);
+  border-radius: var(--radius);
+  box-shadow: inset 0 0 0 1.5px var(--forest);
+  color: var(--forest);
+  transition: background-color var(--dur-ui) var(--ease), color var(--dur-ui) var(--ease);
+}
+.path-num {
+  font: var(--t-label);
+  letter-spacing: var(--track-label);
+  color: var(--moss-ink);
+}
+.path-title {
+  font: 700 20px / 1.15 var(--sans);
+  letter-spacing: -0.015em;
+}
+.path-text {
+  font: var(--t-small);
+  color: var(--moss-ink);
+}
+@media (hover: hover) {
+  .path:hover .path-box {
+    background: rgb(16 38 27 / 0.06);
+  }
+}
+/* scelta: la scheda diventa Forest, titolo Lime (su Forest: Lime o Mist) */
+.path input:checked + .path-box {
+  background: var(--forest);
+  color: var(--lime);
+}
+.path input:checked + .path-box .path-num {
+  color: var(--lime);
+}
+.path input:checked + .path-box .path-text {
+  color: rgb(241 243 234 / 0.82);
+}
+.path input:focus-visible + .path-box {
+  outline: 2px solid var(--forest);
+  outline-offset: 3px;
+}
+.sec--contact .signup-done {
+  align-self: flex-start;
+}
+@media (max-width: 980px) {
+  .contact {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--s-7);
+    max-width: 680px;
+  }
+  .offer-box {
+    margin-top: var(--s-5);
+  }
+}
+@media (max-width: 480px) {
+  .paths-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .path-box {
+    padding: var(--s-4);
+  }
+}
+
+/* ---------- Il sistema in SVG (src/system) ---------- */
+.sys {
+  overflow: hidden; /* i frammenti restano nel loro riquadro (e non allargano la pagina su telefono) */
+}
+.sys-label {
+  font-family: var(--text);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+}
+.sys-text {
+  font-family: var(--text);
+  font-weight: 600;
+  letter-spacing: 0.18em;
+}
+.sys-ui-text {
+  font-family: var(--sans);
+}
+.sys-ground {
+  opacity: 0.2;
+}
+
+/* ---------- Ingresso dei blocchi (src/sections.ts) ---------- */
+.rv-on .rv {
+  transition: opacity 0.8s var(--ease), transform 0.8s var(--ease), background-color var(--dur-state) var(--ease);
+}
+.rv-on .rv:not(.in) {
+  opacity: 0;
+  transform: translateY(18px);
+}
+.rv-on .cap:nth-child(3n + 2),
+.rv-on .step:nth-child(2),
+.rv-on .case:nth-child(2) {
+  transition-delay: 80ms;
+}
+.rv-on .cap:nth-child(3n),
+.rv-on .step:nth-child(3),
+.rv-on .case:nth-child(3) {
+  transition-delay: 160ms;
+}
