@@ -592,24 +592,24 @@ test('prova sociale: riga di credibilità e loghi dei clienti in loop sotto il m
   await expect(page.locator('.proof-line')).toHaveText('70+ clients since 2021');
 });
 
-test('macchina da scrivere: "companies run on." si cancella e si riscrive in ciclo, senza spostare la riga', async ({ page }) => {
+test('macchina da scrivere: "what AI can do." si cancella e si riscrive in ciclo, senza spostare la riga', async ({ page }) => {
   await openFilm(page, '', 'high');
   const st = () => page.evaluate(() => window.__DEPLOIABLE__!.state!());
   const visible = () => page.locator('.tw .ch:not(.off)').count();
-  // il titolo resta "Building the AI products companies run on." per i lettori di schermo, qualunque cosa mostri la macchina da scrivere
-  await expect(page.getByRole('heading', { level: 1 })).toHaveAccessibleName(/Building the AI products\s*companies run on\./);
+  // il titolo resta "Stop doing what AI can do." per i lettori di schermo, qualunque cosa mostri la macchina da scrivere
+  await expect(page.getByRole('heading', { level: 1 })).toHaveAccessibleName(/Stop doing\s*what AI can do\./);
   await seek(page, END);
-  expect(await visible()).toBe(17);
+  expect(await visible()).toBe(15);
   const full = (await page.locator('.tw').boundingBox())!;
   await seek(page, TW_START + TW_HOLD + TW_ERASE * 2.5);
-  expect((await st()).tw).toBe(14);
+  expect((await st()).tw).toBe(12);
   expect((await st()).caret).toBe(true);
-  expect(await visible()).toBe(14);
+  expect(await visible()).toBe(12);
   await expect(page.locator('.tw-caret')).toHaveClass(/on/);
   // la parola non si ricentra mentre si cancella
   const mid = (await page.locator('.tw').boundingBox())!;
   expect(Math.abs(mid.x - full.x)).toBeLessThanOrEqual(0.5);
-  await seek(page, TW_START + TW_HOLD + TW_ERASE * 17 + 0.2);
+  await seek(page, TW_START + TW_HOLD + TW_ERASE * 15 + 0.2);
   expect((await st()).tw).toBe(0);
   // e torna intera
   await seek(page, TW_START + 20 * 3);

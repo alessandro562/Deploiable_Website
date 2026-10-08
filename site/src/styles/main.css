@@ -19,9 +19,9 @@
   --sans: 'Satoshi', 'Helvetica Neue', Arial, sans-serif;
   --text: 'Geist', 'Helvetica Neue', Arial, sans-serif; /* testi piccoli */
 
-  /* Il protagonista è la frase "Building the AI products companies run on.": il suo corpo è la misura di tutto il resto.
+  /* Il protagonista è la frase "Stop doing what AI can do.": il suo corpo è la misura di tutto il resto.
      Dipende da larghezza e altezza, così l'hero sta sempre in una schermata con aria sopra e sotto. */
-  --claim-fs: clamp(32px, min(7.6vw, 10.5svh), 112px);
+  --claim-fs: clamp(36px, min(9vw, 9.5svh), 132px);
   /* spazio fra frase, sottotitolo e blocco iscrizione */
   --gap: calc(var(--claim-fs) * 0.42);
   /* il logo nell'header: piccolo, in alto a sinistra (la camera 3D finale lo inquadra qui, src/gl/stage.ts) */
@@ -73,7 +73,7 @@
   :root {
     --t-body: 400 16px / 1.55 var(--text);
     /* su telefono la frase occupa quasi tutta la larghezza (le due righe sono lunghe uguali) */
-    --claim-fs: clamp(30px, min(9.2vw, 10.5svh), 112px);
+    --claim-fs: clamp(34px, min(12.5vw, 11svh), 140px);
   }
 }
 
@@ -234,9 +234,8 @@ p {
 .line--light {
   font-weight: 300;
   color: var(--ink-light);
-  /* centratura ottica di "Building the AI products": la B ha poca aria a sinistra, la s finale ne ha di più;
-     la riga va spinta di poco a sinistra (misurato sui pixel con scripts/align.mjs) */
-  margin-left: -0.08em;
+  /* centratura ottica (misurata sui pixel con scripts/align.mjs) */
+  margin-left: 0;
 }
 .line--black {
   font-weight: 900;
@@ -260,7 +259,7 @@ p {
   will-change: transform;
 }
 
-/* Macchina da scrivere su "companies run on." (src/app.ts): le lettere cancellate tengono il loro posto, il cursore è
+/* Macchina da scrivere su "what AI can do." (src/app.ts): le lettere cancellate tengono il loro posto, il cursore è
    una barra sottile alta quanto le ascendenti, che scorre a scatti di lettera in lettera. */
 .tw {
   position: relative;
@@ -963,6 +962,14 @@ p {
 .act-claim strong {
   display: block;
   font-weight: 900;
+}
+/* il secondo pilastro: i prodotti, una riga sotto la frase */
+.act-note {
+  max-width: 36em;
+  margin: calc(-1 * var(--s-3)) auto var(--s-6);
+  font: var(--t-body);
+  text-wrap: balance;
+  color: var(--moss-ink);
 }
 .act-cta {
   display: inline-flex;

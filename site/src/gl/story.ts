@@ -25,7 +25,7 @@ import { PIVOT, REST, SYMBOL_H, SYMBOL_W } from './symbol/symbolSpec';
 //             (un piccolo assestamento e un lampo sugli spigoli) e diventa Lime metallico; al terzo step il
 //             simbolo è completo
 //   chiusura  il Lime sale dal basso, il simbolo diventa Forest e si gira di fronte, sopra
-//             "Building the AI products companies run on." e il pulsante per la review
+//             "Stop doing what AI can do." e il pulsante per la review
 // Senza WebGL (o con riduzione del movimento) la stessa sezione è una pagina statica: testi uno sotto l'altro.
 
 const ORDER = [2, 1, 0]; // barra di ogni step: bassa, centrale, alta

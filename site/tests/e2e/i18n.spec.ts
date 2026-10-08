@@ -8,7 +8,7 @@ test('italiano predefinito, inglese col toggle: testi, lang, title e meta', asyn
   await page.goto('/');
   await page.waitForFunction(() => window.__DEPLOIABLE__?.ready === true);
   await expect(page.locator('html')).toHaveAttribute('lang', 'it');
-  await expect(page.locator('.sub')).toHaveText(/Progettiamo, sviluppiamo e integriamo prodotti AI/);
+  await expect(page.locator('.sub')).toHaveText(/Individuiamo i processi ripetitivi/);
   await expect(page.locator('.soon')).toHaveText(/Coming soon/);
   await expect(page.locator('#signup-email')).toHaveAttribute('placeholder', 'nome@azienda.it');
   await expect(page.locator('[data-lang="it"]')).toHaveAttribute('aria-pressed', 'true');
@@ -18,12 +18,12 @@ test('italiano predefinito, inglese col toggle: testi, lang, title e meta', asyn
 
   await page.click('[data-lang="en"]');
   await expect(page.locator('html')).toHaveAttribute('lang', 'en');
-  await expect(page.locator('.sub')).toHaveText('We design, build and integrate AI products into your processes.');
+  await expect(page.locator('.sub')).toHaveText('We identify repetitive processes, redesign them around AI and automation and integrate them with the systems you already use. Step by step, from manual to autonomous.');
   await expect(page.locator('.soon')).toHaveText(/Coming soon/);
   await expect(page.locator('[data-lang="en"]')).toHaveAttribute('aria-pressed', 'true');
-  expect(await meta(page, 'meta[name="description"]')).toMatch(/into your processes\. Coming soon\./);
-  expect(await meta(page, 'meta[property="og:description"]')).toMatch(/We design, build and integrate/);
-  await expect(page).toHaveTitle('Deploiable · Building the AI products companies run on.');
+  expect(await meta(page, 'meta[name="description"]')).toMatch(/from manual to autonomous\. Coming soon\./);
+  expect(await meta(page, 'meta[property="og:description"]')).toMatch(/We identify repetitive processes/);
+  await expect(page).toHaveTitle('Deploiable · Stop doing what AI can do.');
 
   // la scelta vale per la sessione
   await page.reload();
