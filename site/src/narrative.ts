@@ -48,6 +48,22 @@ export function initNarrative(opts: { reduced: boolean; test: boolean }) {
   root.classList.add('narr-live');
   const stage = section.querySelector<HTMLElement>('.narr-stage')!;
   const svg = stage.querySelector('svg')!;
+  // il suolo a puntini è un livello HTML sotto la scena: disegnato una volta, a ogni fotogramma cambia solo la
+  // sua trasformazione (la stessa del piano del mondo), così costa pochissimo
+  const ground = stage.querySelector<HTMLElement>('.narr-ground');
+  const GROUND = 2000;
+  const placeGround = () => {
+    if (!ground) return;
+    const P = scene.P;
+    const c = P.pt(0, 0, 0);
+    const k = P.scale(c[2]);
+    const U = P.dir(1, 0, 0);
+    const V = P.dir(0, 0, 1);
+    const a = U[0] * k, b = U[1] * k, cc = V[0] * k, d = V[1] * k;
+    const e = c[0] - (a + cc) * (GROUND / 2);
+    const f = c[1] - (b + d) * (GROUND / 2);
+    ground.style.transform = `matrix(${a.toFixed(4)}, ${b.toFixed(4)}, ${cc.toFixed(4)}, ${d.toFixed(4)}, ${e.toFixed(1)}, ${f.toFixed(1)})`;
+  };
 
   let tall = isTall(innerWidth, innerHeight);
   let J = journey(tall);
@@ -142,6 +158,7 @@ export function initNarrative(opts: { reduced: boolean; test: boolean }) {
       drawnP = p;
       scene.set(p);
       scene.draw(frame(camAt(J.cams, p), area, tilt), t);
+      placeGround();
     } else scene.tick(t);
     requestAnimationFrame(loop);
   };
@@ -176,6 +193,8 @@ export function initNarrative(opts: { reduced: boolean; test: boolean }) {
       p = target();
       dirty = true;
     },
+    // posizione di scorrimento del capitolo i all'avanzamento c (0..1)
+    yFor: (i: number, c: number) => chapTops[i] + chapHs[i] * c - innerHeight * (tall ? ANCHOR_TALL : 0.5),
     // porta lo scorrimento al capitolo i, all'avanzamento c (0..1) del capitolo
     seekChapter: (i: number, c: number) => {
       const y = chapTops[i] + chapHs[i] * c - innerHeight * (tall ? ANCHOR_TALL : 0.5);

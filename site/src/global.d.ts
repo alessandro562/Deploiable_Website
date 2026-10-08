@@ -23,11 +23,15 @@ interface NarrativeHooks {
   freeze: (t: number | null) => void;
   /** porta subito la scena all'avanzamento dello scorrimento (senza inseguimento) */
   jump: () => void;
+  /** posizione di scorrimento del capitolo i all'avanzamento c */
+  yFor: (i: number, c: number) => number;
   /** scorre fino al capitolo i, all'avanzamento c (0..1) del capitolo */
   seekChapter: (i: number, c: number) => void;
 }
 
 interface Window {
+  /** registrazione fotogramma per fotogramma (scripts/capture.mjs): scorrimenti in JavaScript, non nativi */
+  __CAPTURE__?: boolean;
   __DEPLOIABLE__?: DeploiableHooks;
   __NARR__?: NarrativeHooks;
 }

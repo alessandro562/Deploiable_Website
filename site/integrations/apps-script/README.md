@@ -1,6 +1,6 @@
 # Richieste dalla landing → Google Sheet
 
-Il modulo della landing invia ogni richiesta (email aziendale, azienda, consenso, lingua) a un piccolo
+Il modulo della landing invia ogni richiesta (strada scelta, email aziendale, azienda, consenso, lingua) a un piccolo
 Google Apps Script che la scrive in un Google Sheet. Nessun servizio esterno in più, i dati restano nel
 vostro Google Workspace.
 
@@ -22,4 +22,7 @@ vostro Google Workspace.
   altro dominio): la pagina mostra la conferma quando l'invio non dà errori di rete. Per verificare, controlla
   che la riga compaia nel foglio.
 - Se modifichi lo script, fai **Gestisci deployment → Modifica → Nuova versione**: l'URL resta lo stesso.
+- **Colonna "Interesse" (V2 del sito)**: il modulo invia anche la strada scelta (`interest`: trasformare un
+  processo o costruire un prodotto AI). Per salvarla incolla il nuovo `Code.gs` e pubblica una nuova versione
+  come sopra; finché non lo fai, il campo viene ignorato e il resto della richiesta si salva come prima.
 - Nell'informativa privacy va indicato Google come responsabile del trattamento (vedi `privacy.html`).

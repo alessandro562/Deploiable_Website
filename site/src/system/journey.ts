@@ -34,7 +34,6 @@ const LB = {
   logic: l('LOGICA', 'LOGIC'),
   iface: l('INTERFACCIA', 'INTERFACE'),
   integr: l('INTEGRAZIONI', 'INTEGRATIONS'),
-  pTop: l('INTERFACCIA', 'INTERFACE'),
   pMid: l('SISTEMA AI', 'AI SYSTEM'),
   pBot: l('DATI E INTEGRAZIONI', 'DATA & INTEGRATIONS'),
   tData: l('DATI REALI', 'REAL DATA'),
@@ -85,7 +84,6 @@ export function journey(tall: boolean) {
   // lo stack in produzione
   add({ id: 'pBot', label: LB.pBot, ...left, r: 9 });
   add({ id: 'pMid', label: LB.pMid, ...left, r: 9 });
-  add({ id: 'pTop', label: LB.pTop, ...left, r: 9, face: productUI() });
   // contesto reale
   for (const k of ['tData', 'tUsers', 'tPerms', 'tEvals', 'tMon'] as const) add({ id: k, label: LB[k], fs: 8.5, r: 15 });
   // sistemi dell'azienda e interfacce d'uscita
@@ -310,14 +308,15 @@ export function journey(tall: boolean) {
       erp: into(bot, 0.1),
       ai: into({ ...mid, lime: 1 }, 0.05),
       approval: into(top, 0.1),
-      integr: into(bot),
+      // il prodotto non sparisce: i suoi strati diventano lo stack (l'interfaccia resta in cima, l'intelligenza
+      // diventa il sistema AI, le integrazioni la base); gli strati intermedi e il processo trasformato ci entrano
+      integr: { ...bot, lo: 0 },
       data: into(bot),
-      intel: into({ ...mid }),
+      intel: { ...mid, lo: 0 },
       logic: into(mid),
-      iface: into(top),
-      pBot: { ...bot, delay: 0.2 },
-      pMid: { ...mid, delay: 0.25 },
-      pTop: { ...top, delay: 0.3 },
+      iface: { ...top },
+      pBot: { ...bot, delay: 0.6 },
+      pMid: { ...mid, delay: 0.6 },
       ...tagFrame,
     },
     Object.fromEntries(Object.keys(tags).map((k, i) => [`x${k}`, { draw: 1, o: 0.8, delay: 0.45 + i * 0.05 }])),
@@ -346,7 +345,10 @@ export function journey(tall: boolean) {
     {
       pBot: { ...bot, s: k7, x: bot.x * k7 },
       pMid: { ...mid, s: k7, x: mid.x * k7, y: mid.y * k7 },
-      pTop: { ...top, s: k7, x: top.x * k7, y: top.y * k7 },
+      iface: { ...top, s: k7, x: top.x * k7, y: top.y * k7 },
+      // gli strati del prodotto restano sotto quelli dello stack e se ne vanno con loro
+      integr: { ...bot, s: k7, x: bot.x * k7, o: 0, lo: 0 },
+      intel: { ...mid, s: k7, x: mid.x * k7, y: mid.y * k7, o: 0, lo: 0 },
       ...Object.fromEntries(Object.keys(tagFrame).map((k) => [k, { ...tagFrame[k], o: 0, lo: 0, delay: 0 }])),
       ...sysFrame,
       ...outFrame,
@@ -380,6 +382,6 @@ export function journey(tall: boolean) {
         { t: [0, 10, -20], span: 360, vspan: 480, yaw: -8, pitch: 62 },
       ];
 
-  const spec: SceneSpec = { objects, links, frames, ground: { size: 2600, step: 40 } };
+  const spec: SceneSpec = { objects, links, frames };
   return { spec, cams };
 }

@@ -91,12 +91,30 @@ function anchors(reduced: boolean) {
     const target = id ? document.getElementById(id) : null;
     if (!target) return;
     e.preventDefault();
-    target.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
+    if (window.__CAPTURE__) jsScroll(target.getBoundingClientRect().top + scrollY);
+    else target.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
     history.replaceState(null, '', `#${id}`);
     // il fuoco segue il link (per tastiera e lettori di schermo), senza un secondo salto
     if (!target.hasAttribute('tabindex')) target.setAttribute('tabindex', '-1');
     target.focus({ preventScroll: true });
   });
+}
+
+/** Scorrimento in JavaScript (solo per la registrazione fotogramma per fotogramma, dove il tempo è simulato e
+ *  lo scorrimento morbido nativo andrebbe troppo veloce). */
+function jsScroll(to: number) {
+  const from = scrollY;
+  const max = document.documentElement.scrollHeight - innerHeight;
+  to = Math.min(max, Math.max(0, to));
+  const dur = Math.min(1400, 500 + Math.abs(to - from) * 0.12);
+  const t0 = performance.now();
+  const step = (t: number) => {
+    const k = Math.min(1, (t - t0) / dur);
+    const e = k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+    scrollTo(0, from + (to - from) * e);
+    if (k < 1) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
 }
 
 /** "Parliamo di un tuo processo / prodotto": la strada è già scelta nel modulo. */

@@ -450,8 +450,6 @@ export interface SceneSpec {
   links?: LinkSpec[];
   /** stati chiave: per ogni oggetto le proprietà diverse dai valori predefiniti; gli oggetti assenti sono invisibili */
   frames: { obj: Record<string, Partial<Props>>; link?: Record<string, Partial<LinkProps>> }[];
-  /** suolo a puntini (lo spazio in cui si muove il sistema) */
-  ground?: { size: number; step: number };
 }
 
 /** Riempie gli stati mancanti: un oggetto assente in uno stato resta dove era (o dove sarà), invisibile. */
@@ -480,7 +478,6 @@ export class Scene {
   private readonly objFrames: Props[][] = [];
   private readonly linkFrames: LinkProps[][] = [];
   private readonly objLayer: SVGGElement;
-  private readonly ground?: { g: SVGGElement; size: number };
   private order: Obj[] = [];
   readonly count: number;
   lang: 'it' | 'en' = 'it';
@@ -490,24 +487,6 @@ export class Scene {
     svg.classList.add('sys');
     this.count = spec.frames.length;
     const root = el('g', {}, svg);
-    if (spec.ground) {
-      // puntini ogni `step` unità, in un motivo: un solo rettangolo trasformato come il suolo
-      const id = `g${Math.random().toString(36).slice(2, 8)}`;
-      const defs = el('defs', {}, svg);
-      const pat = el('pattern', { id, width: spec.ground.step, height: spec.ground.step, patternUnits: 'userSpaceOnUse', x: spec.ground.step / 2, y: spec.ground.step / 2 }, defs);
-      el('circle', { cx: spec.ground.step / 2, cy: spec.ground.step / 2, r: 1.1, fill: INK.sage }, pat);
-      const mid = `${id}m`;
-      const grad = el('radialGradient', { id: `${mid}g` }, defs);
-      el('stop', { offset: '0', 'stop-color': '#fff', 'stop-opacity': 1 }, grad);
-      el('stop', { offset: '0.55', 'stop-color': '#fff', 'stop-opacity': 0.5 }, grad);
-      el('stop', { offset: '1', 'stop-color': '#fff', 'stop-opacity': 0 }, grad);
-      const mask = el('mask', { id: mid, maskContentUnits: 'objectBoundingBox' }, defs);
-      el('rect', { width: 1, height: 1, fill: `url(#${mid}g)` }, mask);
-      const g = el('g', { class: 'sys-ground' }, root);
-      const s = spec.ground.size;
-      el('rect', { x: -s / 2, y: -s / 2, width: s, height: s, fill: `url(#${id})`, mask: `url(#${mid})` }, g);
-      this.ground = { g, size: s };
-    }
     const shadows = el('g', { class: 'sys-shadows' }, root);
     const linkLayer = el('g', { class: 'sys-links' }, root);
     this.objLayer = el('g', { class: 'sys-objs' }, root);
@@ -559,13 +538,6 @@ export class Scene {
   draw(cam: Cam, time: number) {
     const P = this.P;
     P.set(cam);
-    if (this.ground) {
-      const c = P.pt(0, 0, 0);
-      const k = P.scale(c[2]);
-      const U = P.dir(1, 0, 0);
-      const V = P.dir(0, 0, 1);
-      this.ground.g.setAttribute('transform', `matrix(${f3(U[0] * k)} ${f3(U[1] * k)} ${f3(V[0] * k)} ${f3(V[1] * k)} ${f1(c[0])} ${f1(c[1])})`);
-    }
     for (const o of this.objs) o.draw(P, time);
     // ordine di disegno: dal più lontano al più vicino (solo se cambia)
     const sorted = [...this.objs].sort((a, b) => a.zc - b.zc);

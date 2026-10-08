@@ -227,6 +227,13 @@ export async function start(caps: Capabilities) {
     if (!playing || paused) return;
     const dt = Math.min(deltaMs, 100) / 1000;
     time += dt;
+    // intro finita e hero fuori dallo schermo: niente da disegnare, si aggiorna solo l'header
+    if (time > DURATION + 1 && window.scrollY >= heroBottom) {
+      if (moved) measureSlot();
+      moved = false;
+      dock();
+      return;
+    }
     draw();
   });
   window.addEventListener('resize', () => {

@@ -34,7 +34,7 @@ for (const [w, h] of sizes) {
     await page.evaluate(() => window.__NARR__?.freeze(1.3));
     const n = await page.evaluate(() => document.querySelectorAll('.chap').length);
     for (let i = 0; i < n; i++) {
-      for (const c of [0.2, 0.5, 0.8]) {
+      for (const c of (process.env.CS ?? '0.2,0.5,0.8').split(',').map(Number)) {
         await page.evaluate(([i, c]) => window.__NARR__.seekChapter(i, c), [i, c]);
         await settle(page);
         await page.evaluate(() => window.__NARR__?.jump());
