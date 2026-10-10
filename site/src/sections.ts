@@ -16,12 +16,13 @@ function headerSurface() {
   const header = document.querySelector<HTMLElement>('.top');
   // le sezioni a colore pieno: quelle con data-surface (testi della barra), la storia scura, il footer Lime
   const secs = Array.from(document.querySelectorAll<HTMLElement>('[data-surface], .story, .foot, #hero'));
-  let spans: { top: number; bottom: number; surface: string; bar: string; hero: boolean; story: boolean; foot: boolean }[] = [];
+  let spans: { el: HTMLElement; top: number; bottom: number; surface: string; bar: string; hero: boolean; story: boolean; foot: boolean }[] = [];
   const measure = () => {
     const y = scrollY;
     spans = secs.map((s) => {
       const r = s.getBoundingClientRect();
       return {
+        el: s,
         top: r.top + y,
         bottom: r.bottom + y,
         surface: s.dataset.surface ?? '',
@@ -37,6 +38,22 @@ function headerSurface() {
   const update = () => {
     const line = scrollY + (header?.offsetHeight ?? 60) / 2;
     const hit = spans.find((s) => line >= s.top && line < s.bottom);
+    // sezione con luce: la barra riporta l'alone della sezione sul suo rettangolo, che si sposta con lo scroll
+    const lightSurface = !!hit?.surface && !!header;
+    if (lightSurface) {
+      const r = hit.el.getBoundingClientRect();
+      const cs = getComputedStyle(hit.el);
+      header.style.setProperty('--sec-x', `${r.left}px`);
+      header.style.setProperty('--sec-y', `${r.top}px`);
+      header.style.setProperty('--sec-w', `${r.width}px`);
+      header.style.setProperty('--sec-h', `${r.height}px`);
+      for (const k of ['--lit-hi', '--lit-base', '--lit-x', '--lit-y']) {
+        const v = cs.getPropertyValue(k).trim();
+        if (v) header.style.setProperty(k, v);
+        else header.style.removeProperty(k);
+      }
+    }
+    header?.classList.toggle('on-surface', lightSurface);
     // la barra prende il colore esatto della sezione sotto; sulla hero (nessuna sezione a colore pieno) è trasparente.
     // Sulla storia il colore segue l'onda Lime della chiusura: Forest finché l'header è sopra la parte scura
     // (is-dark-under, da app.ts), Lime dopo.
@@ -101,6 +118,7 @@ function navMenu() {
 
 /** Link interni: scorrimento morbido (istantaneo con il movimento ridotto), il fuoco passa alla sezione. */
 function anchors(reduced: boolean) {
+  const header = document.querySelector<HTMLElement>('.top');
   document.addEventListener('click', (e) => {
     const a = (e.target as HTMLElement).closest<HTMLAnchorElement>('a[href^="#"]');
     if (!a || e.defaultPrevented || e.metaKey || e.ctrlKey) return;
@@ -108,12 +126,21 @@ function anchors(reduced: boolean) {
     const target = id ? document.getElementById(id) : null;
     if (!target) return;
     e.preventDefault();
-    if (window.__CAPTURE__) jsScroll(target.getBoundingClientRect().top + scrollY);
-    else target.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
+    // il form sta nella hero: "Prenota una call" riporta all'inizio, con la hero intera e il form sotto la barra.
+    // Le altre destinazioni si fermano sotto la barra fissa, non dietro.
+    const form = target.querySelector<HTMLElement>('form');
+    const inHero = !!target.closest('#hero');
+    const to = inHero ? 0 : target.getBoundingClientRect().top + scrollY - (header?.offsetHeight ?? 0);
+    if (window.__CAPTURE__) jsScroll(to);
+    else scrollTo({ top: Math.max(0, to), behavior: reduced ? 'auto' : 'smooth' });
     history.replaceState(null, '', `#${id}`);
-    // il fuoco segue il link (per tastiera e lettori di schermo), senza un secondo salto
-    if (!target.hasAttribute('tabindex')) target.setAttribute('tabindex', '-1');
-    target.focus({ preventScroll: true });
+    // il fuoco segue il link (per tastiera e lettori di schermo), senza un secondo salto: sul form va al primo campo
+    // (con il mouse; sul telefono la tastiera si aprirebbe a metà dello scorrimento), altrove sul contenitore
+    const field = form?.querySelector<HTMLInputElement>('input:not([tabindex="-1"]):not([type="hidden"])');
+    const fine = matchMedia('(pointer: fine)').matches;
+    const focusEl = field && fine && target.closest<HTMLElement>('[data-state]')?.dataset.state !== 'done' ? field : target;
+    if (focusEl === target && !target.hasAttribute('tabindex')) target.setAttribute('tabindex', '-1');
+    focusEl.focus({ preventScroll: true });
   });
 }
 

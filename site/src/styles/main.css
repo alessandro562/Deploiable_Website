@@ -162,6 +162,12 @@ p {
 .top.on-hero::before {
   opacity: 0;
 }
+/* sulle sezioni con luce (Cosa facciamo) la barra disegna lo stesso alone della sezione, posato sul suo rettangolo
+   (--sec-*, da headerSurface): i pixel della barra sono quelli della sezione sotto */
+.top.on-surface::before {
+  background: radial-gradient(55% 85% at var(--lit-x, 50%) var(--lit-y, 50%), var(--lit-hi) 0%, var(--lit-base) 100%)
+    var(--sec-x, 0) var(--sec-y, 0) / var(--sec-w, 100%) var(--sec-h, 100%) no-repeat;
+}
 /* dove il fondo è il Lime del canvas (hero scrollata, chiusura della storia, footer) la barra ne prende la stessa luce;
    scrollando il logo è l'SVG sopra la barra */
 .is-scrolled .top.on-lime::before {
@@ -1066,6 +1072,10 @@ p {
 :focus-visible {
   outline: 2px solid var(--ink-strong);
   outline-offset: 4px;
+}
+/* contenitori che ricevono il fuoco solo dal codice (destinazione di un link interno): nessun riquadro */
+[tabindex='-1']:focus {
+  outline: none;
 }
 
 /* Caratteri: Satoshi per logo, titoli e frase principale; Geist per tutto ciò che è piccolo (sottotitolo, modulo,
