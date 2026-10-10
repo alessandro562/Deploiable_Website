@@ -21,10 +21,9 @@
   </head>
   <body>
     <div class="board">
-      <figure class="desk"><div class="slot" data-tpl="mk-01-1"></div><figcaption>01 · tappa 1 · mappa del processo · desktop, 560 px</figcaption></figure>
-      <figure class="phone"><div class="slot" data-tpl="mk-01-1"></div><figcaption>telefono, colonna da 342 px</figcaption></figure>
-      <figure class="desk"><div class="slot" data-tpl="mk-01-3"></div><figcaption>01 · tappa 3 (da rifare come schema)</figcaption></figure>
-      <figure class="desk"><div class="slot" data-tpl="mk-01-2"></div><figcaption>01 · tappa 2 · in produzione (approvato)</figcaption></figure>
+      <figure class="desk"><div class="slot" data-tpl="mk-01-1"></div><figcaption>01 · tappa 1 · oggi (approvata)</figcaption></figure>
+      <figure class="desk"><div class="slot" data-tpl="mk-01-2"></div><figcaption>01 · tappa 2 · con l’AI, in produzione</figcaption></figure>
+      <figure class="phone"><div class="slot" data-tpl="mk-01-2"></div><figcaption>tappa 2 · telefono, 342 px</figcaption></figure>
     </div>
 
     <template id="mk-01-3">
@@ -128,36 +127,24 @@
       <div class="mk" aria-hidden="true">
         <div class="mk-fit">
           <div class="mk-stage">
-            <div class="mk-layer mk-panel mk-flow">
+            <div class="mk-layer mk-panel mk-map">
               <div class="mk-flow-head">
                 <div>
-                  <div class="mk-k">Ufficio acquisti</div>
-                  <div class="mk-t">Gestione ordini fornitori</div>
+                  <div class="mk-k">Mappa del processo · con l’AI</div>
+                  <div class="mk-t">Ordini ai fornitori</div>
                 </div>
                 <span class="mk-pill mk-pill--live">In produzione</span>
               </div>
-              <ol class="mk-steps">
-                <li class="mk-step">
-                  <span class="mk-node"><svg class="mk-ico" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg></span>
-                  <div><div class="mk-b">Ricezione ordini</div><div class="mk-s">Email e PDF</div></div>
-                  <span class="mk-pill mk-pill--done"><svg class="mk-ico" viewBox="0 0 24 24" style="width:1.1em;height:1.1em"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Completato</span>
-                </li>
-                <li class="mk-step">
-                  <span class="mk-node mk-node--ai"><svg class="mk-ico" viewBox="0 0 24 24" style="fill:currentColor;stroke:none"><path d="M12 2.5c.7 4.6 3 6.9 7.6 7.6-4.6.7-6.9 3-7.6 7.6-.7-4.6-3-6.9-7.6-7.6 4.6-.7 6.9-3 7.6-7.6Z"/><path d="M19 15.5c.3 1.9 1.2 2.8 3 3.1-1.8.3-2.7 1.2-3 3.1-.3-1.9-1.2-2.8-3-3.1 1.8-.3 2.7-1.2 3-3.1Z"/></svg></span>
-                  <div><div class="mk-b">Estrazione dati</div><div class="mk-s">Agente AI</div><div class="mk-bar"><i></i></div></div>
-                  <span class="mk-pill mk-pill--run">In corso</span>
-                </li>
-                <li class="mk-step">
-                  <span class="mk-node"><svg class="mk-ico" viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v12c0 1.7 3.1 3 7 3s7-1.3 7-3V6M5 12c0 1.7 3.1 3 7 3s7-1.3 7-3"/></svg></span>
-                  <div><div class="mk-b">Controllo sul gestionale</div><div class="mk-s">Integrazione ERP</div></div>
-                  <span class="mk-pill mk-pill--wait">In coda</span>
-                </li>
-                <li class="mk-step">
-                  <span class="mk-node"><svg class="mk-ico" viewBox="0 0 24 24"><circle cx="10" cy="8" r="3.5"/><path d="M3.5 20c.8-3.6 3.4-5.5 6.5-5.5 1.5 0 2.9.4 4 1.3M15.5 18.5l2 2 4-4"/></svg></span>
-                  <div><div class="mk-b">Approvazione</div><div class="mk-s">Responsabile acquisti</div></div>
-                  <span class="mk-pill mk-pill--wait">In attesa</span>
-                </li>
-              </ol>
+              <div class="mk-flowmap">
+                <div class="mk-n"><svg class="mk-ico" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg><div><div class="mk-b">Ricezione</div><div class="mk-s">Email e PDF</div></div></div>
+                <span class="mk-link mk-link--ai"></span>
+                <div class="mk-n mk-n--ai"><svg class="mk-ico" viewBox="0 0 24 24" style="fill:currentColor;stroke:none"><path d="M12 2.5c.7 4.6 3 6.9 7.6 7.6-4.6.7-6.9 3-7.6 7.6-.7-4.6-3-6.9-7.6-7.6 4.6-.7 6.9-3 7.6-7.6Z"/><path d="M19 15.5c.3 1.9 1.2 2.8 3 3.1-1.8.3-2.7 1.2-3 3.1-.3-1.9-1.2-2.8-3-3.1 1.8-.3 2.7-1.2 3-3.1Z"/></svg><div><div class="mk-b">Estrazione</div><div class="mk-s">Agente AI</div></div></div>
+                <span class="mk-link mk-link--ai"></span>
+                <div class="mk-n"><svg class="mk-ico" viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v12c0 1.7 3.1 3 7 3s7-1.3 7-3V6M5 12c0 1.7 3.1 3 7 3s7-1.3 7-3"/></svg><div><div class="mk-b">Verifica</div><div class="mk-s">Sul gestionale</div></div></div>
+                <span class="mk-link"></span>
+                <div class="mk-n mk-n--hot"><svg class="mk-ico" viewBox="0 0 24 24"><circle cx="10" cy="8" r="3.5"/><path d="M3.5 20c.8-3.6 3.4-5.5 6.5-5.5 1.5 0 2.9.4 4 1.3M15.5 18.5l2 2 4-4"/></svg><div><div class="mk-b">Approvazione</div><div class="mk-s">Responsabile</div></div><span class="mk-flag mk-flag--ok"><svg viewBox="0 0 24 24"><path d="M6 12.5l4 4L18 8.5"/></svg></span></div>
+                <div class="mk-note"><div><div class="mk-b">Inserimento automatico</div><div class="mk-s">L’AI legge i PDF e compila l’ordine.</div></div></div>
+              </div>
             </div>
 
             <div class="mk-panel mk-sources">
@@ -166,17 +153,14 @@
               <span class="mk-src"><svg class="mk-ico" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20c.6-3.4 3-5 6-5s5.4 1.6 6 5M16 4.5a3 3 0 0 1 0 6M18 15c1.6.6 2.7 2.2 3 5"/></svg>CRM</span>
             </div>
 
-            <div class="mk-panel mk-approve">
-              <div class="mk-approve-head">
-                <span class="mk-avatar"><svg class="mk-ico" viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="3.5"/><path d="M5 20c.9-3.6 3.7-5.5 7-5.5s6.1 1.9 7 5.5"/></svg></span>
-                <div><div class="mk-b">Approvazione richiesta</div><div class="mk-s">Ordine 4821 · fornitore abituale</div></div>
-              </div>
+            <div class="mk-panel mk-goal mk-goal--low">
+              <div class="mk-k">Persona al controllo</div>
+              <div class="mk-t">L’ultima parola è vostra</div>
               <div class="mk-rows">
-                <div class="mk-row"><span>Righe estratte</span><b>12 di 12</b></div>
-                <div class="mk-row"><span>Prezzi a listino</span><b>Conformi</b></div>
-                <div class="mk-row"><span>Anagrafica</span><b>Verificata</b></div>
+                <div class="mk-row"><span>L’AI prepara</span><b>Ordine compilato</b></div>
+                <div class="mk-row"><span>La persona</span><b>Approva o corregge</b></div>
+                <div class="mk-row"><span>Ogni passaggio</span><b class="mk-accent">Tracciato</b></div>
               </div>
-              <div class="mk-actions"><span class="mk-btn mk-btn--primary">Approva</span><span class="mk-btn mk-btn--ghost">Rivedi</span></div>
             </div>
           </div>
         </div>
