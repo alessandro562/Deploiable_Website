@@ -146,8 +146,8 @@ p {
   position: absolute;
   inset: 0;
   z-index: -1;
-  /* niente velo né sfocatura: l'header è trasparente, resta solo il filo sotto */
-  background: none;
+  /* a pagina scorsa l'header è pieno (il testo sotto non deve vedersi): il colore della palette; in cima resta trasparente */
+  background: var(--bg);
   border-bottom: 1px solid rgb(255 255 255 / 0.55);
 
   opacity: 0;
@@ -810,7 +810,7 @@ p {
 /* sopra la fascia scura l'header è vetro scuro, logo e lingua chiari */
 .is-dark-under .top::before {
   opacity: 1;
-  background: none;
+  background: var(--forest);
   border-bottom-color: rgb(241 243 234 / 0.14);
 
 }
