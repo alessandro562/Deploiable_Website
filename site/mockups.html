@@ -7,29 +7,85 @@
     <title>Mockup · anteprima di sviluppo</title>
     <!-- Pagina di sviluppo per rivedere le figure in isolamento. Non è tra gli input del build (vite.config.ts),
          quindi non va pubblicata. Si apre con `npm run dev` su /mockups.html -->
+    <link rel="stylesheet" href="/src/styles/fonts.css" />
+    <link rel="stylesheet" href="/src/styles/mockups.css" />
     <style>
       :root { color-scheme: light; }
       body { margin: 0; background: #f1f3ea; color: #10261b; font: 500 14px/1.5 system-ui, sans-serif; }
-      .board { display: flex; flex-wrap: wrap; gap: 56px; padding: 56px; align-items: flex-start; }
+      .board { display: flex; flex-wrap: wrap; gap: 72px; padding: 56px; align-items: flex-start; }
       figure { margin: 0; }
-      figcaption { margin-top: 14px; font-size: 13px; color: #3f5a46; letter-spacing: 0.02em; }
-      img { display: block; height: auto; }
+      figcaption { margin-top: 18px; font-size: 13px; color: #3f5a46; letter-spacing: 0.02em; }
       .desk { width: 560px; }
-      .phone { width: 390px; }
-      .dark { background: #10261b; padding: 40px; border-radius: 16px; }
-      .dark figcaption { color: #8fa596; }
+      .phone { width: 342px; }
     </style>
   </head>
   <body>
     <div class="board">
-      <figure class="desk">
-        <img src="/assets/mockups/processi.svg" width="560" height="360" alt="" />
-        <figcaption>01 · processi · desktop, 560 px</figcaption>
-      </figure>
-      <figure class="phone">
-        <img src="/assets/mockups/processi.svg" width="390" alt="" />
-        <figcaption>telefono, 390 px</figcaption>
-      </figure>
+      <figure class="desk"><div class="slot"></div><figcaption>01 · processi · desktop, 560 px</figcaption></figure>
+      <figure class="phone"><div class="slot"></div><figcaption>telefono, colonna da 342 px</figcaption></figure>
     </div>
+
+    <template id="mk-processi">
+      <div class="mk" aria-hidden="true">
+        <div class="mk-fit">
+          <div class="mk-stage">
+            <div class="mk-layer mk-panel mk-flow">
+              <div class="mk-flow-head">
+                <div>
+                  <div class="mk-k">Ufficio acquisti</div>
+                  <div class="mk-t">Gestione ordini fornitori</div>
+                </div>
+                <span class="mk-pill mk-pill--live">In produzione</span>
+              </div>
+              <ol class="mk-steps">
+                <li class="mk-step">
+                  <span class="mk-node"><svg class="mk-ico" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg></span>
+                  <div><div class="mk-b">Ricezione ordini</div><div class="mk-s">Email e PDF</div></div>
+                  <span class="mk-pill mk-pill--done"><svg class="mk-ico" viewBox="0 0 24 24" style="width:1.1em;height:1.1em"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Completato</span>
+                </li>
+                <li class="mk-step">
+                  <span class="mk-node mk-node--ai"><svg class="mk-ico" viewBox="0 0 24 24" style="fill:currentColor;stroke:none"><path d="M12 2.5c.7 4.6 3 6.9 7.6 7.6-4.6.7-6.9 3-7.6 7.6-.7-4.6-3-6.9-7.6-7.6 4.6-.7 6.9-3 7.6-7.6Z"/><path d="M19 15.5c.3 1.9 1.2 2.8 3 3.1-1.8.3-2.7 1.2-3 3.1-.3-1.9-1.2-2.8-3-3.1 1.8-.3 2.7-1.2 3-3.1Z"/></svg></span>
+                  <div><div class="mk-b">Estrazione dati</div><div class="mk-s">Agente AI</div><div class="mk-bar"><i></i></div></div>
+                  <span class="mk-pill mk-pill--run">In corso</span>
+                </li>
+                <li class="mk-step">
+                  <span class="mk-node"><svg class="mk-ico" viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v12c0 1.7 3.1 3 7 3s7-1.3 7-3V6M5 12c0 1.7 3.1 3 7 3s7-1.3 7-3"/></svg></span>
+                  <div><div class="mk-b">Controllo sul gestionale</div><div class="mk-s">Integrazione ERP</div></div>
+                  <span class="mk-pill mk-pill--wait">In coda</span>
+                </li>
+                <li class="mk-step">
+                  <span class="mk-node"><svg class="mk-ico" viewBox="0 0 24 24"><circle cx="10" cy="8" r="3.5"/><path d="M3.5 20c.8-3.6 3.4-5.5 6.5-5.5 1.5 0 2.9.4 4 1.3M15.5 18.5l2 2 4-4"/></svg></span>
+                  <div><div class="mk-b">Approvazione</div><div class="mk-s">Responsabile acquisti</div></div>
+                  <span class="mk-pill mk-pill--wait">In attesa</span>
+                </li>
+              </ol>
+            </div>
+
+            <div class="mk-panel mk-sources">
+              <span class="mk-src"><svg class="mk-ico" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>Email</span>
+              <span class="mk-src"><svg class="mk-ico" viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v12c0 1.7 3.1 3 7 3s7-1.3 7-3V6M5 12c0 1.7 3.1 3 7 3s7-1.3 7-3"/></svg>ERP</span>
+              <span class="mk-src"><svg class="mk-ico" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20c.6-3.4 3-5 6-5s5.4 1.6 6 5M16 4.5a3 3 0 0 1 0 6M18 15c1.6.6 2.7 2.2 3 5"/></svg>CRM</span>
+            </div>
+
+            <div class="mk-panel mk-approve">
+              <div class="mk-approve-head">
+                <span class="mk-avatar"><svg class="mk-ico" viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="3.5"/><path d="M5 20c.9-3.6 3.7-5.5 7-5.5s6.1 1.9 7 5.5"/></svg></span>
+                <div><div class="mk-b">Approvazione richiesta</div><div class="mk-s">Ordine 4821 · fornitore abituale</div></div>
+              </div>
+              <div class="mk-rows">
+                <div class="mk-row"><span>Righe estratte</span><b>12 di 12</b></div>
+                <div class="mk-row"><span>Prezzi a listino</span><b>Conformi</b></div>
+                <div class="mk-row"><span>Anagrafica</span><b>Verificata</b></div>
+              </div>
+              <div class="mk-actions"><span class="mk-btn mk-btn--primary">Approva</span><span class="mk-btn mk-btn--ghost">Rivedi</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </template>
+    <script>
+      const t = document.getElementById('mk-processi');
+      document.querySelectorAll('.slot').forEach((s) => s.appendChild(t.content.cloneNode(true)));
+    </script>
   </body>
 </html>

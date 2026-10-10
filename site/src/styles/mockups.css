@@ -1,0 +1,136 @@
+/* Mockup delle due linee di prodotto: interfacce realistiche in prospettiva, testo vero nei font del brand.
+   Tutte le misure sono in em; .mk fissa 1em = 1/56 della larghezza della colonna, così la figura scala
+   da 560 px (desktop) a 320 px (telefono) restando identica. Decorative: aria-hidden nel markup. */
+
+.mk {
+  --mk-ink: #10261b;
+  --mk-soft: #4f6a55;
+  --mk-faint: #8fa596;
+  --mk-line: rgb(16 38 27 / 0.09);
+  --mk-surface: #fcfdf9;
+  --mk-sunk: #f1f3ea;
+  container-type: inline-size;
+  width: 100%;
+  max-width: 560px;
+  aspect-ratio: 560 / 430;
+  position: relative;
+  user-select: none;
+  pointer-events: none;
+}
+.mk-fit {
+  position: absolute;
+  inset: 0;
+  font: 500 calc(100cqw / 56) / 1.35 'Geist', system-ui, sans-serif;
+  color: var(--mk-ink);
+  perspective: 160em;
+  perspective-origin: 50% 30%;
+}
+/* il piano inclinato: un po' da sopra, un po' da destra */
+.mk-stage {
+  position: absolute;
+  left: 4.5em;
+  top: 4.5em;
+  width: 40em;
+  transform-style: preserve-3d;
+  transform: rotateX(22deg) rotateY(-14deg) rotateZ(5deg);
+}
+.mk-layer { transform-style: preserve-3d; }
+
+/* superficie di un pannello: bordo sottile, luce dall'alto, ombra a più strati */
+.mk-panel {
+  background: var(--mk-surface);
+  border-radius: 1.4em;
+  box-shadow:
+    inset 0 0 0 0.1em var(--mk-line),
+    inset 0 0.1em 0 rgb(255 255 255 / 0.9),
+    0 0.1em 0.2em rgb(16 38 27 / 0.06),
+    0 1.2em 2.4em -0.6em rgb(16 38 27 / 0.14),
+    0 4em 6em -2em rgb(16 38 27 / 0.2);
+}
+
+/* testi */
+.mk-k { font-size: 0.95em; letter-spacing: 0.08em; text-transform: uppercase; color: var(--mk-soft); font-weight: 600; }
+.mk-t { font: 700 1.5em/1.15 'Satoshi', system-ui, sans-serif; letter-spacing: -0.01em; }
+.mk-s { font-size: 1.05em; color: var(--mk-soft); }
+.mk-b { font-size: 1.2em; font-weight: 600; }
+
+/* stati */
+.mk-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  padding: 0.35em 0.8em;
+  border-radius: 99em;
+  font-size: 0.95em;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.mk-pill--live { background: #10261b; color: #f1f3ea; }
+.mk-pill--live::before { content: ''; width: 0.6em; height: 0.6em; border-radius: 50%; background: #c8f25a; box-shadow: 0 0 0 0.25em rgb(200 242 90 / 0.25); }
+.mk-pill--done { background: rgb(143 165 150 / 0.18); color: var(--mk-ink); }
+.mk-pill--run { background: #c8f25a; color: #10261b; }
+.mk-pill--wait { background: transparent; color: var(--mk-soft); box-shadow: inset 0 0 0 0.1em rgb(16 38 27 / 0.18); }
+
+.mk-ico { width: 1.6em; height: 1.6em; flex: none; stroke: currentColor; fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+
+/* ——— 01 · processi ——— */
+.mk-flow { padding: 1.8em 2em 1.4em; }
+.mk-flow-head { display: flex; align-items: center; justify-content: space-between; gap: 1em; padding-bottom: 1.4em; border-bottom: 0.1em solid var(--mk-line); }
+.mk-flow-head .mk-t { margin-top: 0.3em; }
+.mk-steps { list-style: none; margin: 0; padding: 0.6em 0 0; }
+.mk-step {
+  display: grid;
+  grid-template-columns: 3.4em 1fr auto;
+  align-items: center;
+  gap: 1.2em;
+  padding: 1em 0;
+  position: relative;
+}
+.mk-step + .mk-step { border-top: 0.1em solid var(--mk-line); }
+.mk-node {
+  width: 3.4em;
+  height: 3.4em;
+  border-radius: 1em;
+  display: grid;
+  place-items: center;
+  background: var(--mk-sunk);
+  color: var(--mk-ink);
+  box-shadow: inset 0 0 0 0.1em var(--mk-line);
+}
+.mk-node--ai { background: #10261b; color: #c8f25a; box-shadow: 0 0.6em 1.2em -0.4em rgb(16 38 27 / 0.5); }
+.mk-bar { height: 0.45em; border-radius: 99em; background: var(--mk-sunk); margin-top: 0.6em; overflow: hidden; width: 70%; }
+.mk-bar i { display: block; height: 100%; width: 64%; border-radius: inherit; background: #10261b; }
+
+/* scheda che si stacca dal piano: la persona approva */
+.mk-approve {
+  position: absolute;
+  right: -9.5em;
+  bottom: -7em;
+  width: 21em;
+  padding: 1.5em 1.6em 1.6em;
+  transform: translateZ(6em);
+}
+.mk-approve-head { display: flex; align-items: center; gap: 1em; }
+.mk-avatar { width: 3.2em; height: 3.2em; border-radius: 50%; background: #1c3a2a; color: #f1f3ea; display: grid; place-items: center; font-weight: 600; font-size: 1.05em; flex: none; }
+.mk-rows { margin: 1.2em 0 1.3em; display: grid; gap: 0.7em; }
+.mk-row { display: flex; justify-content: space-between; font-size: 1.05em; color: var(--mk-soft); }
+.mk-row b { color: var(--mk-ink); font-weight: 600; }
+.mk-actions { display: flex; gap: 0.8em; }
+.mk-btn { flex: 1; text-align: center; padding: 0.85em 0; border-radius: 0.9em; font-weight: 600; font-size: 1.1em; }
+.mk-btn--primary { background: #10261b; color: #f1f3ea; }
+.mk-btn--ghost { box-shadow: inset 0 0 0 0.1em rgb(16 38 27 / 0.18); }
+
+/* fonti collegate, in alto a sinistra, sollevate di poco */
+.mk-sources {
+  position: absolute;
+  left: -5em;
+  top: -3em;
+  display: flex;
+  align-items: center;
+  gap: 0.9em;
+  padding: 0.9em 1.2em;
+  border-radius: 1.2em;
+  transform: translateZ(4em);
+}
+.mk-src { display: inline-flex; align-items: center; gap: 0.45em; font-size: 1.05em; font-weight: 600; }
+.mk-src + .mk-src { padding-left: 0.9em; border-left: 0.1em solid var(--mk-line); }
