@@ -134,21 +134,27 @@ p {
 .top {
   position: fixed;
   z-index: 15; /* sopra l'hero (che parte da y = 0): il logo deve ricevere passaggio del mouse e clic */
-  top: 0;
-  left: 0;
-  right: 0;
-  padding: max(var(--pad-top), env(safe-area-inset-top)) var(--pad-x) var(--s-4);
+  top: max(var(--s-3), env(safe-area-inset-top));
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: var(--s-5);
+  padding: var(--s-2) var(--s-6);
+  /* fissa (position fixed con left 50%: senza questo la larghezza sarebbe metà schermo) */
+  width: max-content;
+  max-width: calc(100vw - 2 * var(--s-3));
 }
-/* Barra di vetro a parallelogramma: contiene logo, menu e lingua. In cima è trasparente; scorrendo il vetro
-   diventa più pieno (--glass, impostata da src/app.ts secondo lo scroll). Con il 3D resta trasparente fino a
-   intro finita: il logo 3D (sul canvas, sotto la pagina) non va sfocato né coperto prima. */
+/* Pillola di vetro, piccola e centrale: contiene logo, etichetta, menu e lingua. In cima è trasparente; scorrendo
+   il vetro si fa pieno (--glass, impostata da src/app.ts). Con il 3D resta trasparente fino a intro finita: il logo
+   3D (sul canvas, sotto la pagina) non va sfocato né coperto prima. */
 .top::before {
   content: '';
   position: absolute;
-  inset: var(--s-2) calc(var(--pad-x) * 0.5) var(--s-1);
+  inset: 0;
   z-index: -1;
   pointer-events: none;
-  clip-path: polygon(22px 0, 100% 0, calc(100% - 22px) 100%, 0 100%);
+  border-radius: 999px;
   background: color-mix(in srgb, var(--bg) calc(var(--glass, 0) * 100%), transparent);
   backdrop-filter: blur(calc(var(--glass, 0) * 14px));
   -webkit-backdrop-filter: blur(calc(var(--glass, 0) * 14px));
@@ -160,10 +166,20 @@ p {
   --glass: 1;
 }
 @media (max-width: 640px) {
-  /* su telefono l'etichetta "Coming soon" sta sotto il logo: la barra la deve contenere */
+  .top {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--s-2) var(--s-4);
+    padding: var(--s-2) var(--s-4);
+    border-radius: 28px;
+  }
   .top::before {
-    bottom: auto;
-    height: calc(var(--pad-top) + var(--logo-w) * 0.19 + 44px);
+    border-radius: 28px;
+  }
+  .top > .logo-slot,
+  .top > .nav,
+  .top > .lang {
+    flex: 0 0 auto;
   }
 }
 .logo-slot {
@@ -286,11 +302,8 @@ p {
 
 /* ---------- Lingua: IT / EN, discreto in alto a destra ---------- */
 .lang {
-  position: fixed;
+  position: relative;
   z-index: 20;
-  /* allineato in verticale al logo dell'header (alto circa 0,19 × la sua larghezza) */
-  top: max(calc(var(--pad-top) + var(--logo-w) * 0.095 - 22px), env(safe-area-inset-top));
-  right: max(calc(var(--pad-x) - 8px), env(safe-area-inset-right));
   display: flex;
   align-items: center;
   font: var(--t-label);
@@ -1035,11 +1048,6 @@ p {
 
 /* "Coming soon": nell'header accanto al logo (sotto il logo su telefono) e nel footer */
 .soon--top {
-  position: absolute;
-  z-index: 16;
-  left: calc(var(--pad-x) + var(--logo-w) + var(--s-5));
-  top: calc(var(--pad-top) + var(--logo-w) * 0.095);
-  transform: translateY(-50%);
   margin: 0;
   color: var(--ink-strong);
   white-space: nowrap;
@@ -1052,8 +1060,8 @@ p {
 }
 @media (max-width: 640px) {
   .soon--top {
-    left: var(--pad-x);
-    top: calc(var(--pad-top) + var(--logo-w) * 0.19 + 8px);
-    transform: none;
+    order: 9;
+    flex-basis: 100%;
+    text-align: center;
   }
 }

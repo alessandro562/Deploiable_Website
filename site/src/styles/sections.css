@@ -62,16 +62,11 @@
 /* ---------- Navigazione: a destra nell'header, prima della lingua ---------- */
 .nav {
   --nav-ink: var(--ink-strong);
-  position: fixed;
+  position: relative;
   z-index: 20;
-  top: max(calc(var(--pad-top) + var(--logo-w) * 0.095 - 22px), env(safe-area-inset-top));
-  right: calc(max(calc(var(--pad-x) - 8px), env(safe-area-inset-right)) + 104px);
   display: flex;
   align-items: center;
   height: 44px;
-}
-.is-webgl .nav {
-  visibility: hidden; /* entra con i testi dell'hero (src/app.ts) */
 }
 .is-dark-under .nav {
   --nav-ink: var(--mist);
@@ -91,6 +86,7 @@
   display: inline-flex;
   align-items: center;
   height: 44px;
+  white-space: nowrap;
   padding: 0 var(--s-3);
   font: 500 14px / 1 var(--text);
   letter-spacing: -0.005em;
