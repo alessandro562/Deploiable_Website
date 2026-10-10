@@ -213,10 +213,10 @@ if (!mobile) {
   await press('.line-toggle[data-journey="1"]');
   await hold(1.2);
   await phases(1, 0.9);
-  // in fondo al percorso: si passa al Product Studio
-  await scroll((await top('#journey-1 .journey-foot')) - 560, 0.9);
+  // si torna alla card del Product Studio (accanto) e si apre la sua colonna: l'altra si chiude
+  await scroll((await top('.line-toggle[data-journey="2"]')) - 260, 0.9);
   await hold(0.2);
-  await press('#journey-1 [data-journey-switch="2"]');
+  await press('.line-toggle[data-journey="2"]');
   await hold(1.1);
   await phases(2, 0.6);
   // dal percorso al contatto, con la strada già scelta

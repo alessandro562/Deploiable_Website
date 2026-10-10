@@ -25,7 +25,7 @@ test('subito sotto la hero: "Cosa facciamo" con le due linee di prodotto', async
   expect(gap).toBeLessThan(2);
 });
 
-test('i percorsi sono chiusi: si apre solo quello scelto, poi si chiude o si passa all’altro', async ({ page }) => {
+test('i percorsi sono chiusi: si apre solo quello scelto, poi si chiude o si passa all’altro', async ({ page }, info) => {
   await ready(page);
   const j1 = page.locator('#journey-1'), j2 = page.locator('#journey-2');
   const t1 = page.locator('.line-toggle[data-journey="1"]'), t2 = page.locator('.line-toggle[data-journey="2"]');
@@ -45,7 +45,16 @@ test('i percorsi sono chiusi: si apre solo quello scelto, poi si chiude o si pas
   await expect(t1).toHaveAttribute('aria-expanded', 'true');
   await expect(j1).toBeFocused();
   // in fondo: passa all'altro
-  await page.click('#journey-1 [data-journey-switch="2"]');
+  // su telefono le colonne sono una sotto l'altra: c'è il pulsante "vedi l'altro"; su desktop l'altra colonna
+  // è già a fianco e si apre dal suo pulsante
+  const other = page.locator('#journey-1 [data-journey-switch="2"]');
+  if (info.project.name === 'mobile') {
+    await expect(other).toBeVisible();
+    await other.click();
+  } else {
+    await expect(other).toBeHidden();
+    await t2.click();
+  }
   await expect(j1).toBeHidden();
   await expect(j2).toBeVisible();
   await expect(t2).toHaveAttribute('aria-expanded', 'true');
@@ -62,6 +71,32 @@ test('i percorsi sono chiusi: si apre solo quello scelto, poi si chiude o si pas
   // "Come lavoriamo" non è più una sezione a sé: l'ancora porta alle due card
   await expect(page.locator('section#metodo, .sec--method')).toHaveCount(0);
   await expect(page.locator('#metodo.lines')).toHaveCount(1);
+});
+
+test('desktop: le due colonne restano affiancate, il percorso si apre dentro la sua colonna', async ({ page }, info) => {
+  test.skip(info.project.name !== 'desktop', 'solo desktop');
+  await ready(page);
+  const col1 = await page.locator('#line-1').boundingBox();
+  const col2 = await page.locator('#line-2').boundingBox();
+  // affiancate: stessa riga, colonne diverse
+  expect(Math.abs(col1!.y - col2!.y)).toBeLessThan(2);
+  expect(col2!.x).toBeGreaterThan(col1!.x + col1!.width);
+  await page.click('.line-toggle[data-journey="1"]');
+  const j1 = await page.locator('#journey-1').boundingBox();
+  // il percorso prende la larghezza della sua colonna, non tutta la pagina
+  expect(Math.abs(j1!.width - col1!.width)).toBeLessThan(2);
+  expect(j1!.x).toBeCloseTo(col1!.x, 0);
+  // la colonna accanto non si sposta e non si allarga
+  const col2After = await page.locator('#line-2').boundingBox();
+  expect(col2After!.x).toBeCloseTo(col2!.x, 0);
+  expect(col2After!.width).toBeCloseTo(col2!.width, 0);
+  // le fasi sono in verticale dentro la colonna
+  const tappe = await page.locator('#journey-1 .tappa').all();
+  expect(tappe).toHaveLength(3);
+  const y0 = (await tappe[0].boundingBox())!.y, y1 = (await tappe[1].boundingBox())!.y;
+  expect(y1).toBeGreaterThan(y0);
+  // nessuno scorrimento orizzontale
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(1440);
 });
 
 test('senza JavaScript i due percorsi restano aperti', async ({ browser }) => {
