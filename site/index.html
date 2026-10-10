@@ -80,108 +80,121 @@
       </section>
 
       <!-- Fascia Forest fra la hero (Lime) e la sezione bianca: il simbolo scorre lento, in fila, a basso contrasto -->
-      <div class="band" aria-hidden="true">
-        <div class="band-track"><!-- symbol:band-mark --><!-- symbol:band-mark --><!-- symbol:band-mark --><!-- symbol:band-mark --><!-- symbol:band-mark --><!-- symbol:band-mark --><!-- symbol:band-mark --><!-- symbol:band-mark --><!-- symbol:band-mark --><!-- symbol:band-mark --><!-- symbol:band-mark --><!-- symbol:band-mark --></div>
-        <div class="band-track"><!-- symbol:band-mark --><!-- symbol:band-mark --><!-- symbol:band-mark --><!-- symbol:band-mark --><!-- symbol:band-mark --><!-- symbol:band-mark --><!-- symbol:band-mark --><!-- symbol:band-mark --><!-- symbol:band-mark --><!-- symbol:band-mark --><!-- symbol:band-mark --><!-- symbol:band-mark --></div>
+      <div class="band" aria-hidden="true" data-band>
+        <div class="band-runner">
+          <!-- symbol:band-mark -->
+        </div>
       </div>
 
-      <!-- Cosa facciamo: le due linee di prodotto, subito sotto la hero. Ogni colonna racconta il suo servizio in tre
-           fasi (Capire, Costruire, Consegnare: è anche il nostro metodo), ognuna con uno schema in prospettiva.
-           Gli schemi sono HTML e CSS (src/styles/mockups.css), decorativi (aria-hidden): il significato è nel testo. -->
       <section class="sec sec--approach" id="cosa-facciamo" data-surface="light" aria-labelledby="approach-title">
         <div class="approach-mark" aria-hidden="true"><!-- symbol:band-mark --></div>
         <div class="sec-head">
           <p class="kicker" data-i18n="approach.k">Cosa facciamo</p>
           <h2 class="sec-title" id="approach-title" data-i18n="approach.t">Due modelli: AI Adoption e AI-native Product Studio.</h2>
         </div>
-        <!-- Due mazzi di card, uno per modello. Si trascina via la card in cima (o si preme Avanti): prima il titolo,
-             poi chi è il modello e cosa fa. Quando i due mazzi sono finiti compaiono i tre passi, uno per card, con il
-             passo dei due modelli. Senza JavaScript restano visibili tutte le card, in colonna. -->
+        <!-- Due mazzi, uno per modello. Ogni mazzo gira in loop: si trascina via la card in cima (o si preme Avanti) e
+             torna in fondo. Il mazzo contiene il titolo, la spiegazione e le tre fasi del modello. Senza JavaScript
+             le card restano in colonna. -->
         <div class="decks" data-decks>
           <div class="deck" data-deck="1">
             <article class="dcard dcard--lime">
               <p class="dcard-k" data-i18n="model.1.k">Modello 01</p>
-              <h3 class="dcard-t" data-i18n="model.1.name">AI Adoption</h3>
+              <h3 class="dcard-t" data-i18n="model.1.name">Modello</h3>
               <p class="dcard-hint" data-i18n="deck.hint">Trascina o scorri</p>
             </article>
             <article class="dcard dcard--lime">
               <p class="dcard-k" data-i18n="model.1.k">Modello 01</p>
-              <h3 class="dcard-t dcard-t--sm" data-i18n="model.1.name">AI Adoption</h3>
-              <p class="dcard-p" data-i18n="model.1.what">Individuiamo i processi in cui l’AI incide su costi, tempi o ricavi e la portiamo in produzione, nei sistemi del cliente.</p>
-              <p class="dcard-who" data-i18n="model.1.who">Per PMI e corporate che vogliono risultati misurabili nei processi che già hanno.</p>
-              <a class="line-link" href="#signup-email" data-interest="transform"><span data-i18n="line.1.link">Parliamo di un tuo processo</span><svg class="arrow" viewBox="0 0 12 12" aria-hidden="true"><path d="M1 6h9M6.5 2.5 10 6l-3.5 3.5" /></svg></a>
+              <h3 class="dcard-t dcard-t--sm" data-i18n="model.1.name">Modello</h3>
+              <p class="dcard-p" data-i18n="model.1.what">Spiegazione</p>
+              <p class="dcard-who" data-i18n="model.1.who">Per chi</p>
+              <a class="line-link" href="#signup-email" data-interest="transform"><span data-i18n="line.1.link">Parliamo</span><svg class="arrow" viewBox="0 0 12 12" aria-hidden="true"><path d="M1 6h9M6.5 2.5 10 6l-3.5 3.5" /></svg></a>
+            </article>
+            <article class="dcard dcard--lime">
+              <p class="dcard-k" data-i18n="phase.1">Fase 1</p>
+              <h3 class="dcard-t dcard-t--step" data-i18n="tappa.1.1.t">Passo</h3>
+              <p class="dcard-p" data-i18n="tappa.1.1.s">Descrizione</p>
+              <p class="dcard-model" data-i18n="model.1.name">Modello</p>
+            </article>
+            <article class="dcard dcard--lime">
+              <p class="dcard-k" data-i18n="phase.2">Fase 2</p>
+              <h3 class="dcard-t dcard-t--step" data-i18n="tappa.1.2.t">Passo</h3>
+              <p class="dcard-p" data-i18n="tappa.1.2.s">Descrizione</p>
+              <p class="dcard-model" data-i18n="model.1.name">Modello</p>
+            </article>
+            <article class="dcard dcard--lime">
+              <p class="dcard-k" data-i18n="phase.3">Fase 3</p>
+              <h3 class="dcard-t dcard-t--step" data-i18n="tappa.1.3.t">Passo</h3>
+              <p class="dcard-p" data-i18n="tappa.1.3.s">Descrizione</p>
+              <p class="dcard-model" data-i18n="model.1.name">Modello</p>
             </article>
             <div class="deck-foot"><button type="button" class="deck-next" data-next><span data-i18n="deck.next">Avanti</span> <svg class="arrow" viewBox="0 0 12 12" aria-hidden="true"><path d="M1 6h9M6.5 2.5 10 6l-3.5 3.5" /></svg></button></div>
           </div>
           <div class="deck deck--forest" data-deck="2">
             <article class="dcard dcard--forest">
               <p class="dcard-k" data-i18n="model.2.k">Modello 02</p>
-              <h3 class="dcard-t" data-i18n="model.2.name">AI-native Product Studio</h3>
+              <h3 class="dcard-t" data-i18n="model.2.name">Modello</h3>
               <p class="dcard-hint" data-i18n="deck.hint">Trascina o scorri</p>
             </article>
             <article class="dcard dcard--forest">
               <p class="dcard-k" data-i18n="model.2.k">Modello 02</p>
-              <h3 class="dcard-t dcard-t--sm" data-i18n="model.2.name">AI-native Product Studio</h3>
-              <p class="dcard-p" data-i18n="model.2.what">Scegliamo una nicchia, ne validiamo la domanda, costruiamo il prodotto AI-native e lo cediamo a chi lo vuole già sul mercato.</p>
-              <p class="dcard-who" data-i18n="model.2.who">Per imprese e acquirenti strategici che vogliono un prodotto AI già validato, senza costruirlo da zero.</p>
-              <a class="line-link" href="#signup-email" data-interest="build"><span data-i18n="line.2.link">Parliamo di un tuo prodotto</span><svg class="arrow" viewBox="0 0 12 12" aria-hidden="true"><path d="M1 6h9M6.5 2.5 10 6l-3.5 3.5" /></svg></a>
+              <h3 class="dcard-t dcard-t--sm" data-i18n="model.2.name">Modello</h3>
+              <p class="dcard-p" data-i18n="model.2.what">Spiegazione</p>
+              <p class="dcard-who" data-i18n="model.2.who">Per chi</p>
+              <a class="line-link" href="#signup-email" data-interest="build"><span data-i18n="line.2.link">Parliamo</span><svg class="arrow" viewBox="0 0 12 12" aria-hidden="true"><path d="M1 6h9M6.5 2.5 10 6l-3.5 3.5" /></svg></a>
+            </article>
+            <article class="dcard dcard--forest">
+              <p class="dcard-k" data-i18n="phase.1">Fase 1</p>
+              <h3 class="dcard-t dcard-t--step" data-i18n="tappa.2.1.t">Passo</h3>
+              <p class="dcard-p" data-i18n="tappa.2.1.s">Descrizione</p>
+              <p class="dcard-model" data-i18n="model.2.name">Modello</p>
+            </article>
+            <article class="dcard dcard--forest">
+              <p class="dcard-k" data-i18n="phase.2">Fase 2</p>
+              <h3 class="dcard-t dcard-t--step" data-i18n="tappa.2.2.t">Passo</h3>
+              <p class="dcard-p" data-i18n="tappa.2.2.s">Descrizione</p>
+              <p class="dcard-model" data-i18n="model.2.name">Modello</p>
+            </article>
+            <article class="dcard dcard--forest">
+              <p class="dcard-k" data-i18n="phase.3">Fase 3</p>
+              <h3 class="dcard-t dcard-t--step" data-i18n="tappa.2.3.t">Passo</h3>
+              <p class="dcard-p" data-i18n="tappa.2.3.s">Descrizione</p>
+              <p class="dcard-model" data-i18n="model.2.name">Modello</p>
             </article>
             <div class="deck-foot"><button type="button" class="deck-next" data-next><span data-i18n="deck.next">Avanti</span> <svg class="arrow" viewBox="0 0 12 12" aria-hidden="true"><path d="M1 6h9M6.5 2.5 10 6l-3.5 3.5" /></svg></button></div>
           </div>
-        </div>
-        <div class="steps-cards" hidden>
-          <p class="steps-cards-k" data-i18n="steps.cards.label">I tre passi di ciascun modello</p>
-          <ol class="steps-grid">
-            <li class="step-card">
-              <p class="step-card-k" data-i18n="phase.1">Phase 1 · Discovery</p>
-              <div class="step-row step-row--lime"><span class="step-row-m" data-i18n="model.1.name">AI Adoption</span><span class="step-row-t" data-i18n="tappa.1.1.t">Troviamo dove l’AI conviene davvero.</span></div>
-              <div class="step-row step-row--forest"><span class="step-row-m" data-i18n="model.2.name">AI-native Product Studio</span><span class="step-row-t" data-i18n="tappa.2.1.t">Troviamo la nicchia.</span></div>
-            </li>
-            <li class="step-card">
-              <p class="step-card-k" data-i18n="phase.2">Phase 2 · Engineering</p>
-              <div class="step-row step-row--lime"><span class="step-row-m" data-i18n="model.1.name">AI Adoption</span><span class="step-row-t" data-i18n="tappa.1.2.t">La portiamo in produzione.</span></div>
-              <div class="step-row step-row--forest"><span class="step-row-m" data-i18n="model.2.name">AI-native Product Studio</span><span class="step-row-t" data-i18n="tappa.2.2.t">Lo portiamo sul mercato.</span></div>
-            </li>
-            <li class="step-card">
-              <p class="step-card-k" data-i18n="phase.3">Phase 3 · Deployment</p>
-              <div class="step-row step-row--lime"><span class="step-row-m" data-i18n="model.1.name">AI Adoption</span><span class="step-row-t" data-i18n="tappa.1.3.t">Se le automazioni non bastano, un prodotto su misura.</span></div>
-              <div class="step-row step-row--forest"><span class="step-row-m" data-i18n="model.2.name">AI-native Product Studio</span><span class="step-row-t" data-i18n="tappa.2.3.t">Lo acquista un’impresa che vuole innovare.</span></div>
-            </li>
-          </ol>
-          <button type="button" class="decks-again" hidden data-again><span data-i18n="deck.again">Ricomincia</span></button>
         </div>
       </section>
 
           <!-- Contatto: due strade, un modulo. La strada scelta arriva con la richiesta (campo interest). -->
       <!-- Il racconto: tre step e la chiusura. Con il 3D i testi restano fermi e il simbolo si costruisce
            scorrendo (src/gl/story.ts); senza, è una sezione statica. -->
-      <section class="story" aria-label="Come lavoriamo" data-i18n-attr="aria-label:story.label">
+      <section class="story" id="metodo" aria-label="Come lavoriamo" data-i18n-attr="aria-label:story.label">
         <div class="story-pin">
           <!-- colonna di testo: i tre step occupano lo stesso posto (con il 3D ne compare uno alla volta),
                sotto la barra di avanzamento -->
           <div class="story-copy">
             <div class="story-acts">
               <article class="act">
-                <p class="act-kicker" data-i18n="story.1k">Analisi</p>
-                <h2 class="act-title" data-i18n="story.1">Troviamo il lavoro ripetitivo.</h2>
-                <p class="act-sub" data-i18n="story.1s">Mappiamo i processi e individuiamo quelli dove AI e automazione fanno risparmiare più tempo ed errori.</p>
+                <p class="act-kicker" data-i18n="story.1k">Come lavoriamo · 01 Misura</p>
+                <h2 class="act-title" data-i18n="story.1">Misuriamo prima di costruire.</h2>
+                <p class="act-sub" data-i18n="story.1s">Ogni progetto parte da un numero concordato: tempo, costo, errore o ricavo. Lo fissiamo prima di iniziare e lo verifichiamo alla fine, con gli stessi dati.</p>
               </article>
               <article class="act">
-                <p class="act-kicker" data-i18n="story.2k">Riprogettazione</p>
-                <h2 class="act-title" data-i18n="story.2">Lo ridisegniamo con l’AI.</h2>
-                <p class="act-sub" data-i18n="story.2s">Ripensiamo il processo attorno ad AI e automazione e lo colleghiamo ai sistemi che già usi: ERP, CRM, email, documenti.</p>
+                <p class="act-kicker" data-i18n="story.2k">Come lavoriamo · 02 Processo</p>
+                <h2 class="act-title" data-i18n="story.2">Partiamo dal processo, non dal modello.</h2>
+                <p class="act-sub" data-i18n="story.2s">Dati, persone e sistemi vengono prima dell’AI. Scegliamo l’AI solo dove sposta un risultato misurabile, e la integriamo nei sistemi che il cliente già usa.</p>
               </article>
               <article class="act">
-                <p class="act-kicker" data-i18n="story.3k">Autonomia</p>
-                <h2 class="act-title" data-i18n="story.3">Lo rendiamo autonomo, un passo alla volta.</h2>
-                <p class="act-sub" data-i18n="story.3s">Prima l’AI assiste le persone, poi esegue da sola dove è sicuro farlo. Ogni passaggio è misurato con i KPI.</p>
+                <p class="act-kicker" data-i18n="story.3k">Come lavoriamo · 03 Autonomia</p>
+                <h2 class="act-title" data-i18n="story.3">Autonomia per gradi, sempre reversibile.</h2>
+                <p class="act-sub" data-i18n="story.3s">Prima l’AI assiste le persone, poi esegue da sola dove è sicuro farlo. Ogni passaggio è misurato e si può tornare indietro.</p>
               </article>
             </div>
             <div class="story-meter" aria-hidden="true"><i></i><i></i><i></i></div>
           </div>
           <article class="act act--end">
             <p class="act-claim" lang="en"><span>Stop doing </span><strong>what AI can do.</strong></p>
-            <p class="act-note" data-i18n="end.note">Dai bisogni che troviamo nelle aziende nascono anche i nostri prodotti AI-native.</p>
+            <p class="act-note" data-i18n="end.note">Misura, processo e autonomia valgono per entrambi i nostri modelli: AI Adoption e AI-native Product Studio.</p>
             <a class="act-cta" href="#signup-email"><span data-i18n="form.submit">Prenota la tua AI process review</span></a>
           </article>
         </div>

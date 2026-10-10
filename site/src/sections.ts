@@ -8,6 +8,7 @@ export function initSections(opts: { reduced: boolean }) {
   anchors(opts.reduced);
   interestLinks();
   decks(opts.reduced);
+  band();
   reveals(opts.reduced);
 }
 
@@ -144,62 +145,60 @@ function reveals(reduced: boolean) {
   });
 }
 
-/** "Cosa facciamo": due mazzi di card, uno per modello. Si trascina via la card in cima (o si preme Avanti): prima il
- *  titolo, poi chi è il modello. Quando i due mazzi sono finiti compaiono i tre passi, con quelli dei due modelli.
- *  Senza JavaScript restano visibili tutte le card, in colonna. */
+/** "Cosa facciamo": due mazzi di card, uno per modello, che girano in loop. La card in cima si trascina via (o si
+ *  preme Avanti) e torna in fondo al mazzo: il mazzo non si svuota mai. Senza JavaScript le card restano in colonna. */
 function decks(reduced: boolean) {
   const root = document.querySelector<HTMLElement>('[data-decks]');
-  const done = document.querySelector<HTMLElement>('.steps-cards');
-  const again = document.querySelector<HTMLButtonElement>('[data-again]');
-  if (!root || !done || !again) return;
+  if (!root) return;
   root.classList.add('is-live');
-  const decks = Array.from(root.querySelectorAll<HTMLElement>('.deck')).map((el) => ({
+  const VISIBLE = 3; // quante card si vedono impilate
+  type Deck = { el: HTMLElement; order: HTMLElement[] };
+  const decks: Deck[] = Array.from(root.querySelectorAll<HTMLElement>('.deck')).map((el) => ({
     el,
-    cards: Array.from(el.querySelectorAll<HTMLElement>('.dcard')),
+    order: Array.from(el.querySelectorAll<HTMLElement>('.dcard')),
   }));
-  const left = (d: { cards: HTMLElement[] }) => d.cards.filter((c) => !c.classList.contains('is-gone'));
-  const layout = (d: { el: HTMLElement; cards: HTMLElement[] }) => {
-    d.el.classList.toggle('is-empty', left(d).length === 0);
-    left(d).forEach((c, i) => {
-      c.style.setProperty('--y', i ? '18px' : '0px');
-      c.style.setProperty('--s', i ? '0.94' : '1');
-      c.style.zIndex = String(10 - i);
+  const layout = (d: Deck) =>
+    d.order.forEach((c, i) => {
+      c.style.setProperty('--y', `${i * 18}px`);
+      c.style.setProperty('--s', `${Math.max(0.8, 1 - i * 0.05)}`);
+      c.style.zIndex = String(20 - i);
       c.classList.toggle('is-back', i > 0);
+      c.classList.toggle('is-hidden', i >= VISIBLE);
     });
-  };
   decks.forEach(layout);
-  const check = () => {
-    if (!decks.every((d) => left(d).length === 0)) return;
-    root.hidden = true;
-    done.hidden = false;
-    again.hidden = false;
-  };
-  const dismiss = (card: HTMLElement, dir: number) => {
-    const d = decks.find((x) => x.cards.includes(card));
-    if (!d || card.classList.contains('is-leaving')) return;
+
+  /** la card esce dal lato indicato, poi torna in fondo al mazzo senza sparire */
+  const cycle = (d: Deck, dir: number) => {
+    const card = d.order[0];
+    if (!card || card.classList.contains('is-leaving')) return;
     card.classList.add('is-leaving');
-    card.style.setProperty('--x', `${dir * (d.el.offsetWidth + 160)}px`);
-    card.style.setProperty('--r', `${dir * 12}deg`);
+    card.style.setProperty('--x', `${dir * (d.el.offsetWidth + 200)}px`);
+    card.style.setProperty('--r', `${dir * 10}deg`);
+    let finished = false;
     const finish = () => {
-      if (card.classList.contains('is-gone')) return;
-      card.classList.add('is-gone');
+      if (finished) return;
+      finished = true;
+      // la card torna in fondo ferma, senza transizione: il movimento visibile è quello delle altre card
+      card.style.transition = 'none';
+      card.classList.remove('is-leaving');
+      card.style.setProperty('--x', '0px');
+      card.style.setProperty('--r', '0deg');
+      d.order.push(d.order.shift()!);
       layout(d);
-      check();
+      void card.offsetWidth; // applica la posizione prima di riattivare la transizione
+      card.style.transition = '';
     };
     card.addEventListener('transitionend', finish, { once: true });
     if (reduced) finish();
     else setTimeout(finish, 800); // rete di sicurezza se la transizione non arriva
   };
-  const snap = (card: HTMLElement) => {
-    card.style.setProperty('--x', '0px');
-    card.style.setProperty('--r', '0deg');
-  };
+
   decks.forEach((d) =>
-    d.cards.forEach((card) => {
+    d.order.forEach((card) => {
       let startX = 0;
       let dragging = false;
       card.addEventListener('pointerdown', (e) => {
-        if (card !== left(d)[0] || card.classList.contains('is-leaving')) return;
+        if (card !== d.order[0] || card.classList.contains('is-leaving')) return;
         dragging = true;
         startX = e.clientX;
         card.classList.add('is-drag');
@@ -211,42 +210,44 @@ function decks(reduced: boolean) {
         card.style.setProperty('--x', `${dx}px`);
         card.style.setProperty('--r', `${dx * 0.05}deg`);
       });
-      const end = (e: PointerEvent) => {
-        if (!dragging) return;
+      const release = (dx: number) => {
         dragging = false;
         card.classList.remove('is-drag');
-        const dx = e.clientX - startX;
-        const limit = Math.min(120, d.el.offsetWidth * 0.22);
-        if (Math.abs(dx) > limit) dismiss(card, Math.sign(dx));
-        else snap(card);
+        if (Math.abs(dx) > Math.min(120, d.el.offsetWidth * 0.22)) {
+          cycle(d, Math.sign(dx));
+        } else {
+          card.style.setProperty('--x', '0px');
+          card.style.setProperty('--r', '0deg');
+        }
       };
-      card.addEventListener('pointerup', end);
+      card.addEventListener('pointerup', (e) => dragging && release(e.clientX - startX));
       card.addEventListener('pointercancel', () => {
         if (!dragging) return;
         dragging = false;
         card.classList.remove('is-drag');
-        snap(card);
+        card.style.setProperty('--x', '0px');
+        card.style.setProperty('--r', '0deg');
       });
     }),
   );
   root.querySelectorAll<HTMLButtonElement>('[data-next]').forEach((btn) => {
     btn.addEventListener('click', () => {
       const d = decks.find((x) => x.el.contains(btn));
-      const top = d && left(d)[0];
-      if (top) dismiss(top, 1);
+      if (d) cycle(d, 1);
     });
   });
-  again.addEventListener('click', () => {
-    decks.forEach((d) =>
-      d.cards.forEach((c) => {
-        c.classList.remove('is-gone', 'is-leaving');
-        c.style.removeProperty('--x');
-        c.style.removeProperty('--r');
-      }),
-    );
-    decks.forEach(layout);
-    root.hidden = false;
-    done.hidden = true;
-    again.hidden = true;
+}
+
+/** La fascia verde: un clic fa scattare il logo con un giro veloce. */
+function band() {
+  const el = document.querySelector<HTMLElement>('[data-band]');
+  if (!el) return;
+  el.addEventListener('click', () => {
+    el.classList.remove('is-spin');
+    void el.offsetWidth; // riavvia l'animazione se si clicca di nuovo
+    el.classList.add('is-spin');
+  });
+  el.addEventListener('animationend', (e) => {
+    if (e.animationName === 'band-spin') el.classList.remove('is-spin');
   });
 }
