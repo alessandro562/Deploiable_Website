@@ -164,7 +164,7 @@
     padding: var(--s-3) var(--s-4) var(--s-4);
     border-radius: 14px;
     background: var(--forest);
-    box-shadow: 0 24px 48px -24px rgb(0 0 0 / 0.5), inset 0 0 0 1px rgb(241 243 234 / 0.08);
+    box-shadow: inset 0 0 0 1px rgb(241 243 234 / 0.08);
   }
   .nav-open .nav-list a {
     display: flex;
@@ -192,7 +192,7 @@
   opacity: 1;
   background: linear-gradient(180deg, rgb(16 38 27 / 0.72), rgb(16 38 27 / 0.5));
   border-bottom-color: rgb(241 243 234 / 0.1);
-  box-shadow: none;
+
 }
 /* sopra la fascia Mist l'header è pieno: gli elementi scuri che ci passano sotto (pulsanti, schede) non
    diventano macchie sfocate dietro il logo */
@@ -335,46 +335,6 @@ h3 {
 }
 
 /* ---------- Contatto: su Lime, solo Forest ---------- */
-.sec--contact {
-  /* insieme al footer riempie almeno lo schermo: arrivando qui il contatto sta sotto l'header */
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  min-height: calc(100vh - 120px);
-  min-height: calc(100svh - 120px);
-  padding-bottom: clamp(72px, 11vh, 128px);
-}
-.sec--contact .contact {
-  width: 100%;
-}
-.contact {
-  display: grid;
-  grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
-  gap: var(--s-8);
-  align-items: start;
-  max-width: var(--content);
-  margin: 0 auto;
-}
-.contact-title {
-  margin-top: var(--s-4);
-  font: 900 clamp(40px, 5vw, 72px) / 1 var(--sans);
-  letter-spacing: -0.045em;
-  text-wrap: balance;
-  color: var(--forest);
-}
-.contact-lead {
-  margin-top: var(--s-5);
-  max-width: 28em;
-  font: var(--t-lead);
-  text-wrap: pretty;
-  color: var(--forest);
-}
-.offer-box {
-  max-width: 28em;
-  margin-top: var(--s-7);
-  padding-top: var(--s-4);
-  border-top: 1px solid var(--hair);
-}
 .paths {
   margin: 0 0 var(--s-2);
   padding: 0;
@@ -451,19 +411,6 @@ h3 {
 .path input:focus-visible + .path-box {
   outline: 2px solid var(--forest);
   outline-offset: 3px;
-}
-.sec--contact .signup-done {
-  align-self: flex-start;
-}
-@media (max-width: 980px) {
-  .contact {
-    grid-template-columns: minmax(0, 1fr);
-    gap: var(--s-7);
-    max-width: 680px;
-  }
-  .offer-box {
-    margin-top: var(--s-5);
-  }
 }
 @media (max-width: 480px) {
   .paths-grid {
@@ -625,7 +572,7 @@ h3 {
 }
 .step-btn[aria-current='step'] {
   background: var(--forest);
-  box-shadow: none;
+
   color: var(--mist);
 }
 .step-btn[aria-current='step'] .step-num {
@@ -670,7 +617,7 @@ h3 {
 }
 .step-next {
   background: var(--forest);
-  box-shadow: none;
+
   color: var(--mist);
 }
 .step-prev:disabled,
@@ -937,11 +884,11 @@ h3 {
 .step-btn[aria-current='step']:hover,
 .line-toggle[aria-expanded='true']:hover {
   background: var(--forest);
-  box-shadow: none;
+
 }
 .step-next {
   background: var(--forest);
-  box-shadow: none;
+
   color: var(--mist);
 }
 .step-prev:disabled,
@@ -1015,78 +962,6 @@ h3 {
   max-width: 820px;
 }
 
-/* ---------- Fascia Forest fra hero e sezione bianca: un solo logo attraversa la striscia ---------- */
-.band {
-  position: relative;
-  z-index: 10;
-  height: 64px;
-  overflow: hidden;
-  background: var(--forest);
-  cursor: pointer;
-}
-/* il logo viaggia da sinistra a destra e rientra da sinistra, in loop; al passaggio del mouse si ferma */
-.band-runner {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  display: flex;
-  align-items: center;
-  animation: band-travel 9s linear infinite;
-  will-change: transform;
-}
-.band:hover .band-runner {
-  animation-play-state: paused;
-}
-@keyframes band-travel {
-  from { transform: translateX(-80px); }
-  to { transform: translateX(calc(100vw + 40px)); }
-}
-.band-mark {
-  display: block;
-  width: 46px;
-  height: auto;
-  overflow: visible;
-  color: var(--lime);
-  transition: transform 0.8s var(--ease);
-}
-/* al passaggio del mouse il logo fa un giro su se stesso */
-.band:hover .band-mark {
-  transform: rotateY(360deg) scale(1.15);
-}
-/* le tre barre si muovono una dopo l'altra, come a scatti */
-.band-mark .bar {
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: band-bar 2.4s var(--ease) infinite;
-}
-.band-mark .bar-2 { animation-delay: 0.22s; }
-.band-mark .bar-3 { animation-delay: 0.44s; }
-@keyframes band-bar {
-  0%, 100% { transform: translateX(0); }
-  30%, 55% { transform: translateX(6px); }
-}
-/* clic: il logo scatta con un giro veloce */
-.band.is-spin .band-mark {
-  animation: band-spin 0.9s var(--ease);
-}
-@keyframes band-spin {
-  from { transform: rotateY(0deg) scale(1); }
-  to { transform: rotateY(720deg) scale(1); }
-}
-@media (prefers-reduced-motion: reduce) {
-  .band-runner {
-    animation: none;
-    left: 50%;
-    transform: translateX(-50%);
-  }
-  .band-mark .bar,
-  .band-mark {
-    animation: none;
-    transition: none;
-  }
-}
-
 /* ---------- Schemi come card 3D: arrivano inclinate in profondità e si raddrizzano al centro dello schermo
    (--p da src/sections.ts, 0 lontano, 1 al centro); su desktop seguono appena il puntatore (--mx, --my) ---------- */
 .tappa-fig .mk-stage {
@@ -1098,9 +973,7 @@ h3 {
   transition: transform 0.12s linear;
 }
 .tappa-fig .mk-panel {
-  box-shadow:
-    0 2em 3em -1em rgb(16 38 27 / 0.28),
-    0 0.4em 0.8em rgb(16 38 27 / 0.12);
+
 }
 @media (prefers-reduced-motion: reduce) {
   .tappa-fig .mk-stage { transition: none; }
@@ -1174,7 +1047,7 @@ h3 {
   background: var(--c);
   color: var(--forest);
   transform: translate3d(calc(var(--i) * 26px), calc(var(--i) * -44px), calc(var(--i) * -20px));
-  box-shadow: 0 26px 42px -24px rgb(16 38 27 / 0.5), 0 2px 6px rgb(16 38 27 / 0.1);
+
 }
 .mkm-node:nth-child(1) { --i: 0; --c: linear-gradient(160deg, #1f4031 0%, var(--forest) 72%); color: var(--mist); }
 .mkm-node:nth-child(2) { --i: 1; --c: #e6ebdd; }
@@ -1229,7 +1102,7 @@ h3 {
     padding: var(--s-5);
     border-radius: 16px;
     background-color: var(--forest);
-    box-shadow: 0 2.4em 3em -1.4em rgb(16 38 27 / 0.45);
+
     perspective: none;
   }
   .mkm-flow {
@@ -1270,7 +1143,7 @@ h3 {
     padding: 0;
     border-radius: 0;
     background: none;
-    box-shadow: none;
+
     transform: none;
     color: var(--mist);
     z-index: auto;
@@ -1369,9 +1242,7 @@ h3 {
   border-radius: 28px;
   overflow: hidden;
   isolation: isolate;
-  box-shadow:
-    0 44px 64px -32px rgb(16 38 27 / 0.5),
-    0 2px 6px rgb(16 38 27 / 0.08);
+
   transform: translate3d(calc(var(--sx, 0px) + var(--x, 0px)), var(--sy, 0px), 0)
     rotateX(var(--tx, 0deg)) rotateY(var(--ty, 0deg)) rotate(var(--r, 0deg)) scale(var(--s, 1));
   transition:
@@ -1395,14 +1266,12 @@ h3 {
 .dcard.is-drag {
   transition: none;
   cursor: grabbing;
-  box-shadow: 0 60px 80px -36px rgb(16 38 27 / 0.6);
+
 }
 /* l'inclinazione segue il mouse: più pronta del movimento di scorrimento */
 .dcard.is-tilt {
   transition: transform 0.35s var(--ease), box-shadow 0.35s var(--ease);
-  box-shadow:
-    0 56px 70px -34px rgb(16 38 27 / 0.55),
-    0 2px 6px rgb(16 38 27 / 0.08);
+
 }
 .decks.is-live .dcard {
   position: absolute;

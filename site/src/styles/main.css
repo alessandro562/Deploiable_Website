@@ -19,7 +19,7 @@
   --sans: 'Satoshi', 'Helvetica Neue', Arial, sans-serif;
   --text: 'Geist', 'Helvetica Neue', Arial, sans-serif; /* testi piccoli */
 
-  /* Il protagonista è la frase "Stop doing what AI can do.": il suo corpo è la misura di tutto il resto.
+  /* Il protagonista è la frase "Built to work. Ready to be yours.": il suo corpo è la misura di tutto il resto.
      Dipende da larghezza e altezza, così l'hero sta sempre in una schermata con aria sopra e sotto. */
   --claim-fs: clamp(36px, min(9vw, 9.5svh), 132px);
   /* spazio fra frase, sottotitolo e blocco iscrizione */
@@ -73,7 +73,7 @@
   :root {
     --t-body: 400 16px / 1.55 var(--text);
     /* su telefono la frase occupa quasi tutta la larghezza (le due righe sono lunghe uguali) */
-    --claim-fs: clamp(34px, min(12.5vw, 11svh), 140px);
+    --claim-fs: clamp(34px, min(10.5vw, 11svh), 140px); /* "Ready to be yours." deve stare nei 390 px */
   }
 }
 
@@ -146,12 +146,10 @@ p {
   position: absolute;
   inset: 0;
   z-index: -1;
-  /* vetro bianco e trasparente: velo bianco leggero (appena più chiaro in alto), sfocatura morbida, nessuna tinta */
-  background: linear-gradient(180deg, rgb(255 255 255 / 0.3), rgb(255 255 255 / 0.18));
-  -webkit-backdrop-filter: blur(12px) saturate(100%);
-  backdrop-filter: blur(12px) saturate(100%);
+  /* niente velo né sfocatura: l'header è trasparente, resta solo il filo sotto */
+  background: none;
   border-bottom: 1px solid rgb(255 255 255 / 0.55);
-  box-shadow: 0 8px 24px -14px color-mix(in srgb, var(--ink-strong) 18%, transparent);
+
   opacity: 0;
   transition: opacity var(--dur-state) var(--ease);
   pointer-events: none;
@@ -163,7 +161,7 @@ p {
 }
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
   .top::before {
-    background: color-mix(in srgb, var(--bg) 80%, white);
+    background: none;
   }
 }
 .logo-slot {
@@ -202,14 +200,12 @@ p {
   z-index: 10;
 }
 .hero {
-  min-height: 100svh;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
   gap: var(--gap);
-  /* sopra lo spazio dell'header; sotto un po' di più: il centro ottico sta sopra il centro geometrico */
-  padding: calc(var(--pad-top) + var(--logo-w) * 0.19 + var(--s-5)) var(--pad-x) calc(var(--pad-top) + var(--logo-w) * 0.19 + var(--s-5) + 4svh);
+  /* sopra lo spazio dell'header; la hero finisce con la CTA, senza vuoto sotto */
+  padding: calc(var(--pad-top) + var(--logo-w) * 0.19 + var(--s-5)) var(--pad-x) calc(var(--pad-top) + var(--logo-w) * 0.19);
 }
 /* Su telefono il contenuto è più alto dello schermo: un po' d'aria in più fra l'header e la frase */
 @media (max-width: 640px) {
@@ -259,7 +255,7 @@ p {
   will-change: transform;
 }
 
-/* Macchina da scrivere su "what AI can do." (src/app.ts): le lettere cancellate tengono il loro posto, il cursore è
+/* Macchina da scrivere su "Ready to be yours." (src/app.ts): le lettere cancellate tengono il loro posto, il cursore è
    una barra sottile alta quanto le ascendenti, che scorre a scatti di lettera in lettera. */
 .tw {
   position: relative;
@@ -335,9 +331,9 @@ p {
   opacity: 0; /* compare dopo la frase (src/app.ts) */
 }
 
-/* ---------- Coming soon, offerta e iscrizione ---------- */
-/* "Coming soon" è un'etichetta sopra la frase: dice subito lo stato del sito. Sotto il sottotitolo, l'offerta
-   (titoletto + una riga) e il modulo compaiono per ultimi. Su Lime solo Forest (i colori seguono la palette). */
+/* ---------- Coming soon e CTA ---------- */
+/* "Coming soon" sta nell'header e nel footer. Sotto il sottotitolo c'è una sola CTA, che porta al contatto nel footer.
+   Su Lime solo Forest (i colori seguono la palette). */
 
 .outro {
   display: flex;
@@ -367,23 +363,6 @@ p {
   margin-right: calc(-1 * var(--track-label));
   color: var(--ink-strong);
 }
-.offer-title {
-  margin-bottom: var(--s-1);
-  font: var(--t-body);
-  font-weight: 600;
-  letter-spacing: -0.01em;
-  text-align: center;
-  color: var(--ink-strong);
-}
-.offer {
-  margin-bottom: var(--s-4);
-  font: var(--t-body);
-  letter-spacing: -0.005em;
-  line-height: 1.3; /* una riga sola: interlinea stretta, come un sottotitolo */
-  text-align: center;
-  text-wrap: balance;
-  color: var(--ink-light);
-}
 .soon-dot {
   width: 6px;
   height: 6px;
@@ -396,196 +375,21 @@ p {
   0%, 100% { opacity: 1; transform: scale(1); }
   50% { opacity: 0.25; transform: scale(0.7); }
 }
-
-.signup {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--s-4);
-  width: min(100%, 760px);
-}
 /* Il modulo ha la forma del simbolo: tre parallelogrammi stondati inclinati di 8°, in fila e incastrati;
    i due campi in Lime Deep pieno, il pulsante in Forest. Il contenuto è controinclinato e resta dritto. */
-.signup-row {
-  display: flex;
-  align-items: stretch;
-  gap: var(--s-2);
-  width: 100%;
-  height: 56px;
-  padding: 0 var(--s-1); /* lo sbalzo degli spigoli inclinati */
-}
-.signup-field {
-  position: relative;
-  flex: 1 1 0;
-  min-width: 0;
-  display: flex;
-  border-radius: var(--radius);
-  background: var(--field-bg);
-  transform: skewX(-8deg);
-  /* il bordo è un'ombra: quando diventa più spesso (errore) il layout non si muove di un pixel */
-  box-shadow: inset 0 0 0 0 var(--ink-strong);
-  outline: 2px solid transparent;
-  outline-offset: 4px;
-  transition: box-shadow var(--dur-ui) var(--ease), outline-color var(--dur-ui) var(--ease);
-}
-.signup-field--email {
-  flex-grow: 1.35;
-}
-.signup-field:focus-within {
-  outline-color: var(--ink-strong);
-}
-.signup-field input {
-  flex: 1 1 auto;
-  min-width: 0;
-  height: 100%;
-  padding: 0 var(--s-4) 0 var(--s-5);
-  border: 0;
-  background: transparent;
-  color: var(--ink-strong);
-  caret-color: var(--ink-strong);
-  font: var(--t-input);
-  letter-spacing: -0.005em;
-  outline: none;
-  transform: skewX(8deg);
-}
-.signup-field input::placeholder {
-  color: var(--ink-soft);
-  opacity: 1;
-}
 /* autocompilazione del browser: niente fondo azzurro o giallo, testo Forest */
-.signup input:-webkit-autofill,
-.signup input:-webkit-autofill:focus {
-  -webkit-text-fill-color: var(--ink-strong);
-  transition: background-color 600000s 0s;
-}
-.signup button {
-  flex: none;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  padding: 0 var(--s-5);
-  border: 0;
-  border-radius: var(--radius);
-  background: var(--ink-strong);
-  color: var(--bg);
-  font: var(--t-button);
-  letter-spacing: -0.005em;
-  white-space: nowrap;
-  cursor: pointer;
-  transform: skewX(-8deg);
-  outline: 2px solid transparent;
-  outline-offset: 4px;
-  transition: background-color var(--dur-ui) var(--ease), transform var(--dur-ui) var(--ease), outline-color var(--dur-ui) var(--ease);
-}
 .btn-in {
   display: inline-flex;
   align-items: center;
   gap: var(--s-2);
   transform: skewX(8deg);
 }
-.signup button:focus-visible {
-  outline-color: var(--ink-strong);
-}
 
 /* Consenso privacy: casella personalizzata, la casella vera resta accessibile (sotto, invisibile). */
-.consent {
-  position: relative;
-  display: flex;
-  align-items: flex-start;
-  gap: var(--s-3);
-  /* allineato all'inizio del testo del primo campo (bordo del campo + il suo margine interno) */
-  align-self: stretch;
-  padding: 0 var(--s-5) 0 calc(var(--s-1) + var(--s-5));
-  font: var(--t-small);
-  text-align: left;
-  color: var(--ink-soft);
-  cursor: pointer;
-}
-.consent input {
-  position: absolute;
-  top: 0;
-  left: calc(var(--s-1) + var(--s-5));
-  width: 20px;
-  height: 20px;
-  margin: 0;
-  opacity: 0;
-  cursor: pointer;
-}
-.consent-box {
-  flex: none;
-  display: grid;
-  place-items: center;
-  width: 20px;
-  height: 20px;
-  margin-top: -1px;
-  border-radius: 6px;
-  box-shadow: inset 0 0 0 1.5px var(--ink-strong);
-  transition: background-color var(--dur-ui) var(--ease);
-}
-.consent-box svg {
-  width: 12px;
-  height: 12px;
-  fill: none;
-  stroke: var(--bg);
-  stroke-width: 2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  opacity: 0;
-}
-.consent input:checked + .consent-box {
-  background: var(--ink-strong);
-}
-.consent input:checked + .consent-box svg {
-  opacity: 1;
-}
-.consent input:focus-visible + .consent-box {
-  outline: 2px solid var(--ink-strong);
-  outline-offset: 4px;
-}
-.consent input[aria-invalid='true'] + .consent-box {
-  box-shadow: inset 0 0 0 2.5px var(--ink-strong);
-}
-.consent a {
-  color: var(--ink-strong);
-  text-decoration: underline;
-  text-decoration-color: color-mix(in srgb, currentColor 45%, transparent);
-  text-underline-offset: 3px;
-  text-decoration-thickness: 1px;
-  transition: text-decoration-color var(--dur-ui) var(--ease);
-}
-@media (hover: hover) {
-  .consent a:hover {
-    text-decoration-color: currentColor;
-  }
-}
 
 /* Telefono: i tre blocchi uno sotto l'altro, stessa forma, ogni bersaglio di tocco almeno 44 px. */
-@media (max-width: 640px) {
-  .signup-row {
-    flex-direction: column;
-    gap: var(--s-2);
-    height: auto;
-    padding: 0 var(--s-1);
-  }
-  .signup-field {
-    flex: none;
-    height: 52px;
-  }
-  .consent {
-    padding: 0 var(--s-1);
-  }
-  .consent input {
-    left: var(--s-1);
-  }
-  .signup button {
-    width: 100%;
-    height: 52px;
-  }
-}
 
-.arrow,
-.check {
+.arrow {
   width: 12px;
   height: 12px;
   fill: none;
@@ -597,40 +401,16 @@ p {
 .arrow {
   transition: transform var(--dur-ui) var(--ease);
 }
-@media (hover: hover) {
-  .signup button:hover {
-    background: var(--ink-hover);
-  }
-  .signup button:hover .arrow {
-    transform: translateX(2px);
-  }
-}
-.signup button:active {
-  transform: skewX(-8deg) scale(0.97);
-}
-.signup[aria-busy='true'] button {
-  cursor: progress;
-}
-.signup[aria-busy='true'] .arrow {
-  animation: nudge 0.6s var(--ease) infinite alternate;
-}
 @keyframes nudge {
   to { transform: translateX(3px); }
 }
 
 /* Errore: bordo più spesso e una breve vibrazione orizzontale sul campo da correggere. */
-.outro[data-state='error'] .signup-field:has([aria-invalid='true']) {
-  box-shadow: inset 0 0 0 2.5px var(--ink-strong);
-  animation: shake-field 0.36s var(--ease);
-}
 @keyframes shake-field {
   20% { transform: skewX(-8deg) translateX(-6px); }
   40% { transform: skewX(-8deg) translateX(5px); }
   60% { transform: skewX(-8deg) translateX(-3px); }
   80% { transform: skewX(-8deg) translateX(2px); }
-}
-.outro[data-state='error'] .consent:has([aria-invalid='true']) {
-  animation: shake 0.36s var(--ease);
 }
 @keyframes shake {
   20% { transform: translateX(-6px); }
@@ -638,49 +418,8 @@ p {
   60% { transform: translateX(-3px); }
   80% { transform: translateX(2px); }
 }
-.outro[data-state='error'] .signup-note,
-.outro[data-state='warn'] .signup-note {
-  color: var(--ink-strong);
-}
-
-.signup-note {
-  min-height: 1.5em; /* lo spazio del messaggio è già riservato: il layout non salta quando compare */
-  margin-top: var(--s-3);
-  font: var(--t-small);
-  text-align: center;
-  max-width: min(92vw, 440px);
-  text-wrap: balance;
-  color: var(--ink-soft);
-}
 
 /* Iscritto: il modulo lascia il posto a un blocco Forest con la spunta, stessa forma del pulsante (8°). */
-.signup-done {
-  display: none;
-  align-items: center;
-  gap: var(--s-3);
-  height: 56px;
-  padding: 0 var(--s-5);
-  border-radius: var(--radius);
-  background: var(--ink-strong);
-  color: var(--bg);
-  font: var(--t-button);
-  letter-spacing: -0.005em;
-  transform: skewX(-8deg);
-}
-.signup-done > * {
-  transform: skewX(8deg);
-}
-.outro[data-state='done'] .signup {
-  display: none;
-}
-.outro[data-state='done'] .signup-done {
-  display: inline-flex;
-  animation: pop-in 0.42s var(--ease) both;
-}
-.outro[data-state='done'] .check path {
-  stroke-dasharray: 14;
-  animation: draw 0.4s 0.18s var(--ease) both;
-}
 @keyframes pop-in {
   from { opacity: 0; transform: skewX(-8deg) scale(0.92); }
 }
@@ -864,7 +603,6 @@ p {
   }
 }
 
-.hp,
 .sr-only {
   position: absolute;
   width: 1px;
@@ -875,17 +613,6 @@ p {
 }
 
 /* Schermi bassi (telefono in orizzontale): logo più piccolo, così logo, frase e modulo stanno tutti dentro. */
-@media (max-height: 520px) and (min-width: 641px) {
-  .signup-row,
-  .signup-done {
-    height: 48px;
-  }
-}
-@media (max-height: 520px) {
-  .signup-note {
-    margin-top: var(--s-2);
-  }
-}
 
 @media (max-aspect-ratio: 1/1) {
   /* in verticale c'è molta altezza libera: più respiro fra i blocchi */
@@ -981,7 +708,7 @@ p {
   color: var(--lime);
   font: var(--t-button);
   text-decoration: none;
-  box-shadow: 0 12px 24px -12px rgb(16 38 27 / 0.55);
+
   transform: skewX(-8deg);
   transition: transform var(--dur-ui) var(--ease), box-shadow var(--dur-ui) var(--ease);
 }
@@ -999,7 +726,7 @@ p {
 @media (hover: hover) {
   .act-cta:hover {
     transform: skewX(-8deg) translateY(-2px);
-    box-shadow: 0 24px 48px -16px rgb(16 38 27 / 0.7);
+
   }
   .act-cta:hover > span::after {
     transform: translateX(4px);
@@ -1080,9 +807,9 @@ p {
 /* sopra la fascia scura l'header è vetro scuro, logo e lingua chiari */
 .is-dark-under .top::before {
   opacity: 1;
-  background: linear-gradient(180deg, rgb(16 38 27 / 0.62), rgb(16 38 27 / 0.4));
+  background: none;
   border-bottom-color: rgb(241 243 234 / 0.14);
-  box-shadow: none;
+
 }
 .is-dark-under .logo-slot,
 .is-dark-under .lang [aria-pressed='true'] {
@@ -1293,8 +1020,6 @@ p {
   .is-static .sub,
   .is-static .soon,
   .is-static .proof,
-  .outro[data-state] .signup,
-  .outro[data-state] .signup-done,
   .soon-dot {
     animation: none;
   }
@@ -1308,3 +1033,28 @@ p {
 /* Caratteri: Satoshi per logo, titoli e frase principale; Geist per tutto ciò che è piccolo (sottotitolo, modulo,
    etichette, footer, testi degli step e della privacy), più nitido a queste dimensioni. Le famiglie arrivano dagli
    stili di testo in :root (--t-*). */
+
+/* "Coming soon": nell'header accanto al logo (sotto il logo su telefono) e nel footer */
+.soon--top {
+  position: absolute;
+  z-index: 16;
+  left: calc(var(--pad-x) + var(--logo-w) + var(--s-5));
+  top: calc(var(--pad-top) + var(--logo-w) * 0.095);
+  transform: translateY(-50%);
+  margin: 0;
+  color: var(--ink-strong);
+  white-space: nowrap;
+}
+.is-dark-under .soon--top {
+  color: var(--mist);
+}
+.soon--foot {
+  margin: 0 0 var(--s-2);
+}
+@media (max-width: 640px) {
+  .soon--top {
+    left: var(--pad-x);
+    top: calc(var(--pad-top) + var(--logo-w) * 0.19 + 8px);
+    transform: none;
+  }
+}

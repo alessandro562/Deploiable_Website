@@ -6,9 +6,7 @@ export function initSections(opts: { reduced: boolean }) {
   headerSurface();
   navMenu();
   anchors(opts.reduced);
-  interestLinks();
   decks(opts.reduced);
-  band();
   reveals(opts.reduced);
 }
 
@@ -114,20 +112,10 @@ function jsScroll(to: number) {
   requestAnimationFrame(step);
 }
 
-/** "Parliamo di un tuo processo / prodotto": la strada è già scelta nel modulo. */
-function interestLinks() {
-  document.querySelectorAll<HTMLAnchorElement>('[data-interest]').forEach((a) => {
-    a.addEventListener('click', () => {
-      const r = document.querySelector<HTMLInputElement>(`input[name="interest"][value="${a.dataset.interest}"]`);
-      if (r) r.checked = true;
-    });
-  });
-}
-
 function reveals(reduced: boolean) {
   if (reduced || !('IntersectionObserver' in window)) return;
   const root = document.documentElement;
-  const els = Array.from(document.querySelectorAll<HTMLElement>('.sec-head, .line-col, .tappa, .contact-head, .signup-box'));
+  const els = Array.from(document.querySelectorAll<HTMLElement>('.sec-head, .line-col, .tappa'));
   root.classList.add('rv-on');
   const io = new IntersectionObserver(
     (entries) => {
@@ -302,18 +290,4 @@ function decks(reduced: boolean) {
       });
     });
   }
-}
-
-/** La fascia verde: un clic fa scattare il logo con un giro veloce. */
-function band() {
-  const el = document.querySelector<HTMLElement>('[data-band]');
-  if (!el) return;
-  el.addEventListener('click', () => {
-    el.classList.remove('is-spin');
-    void el.offsetWidth; // riavvia l'animazione se si clicca di nuovo
-    el.classList.add('is-spin');
-  });
-  el.addEventListener('animationend', (e) => {
-    if (e.animationName === 'band-spin') el.classList.remove('is-spin');
-  });
 }

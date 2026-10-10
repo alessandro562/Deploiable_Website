@@ -11,7 +11,7 @@ test.describe('versione statica', () => {
     expect(await page.evaluate(() => window.__DEPLOIABLE__!.mode)).toBe('static');
     expect(scripts.some((u) => /\/app-.*\.js/.test(u))).toBe(false);
     await expect(page.locator('.logo-slot svg')).toBeVisible();
-    await expect(page.getByRole('heading', { name: /Stop doing/ })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /Built to work/ })).toBeVisible();
     // il logo completo sta sopra la frase, e tutto dentro lo schermo
     const sym = (await page.locator('.logo-slot svg').boundingBox())!;
     const txt = (await page.locator('.claim').boundingBox())!;
@@ -38,21 +38,21 @@ test('senza WebGL si usa la versione statica', async ({ browser }) => {
   await ctx.close();
 });
 
-test('versione statica: coming soon e modulo visibili', async ({ page }) => {
+test('versione statica: coming soon e CTA visibili', async ({ page }) => {
   await page.goto('/?mode=static');
   await expect(page.locator('.outro')).toBeVisible();
-  await expect(page.locator('.soon')).toHaveText(/Coming soon/i);
-  await expect(page.locator('#signup-email')).toBeVisible();
+  await expect(page.locator('.soon--top')).toHaveText(/Coming soon/i);
+  await expect(page.locator('.hero .act-cta')).toBeVisible();
 });
 
-test('nessuno scorrimento orizzontale: il modulo resta dentro lo schermo a ogni larghezza', async ({ page }) => {
+test('nessuno scorrimento orizzontale: la CTA resta dentro lo schermo a ogni larghezza', async ({ page }) => {
   for (const w of [360, 390, 641, 720, 768, 820, 1024, 1440]) {
     await page.setViewportSize({ width: w, height: 900 });
     await page.goto('/');
     await page.waitForFunction(() => window.__DEPLOIABLE__?.ready === true);
     const { sw, right } = await page.evaluate(() => ({
       sw: document.documentElement.scrollWidth,
-      right: document.querySelector('.signup-row')!.getBoundingClientRect().right,
+      right: document.querySelector('.act-cta')!.getBoundingClientRect().right,
     }));
     expect(sw, `${w}px: larghezza della pagina`).toBeLessThanOrEqual(w);
     expect(right, `${w}px: il modulo esce dallo schermo`).toBeLessThanOrEqual(w);

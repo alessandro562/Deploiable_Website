@@ -13,12 +13,12 @@ export type Lang = 'it' | 'en';
 export const LAUNCH = 'Coming soon';
 
 const TITLE = {
-  it: 'Stop doing what AI can do.',
-  en: 'Stop doing what AI can do.',
+  it: 'Built to work. Ready to be yours.',
+  en: 'Built to work. Ready to be yours.',
 };
 const SUB = {
-  it: 'Portiamo l’AI in produzione: nei processi delle aziende e nei prodotti che costruiamo.',
-  en: 'We put AI into production: inside company processes and in the products we build.',
+  it: 'Portiamo l’AI in produzione nei processi delle aziende e nei prodotti che costruiamo, partendo da un numero concordato.',
+  en: 'We put AI into production in companies’ processes and in the products we build, starting from an agreed number.',
 };
 
 // il "word joiner" (U+2060) tiene unito "AI-native" a capo; nei meta non serve
@@ -193,6 +193,7 @@ const DICT = {
     'nav.menu': 'Menu',
     'nav.approach': 'Approccio',
     'nav.contact': 'Contatti',
+    'cta.talk': 'Parliamone',
     sub: SUB.it,
     launch: LAUNCH,
     'cta.primary': 'Costruiamo ciò che serve',
@@ -247,17 +248,6 @@ const DICT = {
     'path.transform.s': 'Ridisegnare un processo esistente con AI e automazione.',
     'path.build': 'Costruire un prodotto AI',
     'path.build.s': 'Progettare e sviluppare un’applicazione o un prodotto AI-⁠native.',
-    'form.email.label': 'Email aziendale',
-    'form.email.placeholder': 'nome@azienda.it',
-    'form.company.label': 'Azienda',
-    'form.company.placeholder': 'Azienda',
-    'form.submit': 'Parliamone',
-    'form.consent.pre': 'Ho letto l’',
-    'form.consent.link': 'informativa privacy',
-    'form.consent.post': ' e acconsento al trattamento dei miei dati per essere ricontattato/a.',
-    'form.offer.title': 'AI process review gratuita',
-    'form.offer': 'Per le prime 20 aziende: analizziamo i tuoi processi e ti mostriamo dove l’AI rende di più.',
-    'form.done': 'Richiesta ricevuta.',
     'msg.invalid': 'Inserisci un indirizzo email valido.',
     'msg.company': 'Inserisci il nome della tua azienda.',
     'msg.consent': 'Per continuare, conferma di aver letto l’informativa privacy.',
@@ -444,6 +434,7 @@ const DICT = {
     'nav.menu': 'Menu',
     'nav.approach': 'Approach',
     'nav.contact': 'Contact',
+    'cta.talk': 'Let’s talk',
     sub: SUB.en,
     launch: LAUNCH,
     'cta.primary': 'Let’s build what’s next',
@@ -498,17 +489,6 @@ const DICT = {
     'path.transform.s': 'Redesign an existing process with AI and automation.',
     'path.build': 'Build an AI product',
     'path.build.s': 'Design and develop an AI-⁠native application or product.',
-    'form.email.label': 'Work email',
-    'form.email.placeholder': 'name@company.com',
-    'form.company.label': 'Company',
-    'form.company.placeholder': 'Company',
-    'form.submit': 'Let’s talk',
-    'form.consent.pre': 'I have read the ',
-    'form.consent.link': 'privacy notice',
-    'form.consent.post': ' and consent to the processing of my data in order to be contacted.',
-    'form.offer.title': 'Free AI process review',
-    'form.offer': 'For the first 20 companies: we analyse your processes and show you where AI pays off most.',
-    'form.done': 'Request received.',
     'msg.invalid': 'Please enter a valid email address.',
     'msg.company': 'Please enter your company name.',
     'msg.consent': 'To continue, please confirm you have read the privacy notice.',

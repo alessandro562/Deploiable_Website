@@ -39,13 +39,13 @@ export async function start(caps: Capabilities) {
   const claim = Array.from(document.querySelectorAll<HTMLElement>('.claim .line'));
   const sweep = document.querySelector<HTMLElement>('.sweep')!;
   const outro = document.querySelector<HTMLElement>('.outro')!;
-  // la pillola di conferma prende il posto del modulo: entra con lui
-  const outroItems = [['.sub'], ['.soon'], ['.offer-title', '.offer'], ['.signup', '.signup-done'], ['.signup-note']].map((sel) =>
+  // sottotitolo, poi la CTA: entrano uno dopo l'altro
+  const outroItems = [['.sub'], ['.outro-cta']].map((sel) =>
     sel.map((q) => document.querySelector<HTMLElement>(q)!),
   );
   const slotEl = document.querySelector<HTMLElement>('.logo-slot')!;
 
-  // Macchina da scrivere su "what AI can do.": ogni lettera è uno <span>; quelle "cancellate" restano al loro posto
+  // Macchina da scrivere su "Ready to be yours.": ogni lettera è uno <span>; quelle "cancellate" restano al loro posto
   // (visibility: hidden), così la parola non si ricentra a ogni lettera. Il testo intero resta per i lettori di schermo.
   const twLine = document.querySelector<HTMLElement>('.line--black')!;
   const word = twLine.textContent ?? '';
@@ -105,6 +105,7 @@ export async function start(caps: Capabilities) {
     current = name;
     stage.setPalette(name);
     (engine.bgScene.background as Color).set(PALETTES[name].background);
+    engine.setLimeLight(name === 'lime');
     // il cambio di palette è un taglio netto: nessuna transizione CSS deve sfumarlo
     const root = document.documentElement;
     root.classList.add('palette-snap');

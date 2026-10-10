@@ -10,6 +10,7 @@ import {
   PlaneGeometry,
   Scene,
   ShaderMaterial,
+  Vector2,
   Vector3,
   type WebGLRenderer,
 } from 'three';
@@ -25,7 +26,7 @@ import { PIVOT, REST, SYMBOL_H, SYMBOL_W } from './symbol/symbolSpec';
 //             (un piccolo assestamento e un lampo sugli spigoli) e diventa Lime metallico; al terzo step il
 //             simbolo è completo
 //   chiusura  il Lime sale dal basso, il simbolo diventa Forest e si gira di fronte, sopra
-//             "Stop doing what AI can do." e il pulsante per la review
+//             "Built to work. Ready to be yours." e il pulsante per la review
 // Senza WebGL (o con riduzione del movimento) la stessa sezione è una pagina statica: testi uno sotto l'altro.
 
 const ORDER = [2, 1, 0]; // barra di ogni step: bassa, centrale, alta
@@ -53,6 +54,9 @@ const waveAt = (s: number) => smooth(2.5, 2.86, s);
 const WHITE = new Color('#ffffff');
 const EDGE_LIME = new Color(COLORS.lime).lerp(WHITE, 0.6);
 const EDGE_FOREST = new Color(COLORS.mist);
+// Luce del Lime: centro più chiaro, bordi nel Lime profondo (come il bianco della sezione due)
+const LIME_HI = new Color(COLORS.lime).lerp(WHITE, 0.35);
+const LIME_BASE = new Color(COLORS.limeDeep);
 
 const smooth = (a: number, b: number, x: number) => {
   const k = Math.min(1, Math.max(0, (x - a) / (b - a)));
@@ -222,25 +226,28 @@ export class Story {
     this.copy = section.querySelector<HTMLElement>('.story-copy') ?? section;
     this.meter = section.querySelector<HTMLElement>('.story-meter');
     this.segments = Array.from(section.querySelectorAll<HTMLElement>('.story-meter i'));
-    const lime = new Color(COLORS.lime);
     this.roomMat = new ShaderMaterial({
       side: DoubleSide,
       depthWrite: false,
       uniforms: {
-        uLime: { value: lime },
         uForest: { value: FOREST },
         uEdge: { value: -1 },
         uTop: { value: 0 },
         uBottom: { value: 0 },
         uVh: { value: 1 },
+        uRes: { value: new Vector2(1, 1) },
+        uLimeHi: { value: LIME_HI },
+        uLimeBase: { value: LIME_BASE },
       },
       vertexShader: /* glsl */ `
         varying vec3 vW;
         void main() { vec4 w = modelMatrix * vec4(position, 1.0); vW = w.xyz; gl_Position = projectionMatrix * viewMatrix * w; }
       `,
       fragmentShader: /* glsl */ `
-        uniform vec3 uLime, uForest;
+        uniform vec3 uForest;
         uniform float uTop, uBottom, uVh, uEdge;
+        uniform vec2 uRes;
+        uniform vec3 uLimeHi, uLimeBase;
         varying vec3 vW;
         void main() {
           // pavimento più chiaro (la luce cade dall'alto), parete un tono sotto, raccordo in leggera ombra:
@@ -251,7 +258,10 @@ export class Story {
           float side = exp(-vW.x * vW.x / (2.0 * 55.0 * 55.0));
           // l'onda Lime della chiusura sale dal basso dello schermo, con un bordo morbido di pochi pixel
           float lime = 1.0 - smoothstep(uEdge - 1.5, uEdge + 1.5, gl_FragCoord.y);
-          vec3 bg = mix(uForest, uLime, lime);
+          // il Lime ha la stessa luce della sezione bianca: ellisse 55% × 85%, centro chiaro, bordi Lime profondo
+          vec2 q = (gl_FragCoord.xy / uRes - 0.5) / vec2(0.55, 0.85);
+          vec3 limeLit = mix(uLimeHi, uLimeBase, clamp(length(q), 0.0, 1.0));
+          vec3 bg = mix(uForest, limeLit, lime);
           vec3 col = mix(bg * (0.97 + 0.06 * pool), bg * mix(0.86, 1.0, 0.55), wall * 0.8);
           col *= mix(0.94, 1.0, side);
           float cove = exp(-pow((h - ${COVE.toFixed(1)} * 0.35) / 2.2, 2.0)) * smoothstep(${(WALL_Z + COVE).toFixed(1)}, ${(WALL_Z + COVE * 0.3).toFixed(1)}, vW.z);
@@ -260,7 +270,7 @@ export class Story {
           // in alto un bordo netto: il racconto è un capitolo nuovo, con il suo colore
           float fade = smoothstep(uTop - uVh * 0.004, uTop, gl_FragCoord.y)
                      + 1.0 - smoothstep(uBottom + uVh * 0.02, uBottom + uVh * 0.3, gl_FragCoord.y);
-          gl_FragColor = vec4(mix(col, uLime, clamp(fade, 0.0, 1.0)), 1.0);
+          gl_FragColor = vec4(mix(col, limeLit, clamp(fade, 0.0, 1.0)), 1.0);
           #include <colorspace_fragment>
         }
       `,
@@ -318,12 +328,6 @@ export class Story {
         { passive: true },
       );
     }
-    // il pulsante della chiusura riporta al modulo in cima e mette il cursore nell'email
-    section.querySelector('.act-cta')?.addEventListener('click', (e) => {
-      e.preventDefault();
-      scrollTo({ top: 0, behavior: 'smooth' });
-      setTimeout(() => document.querySelector<HTMLInputElement>('#signup-email')?.focus({ preventScroll: true }), 700);
-    });
   }
 
   /** Rilegge le misure della pagina: da chiamare a resize, cambio lingua e font caricati. */
@@ -556,6 +560,7 @@ export class Story {
     this.roomMat.uniforms.uTop.value = (height - this.rect.top) * dpr;
     this.roomMat.uniforms.uBottom.value = (height - this.rect.bottom) * dpr;
     this.roomMat.uniforms.uVh.value = height * dpr;
+    this.roomMat.uniforms.uRes.value.set(width * dpr, height * dpr);
     // il bordo dell'onda Lime, in pixel dal basso: lo stesso per il fondo, le barre e i loro spigoli
     const edge = (this.wave * 1.12 - 0.04) * height * dpr;
     this.roomMat.uniforms.uEdge.value = edge;

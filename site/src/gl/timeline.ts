@@ -24,7 +24,7 @@ export const TIMES = {
 export const LOOP_PERIOD = 5;
 export const LOOP_START = DURATION + 1.2;
 
-/** Macchina da scrivere su "what AI can do.": dopo TW_START, in ciclo. Ferma per TW_HOLD a parola intera, poi
+/** Macchina da scrivere su "Ready to be yours.": dopo TW_START, in ciclo. Ferma per TW_HOLD a parola intera, poi
  *  si cancella lettera per lettera, una pausa a vuoto, si riscrive lettera per lettera. */
 export const TW_START = DURATION + 3;
 export const TW_HOLD = 5.2;

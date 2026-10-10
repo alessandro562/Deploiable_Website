@@ -255,124 +255,19 @@ test('sul telefono le barre non escono mai dallo schermo', async ({ page }) => {
   }
 });
 
-test('coming soon e modulo: compaiono per ultimi, dentro lo schermo, sotto la frase', async ({ page }) => {
-  await openFilm(page);
-  const outro = page.locator('.outro');
-  for (const t of [TIMES.deploy, TIMES.silenzio, END - 0.5]) {
-    await seek(page, t);
-    await expect(outro, `t=${t}`).toBeHidden();
-  }
-  await seek(page, END);
-  await expect(outro).toBeVisible();
-  const vp = page.viewportSize()!;
-  const box = (await outro.boundingBox())!;
-  const claim = (await page.locator('.claim').boundingBox())!;
-  expect(box.y).toBeGreaterThanOrEqual(claim.y + claim.height);
-  expect(box.y + box.height).toBeLessThanOrEqual(vp.height);
-  expect(box.x).toBeGreaterThanOrEqual(0);
-  expect(box.x + box.width).toBeLessThanOrEqual(vp.width);
-});
-
-test('richiesta review: validazione, avviso email personale, invio ad Apps Script, conferma', async ({ page }) => {
-  await openFilm(page);
-  await seek(page, END);
-  const note = page.locator('.signup-note');
-  const submit = () => page.click('.signup button[type="submit"]');
-
-  // email non valida → errore sul campo email, con focus
-  await page.fill('#signup-email', 'non-una-email');
-  await submit();
-  await expect(note).toHaveText(/email valido/);
-  await expect(page.locator('.outro')).toHaveAttribute('data-state', 'error');
-  await expect(page.locator('#signup-email')).toHaveAttribute('aria-invalid', 'true');
-  await expect(page.locator('#signup-email')).toBeFocused();
-  // il bordo spesso è sulla capsula (desktop) o sul campo stesso (telefono, campi in colonna)
-  const errSel = '.signup-field:has(#signup-email)';
-  await expect.poll(() => page.locator(errSel).evaluate((el) => getComputedStyle(el).boxShadow)).toContain('2.5px');
-  expect(await note.evaluate((el) => getComputedStyle(el).color)).toBe('rgb(16, 38, 27)');
-
-  // email personale → avviso morbido, non bloccante
-  await page.fill('#signup-email', 'mario.rossi@gmail.com');
-  await page.locator('#signup-email').blur();
-  await expect(note).toHaveText(/email aziendale/);
-  await expect(page.locator('.outro')).toHaveAttribute('data-state', 'warn');
-
-  // azienda mancante, poi consenso mancante
-  await submit();
-  await expect(note).toHaveText(/nome della tua azienda/);
-  await expect(page.locator('#signup-company')).toBeFocused();
-  await page.fill('#signup-company', 'Acme Srl');
-  await submit();
-  await expect(note).toHaveText(/informativa privacy/);
-  await expect(page.locator('#signup-consent')).toHaveAttribute('aria-invalid', 'true');
-  // la casella non è pre-spuntata e si spunta cliccando il testo
-  await page.click('.consent-text span >> nth=0');
-  await expect(page.locator('#signup-consent')).toBeChecked();
-
-  // invio: prima la rete fallisce, poi va
-  let body = '';
-  let fail = true;
-  await page.route('https://script.test/**', (route) => {
-    if (fail) return route.abort();
-    body = route.request().postData() ?? '';
-    return route.fulfill({ status: 200, body: 'ok' });
-  });
-  await page.evaluate(() => (document.querySelector<HTMLFormElement>('.signup')!.dataset.endpoint = 'https://script.test/exec'));
-  await page.fill('#signup-email', 'mario.rossi@acme.it');
-  await submit();
-  await expect(note).toHaveText(/Invio non riuscito/);
-  fail = false;
-  await submit();
-  await expect(page.locator('.signup-done')).toBeVisible();
-  await expect(page.locator('.signup-done')).toHaveText(/Richiesta ricevuta/);
-  await expect(note).toHaveText('Ti contattiamo entro 3 giorni lavorativi per fissare la review.');
-  await expect(page.locator('.signup')).toBeHidden();
-  const sent = new URLSearchParams(body);
-  expect(sent.get('email')).toBe('mario.rossi@acme.it');
-  expect(sent.get('company')).toBe('Acme Srl');
-  expect(sent.get('consent')).toBe('si');
-  expect(sent.get('lang')).toBe('it');
-});
-
-test('modulo: link all\'informativa, casella non spuntata, su telefono in colonna con bersagli ≥ 44 px', async ({ page }) => {
-  await openFilm(page);
-  await seek(page, END);
-  await expect(page.locator('.consent a')).toHaveAttribute('href', 'privacy.html');
-  await expect(page.locator('#signup-consent')).not.toBeChecked();
-  await expect(page.locator('label[for="signup-email"]')).toHaveText('Email aziendale');
-  await expect(page.locator('label[for="signup-company"]')).toHaveText('Azienda');
-  const vp = page.viewportSize()!;
-  if (vp.width <= 640) {
-    const e = (await page.locator('#signup-email').boundingBox())!;
-    const c = (await page.locator('#signup-company').boundingBox())!;
-    const b = (await page.locator('.signup button[type="submit"]').boundingBox())!;
-    expect(c.y).toBeGreaterThan(e.y + e.height - 1); // in colonna
-    expect(b.y).toBeGreaterThan(c.y + c.height - 1);
-    for (const r of [e, c, b]) expect(r.height).toBeGreaterThanOrEqual(44);
-    expect(b.width).toBeGreaterThan(vp.width - 2 * 48); // a tutta larghezza
-  }
-  await page.click('[data-lang="en"]');
-  await expect(page.locator('.signup button[type="submit"]')).toHaveText(/Book your AI process review/);
-  await expect(page.locator('#signup-email')).toHaveAttribute('placeholder', 'name@company.com');
-});
-
 test('dettagli: testo secondario in Moss scurito pieno, Satoshi per i titoli e Geist per i testi piccoli', async ({ page }) => {
   await openFilm(page);
   await seek(page, END);
   const css = (sel: string, prop: string, pseudo?: string) =>
     page.locator(sel).evaluate((el, [p, ps]) => getComputedStyle(el, ps || null).getPropertyValue(p), [prop, pseudo ?? ''] as const);
-  const MOSS = 'rgb(63, 90, 70)'; // Moss scurito per il testo piccolo (#3F5A46, 5,9:1 su Lime)
-  expect(await css('.signup-note', 'color')).toBe(MOSS);
-  expect(await css('#signup-email', 'color', '::placeholder')).toBe(MOSS);
-  expect(await css('.signup-note', 'opacity')).toBe('1');
   // Satoshi per titoli e frase principale, Geist per i testi piccoli
   for (const sel of ['.line--black'])
     expect(await css(sel, 'font-family'), sel).toMatch(/^"?Satoshi/);
-  for (const sel of ['.soon', '.signup-note', '.sub', '.signup button', '#signup-email'])
+  for (const sel of ['.soon--top', '.sub', '.act-cta'])
     expect(await css(sel, 'font-family'), sel).toMatch(/^"?Geist/);
-  expect(await css('.soon', 'text-transform')).toBe('uppercase');
+  expect(await css('.soon--top', 'text-transform')).toBe('uppercase');
   // etichetta del sistema (--t-label): Geist 500, maiuscolo spaziato
-  expect(await css('.soon', 'font-weight')).toBe('500');
+  expect(await css('.soon--top', 'font-weight')).toBe('500');
 });
 
 test('hero: il blocco dei testi è centrato in altezza (centro ottico appena sopra la metà)', async ({ page }) => {
@@ -451,49 +346,24 @@ test('header fisso: in cima trasparente col logo 3D, scorrendo barra di vetro co
   expect(await svgOpacity()).toBe('0');
 });
 
-test('prova sociale: riga di credibilità e loghi dei clienti in loop sotto il modulo', async ({ page }) => {
-  const logoResponses: number[] = [];
-  page.on('response', (r) => r.url().includes('/assets/clients/') && logoResponses.push(r.status()));
-  await openFilm(page, '', 'high');
-  await seek(page, END);
-  await expect(page.locator('.proof-line')).toHaveText('70+ clienti dal 2021');
-  // quattro loghi con il loro nome (la seconda copia della traccia è nascosta ai lettori di schermo)
-  const named = page.getByRole('img', { name: /Comtel|Braga Moro|Marchiani|Junker/ });
-  await expect(named).toHaveCount(4);
-  await expect(page.locator('.clients')).not.toContainText('[CLIENTE_');
-  await expect(page.locator('.clients')).not.toContainText(/green ?stone/i);
-  const form = (await page.locator('.signup').boundingBox())!;
-  const proof = (await page.locator('.proof').boundingBox())!;
-  expect(proof.y).toBeGreaterThan(form.y + form.height);
-  // la traccia scorre
-  const x = () => page.locator('.clients-track').first().evaluate((el) => el.getBoundingClientRect().x);
-  const x0 = await x();
-  await page.waitForTimeout(600);
-  expect(Math.abs((await x()) - x0)).toBeGreaterThan(5);
-  expect(logoResponses.length).toBeGreaterThan(0);
-  expect(logoResponses.every((s) => s === 200)).toBe(true);
-  await page.click('[data-lang="en"]');
-  await expect(page.locator('.proof-line')).toHaveText('70+ clients since 2021');
-});
-
-test('macchina da scrivere: "what AI can do." si cancella e si riscrive in ciclo, senza spostare la riga', async ({ page }) => {
+test('macchina da scrivere: "Ready to be yours." si cancella e si riscrive in ciclo, senza spostare la riga', async ({ page }) => {
   await openFilm(page, '', 'high');
   const st = () => page.evaluate(() => window.__DEPLOIABLE__!.state!());
   const visible = () => page.locator('.tw .ch:not(.off)').count();
-  // il titolo resta "Stop doing what AI can do." per i lettori di schermo, qualunque cosa mostri la macchina da scrivere
-  await expect(page.getByRole('heading', { level: 1 })).toHaveAccessibleName(/Stop doing\s*what AI can do\./);
+  // il titolo resta "Built to work. Ready to be yours." per i lettori di schermo, qualunque cosa mostri la macchina da scrivere
+  await expect(page.getByRole('heading', { level: 1 })).toHaveAccessibleName(/Built to work\.\s*Ready to be yours\./);
   await seek(page, END);
-  expect(await visible()).toBe(15);
+  expect(await visible()).toBe(18);
   const full = (await page.locator('.tw').boundingBox())!;
   await seek(page, TW_START + TW_HOLD + TW_ERASE * 2.5);
-  expect((await st()).tw).toBe(12);
+  expect((await st()).tw).toBe(15);
   expect((await st()).caret).toBe(true);
-  expect(await visible()).toBe(12);
+  expect(await visible()).toBe(15);
   await expect(page.locator('.tw-caret')).toHaveClass(/on/);
   // la parola non si ricentra mentre si cancella
   const mid = (await page.locator('.tw').boundingBox())!;
   expect(Math.abs(mid.x - full.x)).toBeLessThanOrEqual(0.5);
-  await seek(page, TW_START + TW_HOLD + TW_ERASE * 15 + 0.2);
+  await seek(page, TW_START + TW_HOLD + TW_ERASE * 18 + 0.2);
   expect((await st()).tw).toBe(0);
   // e torna intera
   await seek(page, TW_START + 20 * 3);

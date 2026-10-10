@@ -21,8 +21,8 @@ test('racconto: tre step e la chiusura, uno alla volta mentre si scorre', async 
   await openFilm(page, '', 'high');
   await seek(page, 7.3);
   await expect(page.locator('.story .act')).toHaveCount(4);
-  await expect(page.locator('.story .act-title')).toHaveText(['Troviamo il lavoro ripetitivo.', 'Lo ridisegniamo con l’AI.', 'Lo rendiamo autonomo, un passo alla volta.']);
-  await expect(page.locator('.story .act-kicker')).toHaveText(['Analisi', 'Riprogettazione', 'Autonomia']);
+  await expect(page.locator('.story .act-title')).toHaveText(['Misuriamo prima di costruire.', 'Partiamo dal processo, non dal modello.', 'Autonomia per gradi, sempre reversibile.']);
+  await expect(page.locator('.story .act-kicker')).toHaveText(['Come lavoriamo · 01 Misura', 'Come lavoriamo · 02 Processo', 'Come lavoriamo · 03 Autonomia']);
   for (const stage of [0, 1, 2, 3]) {
     await scrollToStage(page, stage + (stage < 3 ? 0.25 : 0));
     await seek(page, 7.3);
@@ -43,17 +43,17 @@ test('racconto: tre step e la chiusura, uno alla volta mentre si scorre', async 
   }
 });
 
-test('racconto: il pulsante della chiusura riporta al modulo, in inglese con il toggle', async ({ page }) => {
+test('racconto: il pulsante della chiusura porta al contatto, in inglese con il toggle', async ({ page }) => {
   await openFilm(page, '', 'high');
   await page.click('[data-lang="en"]');
-  await expect(page.locator('.story .act-title').first()).toHaveText('We find the repetitive work.');
-  await expect(page.locator('.story .act-kicker')).toHaveText(['Discovery', 'Redesign', 'Autonomy']);
-  await expect(page.locator('.story .act-cta')).toHaveText('Book your AI process review');
+  await expect(page.locator('.story .act-title').first()).toHaveText('We measure before we build.');
+  await expect(page.locator('.story .act-kicker')).toHaveText(['How we work · 01 Measure', 'How we work · 02 Process', 'How we work · 03 Autonomy']);
+  await expect(page.locator('.story .act-cta')).toHaveText('Let’s talk');
   await scrollToStage(page, 3);
   await seek(page, 7.3);
+  await expect(page.locator('.story .act-cta')).toHaveAttribute('href', '#contatti');
   await page.click('.story .act-cta');
-  await expect.poll(() => page.evaluate(() => scrollY), { timeout: 5000 }).toBeLessThan(5);
-  await expect(page.locator('#signup-email')).toBeFocused({ timeout: 5000 });
+  await expect(page.locator('#contatti')).toBeInViewport({ timeout: 5000 });
 });
 
 test.describe('senza animazioni', () => {

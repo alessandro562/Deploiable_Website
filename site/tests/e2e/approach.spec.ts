@@ -102,16 +102,11 @@ test('gli schemi si traducono con la pagina', async ({ page }) => {
   await expect(page.locator('#cosa-facciamo .tappa-k').first()).toHaveText('Phase 1 · Understand');
 });
 
-test('ogni linea porta al contatto con la strada già scelta', async ({ page }) => {
+test('ogni linea porta al contatto nel footer', async ({ page }) => {
   await ready(page);
-  await page.click('.line-toggle[data-journey="2"]');
-  await page.click('#cosa-facciamo .line-link[data-interest="build"]');
-  await expect(page.locator('input[name="interest"][value="build"]')).toBeChecked();
-  await page.goto('/?__test=1');
-  await page.waitForFunction(() => window.__DEPLOIABLE__?.ready === true);
-  await page.click('.line-toggle[data-journey="1"]');
-  await page.click('#cosa-facciamo .line-link[data-interest="transform"]');
-  await expect(page.locator('input[name="interest"][value="transform"]')).toBeChecked();
+  const links = page.locator('#cosa-facciamo .line-link');
+  await expect(links).toHaveCount(2);
+  expect(await links.evaluateAll((els) => els.map((e) => e.getAttribute('href')))).toEqual(['#contatti', '#contatti']);
 });
 
 test('navigazione: Approccio, Come lavoriamo, Contatti; niente esempi né "Cosa realizziamo"', async ({ page }, info) => {

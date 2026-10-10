@@ -1,4 +1,15 @@
-import { Color, NoToneMapping, PerspectiveCamera, Scene, SRGBColorSpace, Vector2, WebGLRenderer } from 'three';
+import {
+  Color,
+  Mesh,
+  NoToneMapping,
+  PerspectiveCamera,
+  PlaneGeometry,
+  Scene,
+  ShaderMaterial,
+  SRGBColorSpace,
+  Vector2,
+  WebGLRenderer,
+} from 'three';
 import { COLORS } from '../config/brand';
 import type { Quality } from '../config/quality';
 
@@ -10,6 +21,31 @@ export class Engine {
   /** Il fondo: colore pieno e supergrafica, con una camera propria (non segue zoom e pan del logo). */
   readonly bgScene = new Scene();
   readonly bgCamera = new PerspectiveCamera(30, 1, 1, 4000);
+  /** Il Lime del fondo ha la stessa luce della sezione bianca: centro chiaro, bordi nel Lime profondo.
+   *  È un piano a schermo intero (acceso solo con la palette Lime); il canvas è opaco, non si può usare il CSS. */
+  private readonly limeBg = new Mesh(
+    new PlaneGeometry(2, 2),
+    new ShaderMaterial({
+      depthTest: false,
+      depthWrite: false,
+      uniforms: {
+        uRes: { value: new Vector2(1, 1) },
+        uHi: { value: new Color(COLORS.lime).lerp(new Color('#ffffff'), 0.35) },
+        uBase: { value: new Color(COLORS.limeDeep) },
+      },
+      vertexShader: 'void main() { gl_Position = vec4(position.xy, 0.0, 1.0); }',
+      fragmentShader: /* glsl */ `
+        uniform vec2 uRes;
+        uniform vec3 uHi, uBase;
+        void main() {
+          // ellisse 55% × 85%: la stessa luce di [data-surface='light'] (src/styles/sections.css)
+          vec2 q = (gl_FragCoord.xy / uRes - 0.5) / vec2(0.55, 0.85);
+          gl_FragColor = vec4(mix(uHi, uBase, clamp(length(q), 0.0, 1.0)), 1.0);
+          #include <colorspace_fragment>
+        }
+      `,
+    }),
+  );
   readonly camera = new PerspectiveCamera(36, 1, 1, 2000);
   readonly res = new Vector2(1, 1);
   dpr = 1;
@@ -33,6 +69,9 @@ export class Engine {
     this.renderer.outputColorSpace = SRGBColorSpace;
     this.renderer.toneMapping = NoToneMapping;
     this.bgScene.background = new Color(COLORS.forest);
+    this.limeBg.frustumCulled = false;
+    this.limeBg.visible = false;
+    this.bgScene.add(this.limeBg);
     this.renderer.autoClear = false;
     this.dpr = Math.min(window.devicePixelRatio || 1, quality.dprMax);
     this.renderer.setPixelRatio(this.dpr);
@@ -58,10 +97,16 @@ export class Engine {
     this.height = h;
     // lo stile lo dà il CSS (100vw × 100lvh): qui solo la risoluzione del disegno
     this.renderer.setSize(w, h, false);
+    (this.limeBg.material as ShaderMaterial).uniforms.uRes.value.set(w * this.dpr, h * this.dpr);
     document.documentElement.style.setProperty('--gl-h', `${h}px`);
     this.camera.aspect = w / h;
     this.res.set(w * this.dpr, h * this.dpr);
     return true;
+  }
+
+  /** Palette Lime: il fondo prende la luce del Lime; Forest resta il colore pieno. */
+  setLimeLight(on: boolean) {
+    this.limeBg.visible = on;
   }
 
   /** extra: un passaggio disegnato sopra a tutto (il racconto a scorrimento sotto l'hero). */
