@@ -1081,3 +1081,25 @@ h3 {
     scale: 1.15;
   }
 }
+
+/* Desktop: testo a sinistra, schema grande a destra. La fase si legge come una scena, non come una colonna. */
+@media (min-width: 900px) {
+  .tappa {
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.5fr);
+    column-gap: var(--s-8);
+    align-items: center;
+  }
+  .tappa-txt {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .tappa-s {
+    margin-top: var(--s-4);
+  }
+  .tappa-fig {
+    max-width: none;
+    margin-top: 0;
+  }
+}
