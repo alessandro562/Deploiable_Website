@@ -355,3 +355,19 @@
 .mk-mile .mk-s { font-size: 0.9em; }
 .mk-chart { margin-top: 1.6em; width: 58%; padding: 1em 1.1em 0.8em; border-radius: 1em; background: var(--mk-sunk); box-shadow: inset 0 0 0 0.1em var(--mk-line); }
 .mk-chart svg { display: block; width: 100%; height: 6.2em; margin-top: 0.6em; overflow: visible; }
+
+/* ——— 02 · tappa 3: passaggio all'impresa acquirente ——— */
+.mk-handover { display: grid; grid-template-columns: 9.5em 1fr 9.5em; gap: 1.4em; align-items: center; margin-top: 1.8em; }
+.mk-party { padding: 1.2em 1em; border-radius: 1.2em; display: grid; gap: 0.6em; justify-items: start; }
+.mk-party .mk-ico { width: 1.8em; height: 1.8em; }
+.mk-party .mk-b { font-size: 1.08em; line-height: 1.2; }
+.mk-party--from { background: #10261b; color: #f1f3ea; box-shadow: 0 0.9em 1.8em -0.6em rgb(16 38 27 / 0.55); }
+.mk-party--from .mk-ico { color: #c8f25a; }
+.mk-party--from .mk-s { color: #8fa596; }
+.mk-party--to { background: var(--mk-surface); box-shadow: inset 0 0 0 0.16em #10261b, 0 0.8em 1.6em -0.6em rgb(16 38 27 / 0.3); }
+.mk-assets { display: grid; gap: 0.6em; }
+.mk-asset { display: flex; align-items: center; gap: 0.6em; padding: 0.6em 0.8em; border-radius: 0.8em; background: var(--mk-sunk); box-shadow: inset 0 0 0 0.1em var(--mk-line); font-weight: 600; font-size: 1em; position: relative; }
+.mk-asset .mk-ico { width: 1.4em; height: 1.4em; color: var(--mk-soft); }
+.mk-asset::after { content: ''; margin-left: auto; width: 0.5em; height: 0.5em; border-top: 0.14em solid #4f6a55; border-right: 0.14em solid #4f6a55; transform: rotate(45deg); }
+.mk-asset.is-key { background: rgb(200 242 90 / 0.35); }
+.mk-goal--deep { bottom: -12.5em; }
