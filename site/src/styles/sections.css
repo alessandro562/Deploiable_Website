@@ -190,7 +190,7 @@
 /* logo e lingua sopra le fasce scure e sopra il contatto */
 .is-dark-under .top::before {
   opacity: 1;
-  background: linear-gradient(180deg, rgb(16 38 27 / 0.72), rgb(16 38 27 / 0.5));
+  background: var(--forest);
   border-bottom-color: rgb(241 243 234 / 0.1);
 
 }
