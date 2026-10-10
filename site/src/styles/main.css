@@ -158,8 +158,14 @@ p {
 .has-bar .top::before {
   opacity: 1;
 }
-/* sulla hero la barra ha la stessa luce Lime del canvas: lo stesso gradiente, ancorato alla finestra (--gl-h) */
+/* sulla hero, in cima, la barra è trasparente: il logo 3D sta sul canvas, sotto la barra */
 .top.on-hero::before {
+  opacity: 0;
+}
+/* dove il fondo è il Lime del canvas (hero scrollata, chiusura della storia, footer) la barra ne prende la stessa luce;
+   scrollando il logo è l'SVG sopra la barra */
+.is-scrolled .top.on-lime::before {
+  opacity: 1;
   /* in srgb-linear come il canvas: stessi colori anche nei passaggi */
   background: radial-gradient(55% 85% at 50% 50% in srgb-linear, color-mix(in srgb-linear, var(--lime), white 35%) 0%, var(--lime-deep) 100%)
     50% 0 / 100vw var(--gl-h, 100lvh) no-repeat;
@@ -592,8 +598,14 @@ p {
 .foot dd {
   font-variant-numeric: tabular-nums;
 }
-.foot-link {
+/* Privacy e lingua sulla stessa riga, a destra: il footer resta alto una riga */
+.foot-end {
   justify-self: end;
+  display: flex;
+  align-items: center;
+  gap: var(--s-5);
+}
+.foot-link {
   /* area di tocco di 44 px senza spostare il testo */
   margin: calc((44px - 1.5em) / -2) 0;
   padding: calc((44px - 1.5em) / 2) 0;

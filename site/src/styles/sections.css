@@ -1211,9 +1211,13 @@ h3 {
   border-radius: 28px;
 }
 /* il mazzo si sceglie con la tastiera: contorno chiaro, nessun altro segnale */
+/* focus da tastiera: un contorno stretto sulla card in primo piano, non attorno a tutto il mazzo */
 .deck:focus-visible {
+  outline: none;
+}
+.deck:focus-visible .dcard:not(.is-back):not(.is-hidden) {
   outline: 2px solid var(--forest);
-  outline-offset: 10px;
+  outline-offset: 4px;
 }
 .dcard {
   position: relative;
@@ -1308,16 +1312,17 @@ h3 {
 }
 /* titoli grandi: il nome del modello e il nome del passo sono il primo livello di lettura */
 .dcard-t {
-  font: 700 clamp(48px, 5.8vw, 92px) / 0.96 var(--sans);
+  /* legati anche all'altezza: con card più basse il testo resta dentro */
+  font: 700 clamp(40px, min(5.8vw, 9svh), 92px) / 0.96 var(--sans);
   letter-spacing: -0.05em;
   text-wrap: balance;
 }
 .dcard-t--sm {
-  font-size: clamp(36px, 3.8vw, 56px);
+  font-size: clamp(30px, min(3.8vw, 5.6svh), 56px);
   letter-spacing: -0.04em;
 }
 .dcard-t--step {
-  font-size: clamp(40px, 4.4vw, 66px);
+  font-size: clamp(30px, min(4.4vw, 5.4svh), 66px);
   letter-spacing: -0.045em;
 }
 .dcard-p {

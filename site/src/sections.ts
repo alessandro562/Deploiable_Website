@@ -16,7 +16,7 @@ function headerSurface() {
   const header = document.querySelector<HTMLElement>('.top');
   // le sezioni a colore pieno: quelle con data-surface (testi della barra), la storia scura, il footer Lime
   const secs = Array.from(document.querySelectorAll<HTMLElement>('[data-surface], .story, .foot, #hero'));
-  let spans: { top: number; bottom: number; surface: string; bar: string; hero: boolean }[] = [];
+  let spans: { top: number; bottom: number; surface: string; bar: string; hero: boolean; story: boolean; foot: boolean }[] = [];
   const measure = () => {
     const y = scrollY;
     spans = secs.map((s) => {
@@ -27,6 +27,8 @@ function headerSurface() {
         surface: s.dataset.surface ?? '',
         bar: getComputedStyle(s).getPropertyValue('--bar').trim(),
         hero: s.id === 'hero',
+        story: s.classList.contains('story'),
+        foot: s.classList.contains('foot'),
       };
     });
     update();
@@ -35,17 +37,23 @@ function headerSurface() {
   const update = () => {
     const line = scrollY + (header?.offsetHeight ?? 60) / 2;
     const hit = spans.find((s) => line >= s.top && line < s.bottom);
-    // la barra prende il colore esatto della sezione sotto; sulla hero (nessuna sezione a colore pieno) è trasparente
-    const key = hit ? `${hit.surface}|${hit.bar}|${hit.hero}` : '';
+    // la barra prende il colore esatto della sezione sotto; sulla hero (nessuna sezione a colore pieno) è trasparente.
+    // Sulla storia il colore segue l'onda Lime della chiusura: Forest finché l'header è sopra la parte scura
+    // (is-dark-under, da app.ts), Lime dopo.
+    const bar = hit?.story ? (root.classList.contains('is-dark-under') ? 'var(--forest)' : 'var(--lime)') : (hit?.bar ?? '');
+    const key = hit ? `${hit.surface}|${bar}|${hit.hero}` : '';
     if (key === under) return;
     under = key;
     root.classList.toggle('is-light-under', hit?.surface === 'light');
     root.classList.toggle('is-lime-under', hit?.surface === 'lime');
     root.dataset.under = hit?.surface ?? '';
     // sulla hero la barra ha la luce del canvas (CSS: .on-hero); sulle altre sezioni il colore esatto della sezione
-    root.classList.toggle('has-bar', !!hit && (hit.hero || !!hit.bar));
+    // dove il fondo è il Lime del canvas (hero, chiusura della storia, footer) la barra ne prende la stessa luce
+    const lit = !!hit && (hit.hero || hit.foot || (hit.story && bar === 'var(--lime)'));
+    root.classList.toggle('has-bar', !!hit && (hit.hero || !!bar));
     header?.classList.toggle('on-hero', !!hit?.hero);
-    if (hit?.bar && !hit.hero && header) header.style.setProperty('--bar', hit.bar);
+    header?.classList.toggle('on-lime', lit);
+    if (bar && !lit && header) header.style.setProperty('--bar', bar);
   };
   let queued = false;
   addEventListener(
@@ -61,6 +69,8 @@ function headerSurface() {
     { passive: true },
   );
   new ResizeObserver(measure).observe(document.body);
+  // l'onda della storia cambia is-dark-under anche senza scroll (la molla si assesta): la barra la segue
+  new MutationObserver(update).observe(root, { attributes: true, attributeFilter: ['class'] });
   measure();
 }
 
