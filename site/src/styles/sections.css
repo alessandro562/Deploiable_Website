@@ -767,6 +767,30 @@ h3 {
   max-width: 100%;
 }
 @media (max-width: 860px) {
+  /* i passi sono un controllo su una riga sola: tre segmenti uguali, il numero si legge dal segmento attivo */
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--s-2);
+  }
+  .step-btn {
+    justify-content: center;
+    min-width: 0;
+    padding: 0 10px;
+    font-size: 14px;
+  }
+  .step-num {
+    display: none;
+  }
+  .step-nav {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    width: 100%;
+  }
+  .step-prev,
+  .step-next {
+    justify-content: center;
+  }
   .tappa-fig .mk [data-i18n] {
     visibility: hidden;
   }
