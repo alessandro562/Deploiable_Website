@@ -129,38 +129,21 @@ p {
   margin: 0;
 }
 
-/* ---------- Header: il logo piccolo in alto a sinistra, fisso; scorrendo diventa una barra di vetro ---------- */
+/* ---------- Header: una barra fissa a tutta larghezza, col colore della sezione sotto (vedi sotto) ---------- */
 
+/* Barra a tutta larghezza: logo a sinistra, "Coming soon" al centro, "Prenota una call" a destra. Il colore è quello
+   esatto della sezione sotto la barra (--bar, impostato da src/sections.ts); sulla hero è trasparente. */
 .top {
   position: fixed;
   z-index: 15; /* sopra l'hero (che parte da y = 0): il logo deve ricevere passaggio del mouse e clic */
-  top: max(var(--s-3), env(safe-area-inset-top));
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  align-items: center;
-  gap: var(--s-5);
-  padding: var(--s-2) var(--s-6);
-  /* fissa (position fixed con left 50%: senza questo la larghezza sarebbe metà schermo) */
-  width: max-content;
-  max-width: calc(100vw - 2 * var(--s-3));
-}
-/* Pillola di vetro, piccola e centrale: logo, menu e lingua. Compare a intro finita (.is-ready), senza "Coming soon"
-   (sta nel footer). Scrollando il vetro si fa più pieno e sfoca ciò che gli passa sotto; in cima non c'è nulla
-   sotto, e il logo 3D sul canvas resta nitido. */
-.top {
-  position: fixed;
-  z-index: 15; /* sopra l'hero (che parte da y = 0): il logo deve ricevere passaggio del mouse e clic */
-  top: max(var(--s-3), env(safe-area-inset-top));
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
   gap: var(--s-4);
-  padding: var(--s-1) var(--s-5);
-  /* fissa (position fixed con left 50%: senza questo la larghezza sarebbe metà schermo) */
-  width: max-content;
-  max-width: calc(100vw - 2 * var(--s-3));
+  padding: var(--s-3) var(--pad-x);
 }
 .top::before {
   content: '';
@@ -168,46 +151,38 @@ p {
   inset: 0;
   z-index: -1;
   pointer-events: none;
-  border-radius: 999px;
+  background: var(--bar, transparent);
   opacity: 0;
-  background: rgb(255 255 255 / 0.22);
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.6), inset 0 0 0 1px rgb(255 255 255 / 0.3);
-  transition: opacity var(--dur-state) var(--ease), background var(--dur-state) var(--ease);
+  transition: opacity var(--dur-state) var(--ease), background-color var(--dur-state) var(--ease);
 }
-/* a intro finita il vetro compare subito; sulle pagine senza 3D è sempre presente */
-.is-ready .top::before,
-html:not(.is-webgl) .top::before {
+.has-bar .top::before {
   opacity: 1;
-}
-/* scrollando il vetro si fa più pieno e sfoca ciò che gli passa sotto */
-.is-scrolled .top::before {
-  /* ghiaccio opaco: bianco quasi pieno, grana sottile e riflesso in diagonale; sfocatura standard (la forma con
-     solo il prefisso non veniva applicata) */
-  background:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .14 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),
-    linear-gradient(115deg, transparent 40%, rgb(255 255 255 / 0.45) 50%, transparent 60%),
-    linear-gradient(135deg, rgb(255 255 255 / 0.82), rgb(255 255 255 / 0.66));
-  backdrop-filter: blur(26px) saturate(1.5);
 }
 /* durante l'intro la barra è vuota: nessuna voce ferma in alto */
 .is-webgl:not(.is-ready) .top .nav,
-.is-webgl:not(.is-ready) .top .lang {
+.is-webgl:not(.is-ready) .top .soon--top {
   visibility: hidden;
+}
+.top .logo-slot {
+  justify-self: start;
+}
+.top .soon--top {
+  justify-self: center;
+  margin: 0;
+  color: var(--ink-strong);
+  white-space: nowrap;
+}
+.top .nav {
+  justify-self: end;
 }
 @media (max-width: 640px) {
   .top {
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: var(--s-2) var(--s-4);
     padding: var(--s-2) var(--s-4);
+    gap: var(--s-2);
   }
-  .top::before {
-    border-radius: 28px;
-  }
-  .top > .logo-slot,
-  .top > .nav,
-  .top > .lang {
-    flex: 0 0 auto;
+  .top .soon--top {
+    font-size: 11px;
+    letter-spacing: 0.08em;
   }
 }
 
@@ -1114,11 +1089,4 @@ html:not(.is-webgl) .top::before {
 }
 .soon--foot {
   margin: 0 0 var(--s-2);
-}
-@media (max-width: 640px) {
-  .soon--top {
-    order: 9;
-    flex-basis: 100%;
-    text-align: center;
-  }
 }

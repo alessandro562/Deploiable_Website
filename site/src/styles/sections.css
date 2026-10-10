@@ -144,8 +144,9 @@
   .nav-open .nav-toggle-icon {
     transform: scaleY(0.4);
   }
+  /* la barra ha una sola voce (Prenota una call): resta visibile anche su telefono */
   .nav-list {
-    display: none;
+    display: flex;
   }
   /* il menu aperto: un pannello Forest sotto l'header, voci grandi */
   .nav-open .nav-list {
@@ -182,15 +183,6 @@
   .nav-open .nav-list .nav-cta::before {
     display: none;
   }
-}
-/* logo e lingua sopra le fasce scure e sopra il contatto */
-.is-dark-under .top::before {
-  background: linear-gradient(135deg, rgb(16 38 27 / 0.84), rgb(16 38 27 / 0.7));
-}
-/* sopra la fascia Mist l'header è pieno: gli elementi scuri che ci passano sotto (pulsanti, schede) non
-   diventano macchie sfocate dietro il logo */
-.is-light-under .top::before {
-  background: linear-gradient(135deg, rgb(241 243 234 / 0.88), rgb(241 243 234 / 0.76));
 }
 .is-dark-under .logo-slot,
 .is-dark-under .lang [aria-pressed='true'] {
@@ -1410,4 +1402,15 @@ h3 {
   .dcard {
     transition: none;
   }
+}
+
+/* Colore della barra: quello della sezione sotto di lei (src/sections.ts). La storia è scura, il footer è Lime. */
+.story {
+  --bar: var(--forest);
+}
+.sec--approach {
+  --bar: var(--mist);
+}
+.foot {
+  --bar: var(--lime);
 }
