@@ -189,17 +189,12 @@
 }
 /* logo e lingua sopra le fasce scure e sopra il contatto */
 .is-dark-under .top::before {
-  opacity: 1;
-  background: var(--forest);
-  border-bottom-color: rgb(241 243 234 / 0.1);
-
+  background: color-mix(in srgb, var(--forest) calc(var(--glass, 0) * 92%), transparent);
 }
 /* sopra la fascia Mist l'header è pieno: gli elementi scuri che ci passano sotto (pulsanti, schede) non
    diventano macchie sfocate dietro il logo */
 .is-light-under .top::before {
-  opacity: 1;
-  background: var(--mist);
-  border-bottom-color: rgb(16 38 27 / 0.08);
+  background: color-mix(in srgb, var(--mist) calc(var(--glass, 0) * 92%), transparent);
 }
 .is-dark-under .logo-slot,
 .is-dark-under .lang [aria-pressed='true'] {

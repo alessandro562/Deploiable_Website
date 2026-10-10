@@ -124,6 +124,8 @@ export async function start(caps: Capabilities) {
   const dock = () => {
     const root = document.documentElement;
     if (scrolled !== scrollY > 2) root.classList.toggle('is-scrolled', (scrolled = scrollY > 2));
+    // il vetro dell'header si fa più pieno scorrendo: pieno a 240 px
+    root.style.setProperty('--glass', Math.min(1, Math.max(0, scrollY / 240)).toFixed(3));
     if (docked !== (scrolled && time >= DURATION)) {
       docked = !docked;
       root.classList.toggle('is-docked', docked);

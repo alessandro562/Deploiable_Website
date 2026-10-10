@@ -139,29 +139,31 @@ p {
   right: 0;
   padding: max(var(--pad-top), env(safe-area-inset-top)) var(--pad-x) var(--s-4);
 }
-/* Il vetro compare solo a pagina scorsa: in cima l'header resta trasparente e il logo 3D (sul canvas, sotto
-   la pagina) non viene sfocato. Scorrendo il logo passa all'SVG ufficiale, sopra il vetro (src/app.ts). */
+/* Barra di vetro a parallelogramma: contiene logo, menu e lingua. In cima è trasparente; scorrendo il vetro
+   diventa più pieno (--glass, impostata da src/app.ts secondo lo scroll). Con il 3D resta trasparente fino a
+   intro finita: il logo 3D (sul canvas, sotto la pagina) non va sfocato né coperto prima. */
 .top::before {
   content: '';
   position: absolute;
-  inset: 0;
+  inset: var(--s-2) calc(var(--pad-x) * 0.5) var(--s-1);
   z-index: -1;
-  /* a pagina scorsa l'header è pieno (il testo sotto non deve vedersi): il colore della palette; in cima resta trasparente */
-  background: var(--bg);
-  border-bottom: 1px solid rgb(255 255 255 / 0.55);
-
-  opacity: 0;
-  transition: opacity var(--dur-state) var(--ease);
   pointer-events: none;
+  clip-path: polygon(22px 0, 100% 0, calc(100% - 22px) 100%, 0 100%);
+  background: color-mix(in srgb, var(--bg) calc(var(--glass, 0) * 100%), transparent);
+  backdrop-filter: blur(calc(var(--glass, 0) * 14px));
+  -webkit-backdrop-filter: blur(calc(var(--glass, 0) * 14px));
 }
-/* con il 3D il vetro aspetta la fine dell'intro (logo atterrato, Lime): mai sopra il Forest dell'apertura */
-.is-scrolled:not(.is-webgl) .top::before,
-.is-webgl.is-docked .top::before {
-  opacity: 1;
+.is-webgl:not(.is-docked) .top::before {
+  --glass: 0;
 }
-@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+.is-scrolled:not(.is-webgl) .top::before {
+  --glass: 1;
+}
+@media (max-width: 640px) {
+  /* su telefono l'etichetta "Coming soon" sta sotto il logo: la barra la deve contenere */
   .top::before {
-    background: none;
+    bottom: auto;
+    height: calc(var(--pad-top) + var(--logo-w) * 0.19 + 44px);
   }
 }
 .logo-slot {
@@ -808,12 +810,6 @@ p {
   transform-origin: left;
 }
 /* sopra la fascia scura l'header è vetro scuro, logo e lingua chiari */
-.is-dark-under .top::before {
-  opacity: 1;
-  background: var(--forest);
-  border-bottom-color: rgb(241 243 234 / 0.14);
-
-}
 .is-dark-under .logo-slot,
 .is-dark-under .lang [aria-pressed='true'] {
   color: var(--mist); /* come i titoli sul Forest */
