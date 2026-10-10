@@ -40,7 +40,7 @@ export async function start(caps: Capabilities) {
   const sweep = document.querySelector<HTMLElement>('.sweep')!;
   const outro = document.querySelector<HTMLElement>('.outro')!;
   // sottotitolo, poi la CTA: entrano uno dopo l'altro
-  const outroItems = [['.sub'], ['.outro-cta']].map((sel) =>
+  const outroItems = [['.sub'], ['.signup', '.signup-done'], ['.signup-note']].map((sel) =>
     sel.map((q) => document.querySelector<HTMLElement>(q)!),
   );
   const slotEl = document.querySelector<HTMLElement>('.logo-slot')!;

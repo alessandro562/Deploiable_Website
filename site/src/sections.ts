@@ -15,8 +15,8 @@ function headerSurface() {
   const root = document.documentElement;
   const header = document.querySelector<HTMLElement>('.top');
   // le sezioni a colore pieno: quelle con data-surface (testi della barra), la storia scura, il footer Lime
-  const secs = Array.from(document.querySelectorAll<HTMLElement>('[data-surface], .story, .foot'));
-  let spans: { top: number; bottom: number; surface: string; bar: string }[] = [];
+  const secs = Array.from(document.querySelectorAll<HTMLElement>('[data-surface], .story, .foot, #hero'));
+  let spans: { top: number; bottom: number; surface: string; bar: string; hero: boolean }[] = [];
   const measure = () => {
     const y = scrollY;
     spans = secs.map((s) => {
@@ -26,6 +26,7 @@ function headerSurface() {
         bottom: r.bottom + y,
         surface: s.dataset.surface ?? '',
         bar: getComputedStyle(s).getPropertyValue('--bar').trim(),
+        hero: s.id === 'hero',
       };
     });
     update();
@@ -35,14 +36,16 @@ function headerSurface() {
     const line = scrollY + (header?.offsetHeight ?? 60) / 2;
     const hit = spans.find((s) => line >= s.top && line < s.bottom);
     // la barra prende il colore esatto della sezione sotto; sulla hero (nessuna sezione a colore pieno) è trasparente
-    const key = hit ? `${hit.surface}|${hit.bar}` : '';
+    const key = hit ? `${hit.surface}|${hit.bar}|${hit.hero}` : '';
     if (key === under) return;
     under = key;
     root.classList.toggle('is-light-under', hit?.surface === 'light');
     root.classList.toggle('is-lime-under', hit?.surface === 'lime');
     root.dataset.under = hit?.surface ?? '';
-    root.classList.toggle('has-bar', !!hit?.bar);
-    if (hit?.bar && header) header.style.setProperty('--bar', hit.bar);
+    // sulla hero la barra ha la luce del canvas (CSS: .on-hero); sulle altre sezioni il colore esatto della sezione
+    root.classList.toggle('has-bar', !!hit && (hit.hero || !!hit.bar));
+    header?.classList.toggle('on-hero', !!hit?.hero);
+    if (hit?.bar && !hit.hero && header) header.style.setProperty('--bar', hit.bar);
   };
   let queued = false;
   addEventListener(

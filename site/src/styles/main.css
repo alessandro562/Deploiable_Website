@@ -158,6 +158,16 @@ p {
 .has-bar .top::before {
   opacity: 1;
 }
+/* sulla hero la barra ha la stessa luce Lime del canvas: lo stesso gradiente, ancorato alla finestra (--gl-h) */
+.top.on-hero::before {
+  /* in srgb-linear come il canvas: stessi colori anche nei passaggi */
+  background: radial-gradient(55% 85% at 50% 50% in srgb-linear, color-mix(in srgb-linear, var(--lime), white 35%) 0%, var(--lime-deep) 100%)
+    50% 0 / 100vw var(--gl-h, 100lvh) no-repeat;
+}
+/* durante l'intro la barra non c'è */
+.is-webgl:not(.is-ready) .top::before {
+  opacity: 0;
+}
 /* durante l'intro la barra è vuota: nessuna voce ferma in alto */
 .is-webgl:not(.is-ready) .top .nav,
 .is-webgl:not(.is-ready) .top .soon--top {
@@ -184,34 +194,6 @@ p {
     font-size: 11px;
     letter-spacing: 0.08em;
   }
-}
-
-/* quando scendi: un solo simbolo fisso in basso a sinistra, che riporta alla hero */
-.back-top {
-  position: fixed;
-  z-index: 16;
-  left: max(var(--pad-x), env(safe-area-inset-left));
-  bottom: max(var(--s-4), env(safe-area-inset-bottom));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 44px;
-  color: var(--ink-strong);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity var(--dur-state) var(--ease);
-}
-.back-top svg {
-  width: 30px;
-  height: auto;
-}
-.is-scrolled .back-top {
-  opacity: 1;
-  pointer-events: auto;
-}
-.is-dark-under .back-top {
-  color: var(--mist);
 }
 
 .logo-slot {

@@ -1,0 +1,288 @@
+/* Modulo di richiesta (hero): ripristinato dalla versione precedente di main.css. */
+
+
+.signup {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--s-4);
+  width: min(100%, 760px);
+}
+.signup-row {
+  display: flex;
+  align-items: stretch;
+  gap: var(--s-2);
+  width: 100%;
+  height: 56px;
+  padding: 0 var(--s-1); /* lo sbalzo degli spigoli inclinati */
+}
+.signup-field {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  border-radius: var(--radius);
+  background: var(--field-bg);
+  transform: skewX(-8deg);
+  /* il bordo è un'ombra: quando diventa più spesso (errore) il layout non si muove di un pixel */
+  box-shadow: inset 0 0 0 0 var(--ink-strong);
+  outline: 2px solid transparent;
+  outline-offset: 4px;
+  transition: box-shadow var(--dur-ui) var(--ease), outline-color var(--dur-ui) var(--ease);
+}
+.signup-field--email {
+  flex-grow: 1.35;
+}
+.signup-field:focus-within {
+  outline-color: var(--ink-strong);
+}
+.signup-field input {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 100%;
+  padding: 0 var(--s-4) 0 var(--s-5);
+  border: 0;
+  background: transparent;
+  color: var(--ink-strong);
+  caret-color: var(--ink-strong);
+  font: var(--t-input);
+  letter-spacing: -0.005em;
+  outline: none;
+  transform: skewX(8deg);
+}
+.signup-field input::placeholder {
+  color: var(--ink-soft);
+  opacity: 1;
+}
+.signup input:-webkit-autofill,
+.signup input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--ink-strong);
+  transition: background-color 600000s 0s;
+}
+.signup button {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 0 var(--s-5);
+  border: 0;
+  border-radius: var(--radius);
+  background: var(--ink-strong);
+  color: var(--bg);
+  font: var(--t-button);
+  letter-spacing: -0.005em;
+  white-space: nowrap;
+  cursor: pointer;
+  transform: skewX(-8deg);
+  outline: 2px solid transparent;
+  outline-offset: 4px;
+  transition: background-color var(--dur-ui) var(--ease), transform var(--dur-ui) var(--ease), outline-color var(--dur-ui) var(--ease);
+}
+.signup button:focus-visible {
+  outline-color: var(--ink-strong);
+}
+.consent {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s-3);
+  /* allineato all'inizio del testo del primo campo (bordo del campo + il suo margine interno) */
+  align-self: stretch;
+  padding: 0 var(--s-5) 0 calc(var(--s-1) + var(--s-5));
+  font: var(--t-small);
+  text-align: left;
+  color: var(--ink-soft);
+  cursor: pointer;
+}
+.consent input {
+  position: absolute;
+  top: 0;
+  left: calc(var(--s-1) + var(--s-5));
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.consent-box {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  margin-top: -1px;
+  border-radius: 6px;
+  box-shadow: inset 0 0 0 1.5px var(--ink-strong);
+  transition: background-color var(--dur-ui) var(--ease);
+}
+.consent-box svg {
+  width: 12px;
+  height: 12px;
+  fill: none;
+  stroke: var(--bg);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0;
+}
+.consent input:checked + .consent-box {
+  background: var(--ink-strong);
+}
+.consent input:checked + .consent-box svg {
+  opacity: 1;
+}
+.consent input:focus-visible + .consent-box {
+  outline: 2px solid var(--ink-strong);
+  outline-offset: 4px;
+}
+.consent input[aria-invalid='true'] + .consent-box {
+  box-shadow: inset 0 0 0 2.5px var(--ink-strong);
+}
+.consent a {
+  color: var(--ink-strong);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, currentColor 45%, transparent);
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+  transition: text-decoration-color var(--dur-ui) var(--ease);
+}
+@media (hover: hover) {
+  .consent a:hover {
+    text-decoration-color: currentColor;
+  }
+  .signup button:hover {
+    background: var(--ink-hover);
+  }
+  .signup button:hover .arrow {
+    transform: translateX(2px);
+  }
+}
+@media (max-width: 640px) {
+  .signup-row {
+    flex-direction: column;
+    gap: var(--s-2);
+    height: auto;
+    padding: 0 var(--s-1);
+  }
+  .signup-field {
+    flex: none;
+    height: 52px;
+  }
+  .consent {
+    padding: 0 var(--s-1);
+  }
+  .consent input {
+    left: var(--s-1);
+  }
+  .signup button {
+    width: 100%;
+    height: 52px;
+  }
+}
+
+.arrow,
+.check {
+  width: 12px;
+  height: 12px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.signup button:active {
+  transform: skewX(-8deg) scale(0.97);
+}
+.signup[aria-busy='true'] button {
+  cursor: progress;
+}
+.signup[aria-busy='true'] .arrow {
+  animation: nudge 0.6s var(--ease) infinite alternate;
+}
+.outro[data-state='error'] .signup-field:has([aria-invalid='true']) {
+  box-shadow: inset 0 0 0 2.5px var(--ink-strong);
+  animation: shake-field 0.36s var(--ease);
+}
+.outro[data-state='error'] .consent:has([aria-invalid='true']) {
+  animation: shake 0.36s var(--ease);
+}
+.outro[data-state='error'] .signup-note,
+.outro[data-state='warn'] .signup-note {
+  color: var(--ink-strong);
+}
+
+.signup-note {
+  min-height: 1.5em; /* lo spazio del messaggio è già riservato: il layout non salta quando compare */
+  margin-top: var(--s-3);
+  font: var(--t-small);
+  text-align: center;
+  max-width: min(92vw, 440px);
+  text-wrap: balance;
+  color: var(--ink-soft);
+}
+.signup-done {
+  display: none;
+  align-items: center;
+  gap: var(--s-3);
+  height: 56px;
+  padding: 0 var(--s-5);
+  border-radius: var(--radius);
+  background: var(--ink-strong);
+  color: var(--bg);
+  font: var(--t-button);
+  letter-spacing: -0.005em;
+  transform: skewX(-8deg);
+}
+.signup-done > * {
+  transform: skewX(8deg);
+}
+.outro[data-state='done'] .signup {
+  display: none;
+}
+.outro[data-state='done'] .signup-done {
+  display: inline-flex;
+  animation: pop-in 0.42s var(--ease) both;
+}
+.outro[data-state='done'] .check path {
+  stroke-dasharray: 14;
+  animation: draw 0.4s 0.18s var(--ease) both;
+}
+
+.hp,
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@media (max-height: 520px) and (min-width: 641px) {
+  .signup-row,
+  .signup-done {
+    height: 48px;
+  }
+}
+
+@media (max-height: 520px) {
+  .signup-note {
+    margin-top: var(--s-2);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .is-static .logo-slot .bar,
+  .is-static .logo-slot .logo-lettering,
+  .is-static .line,
+  .is-static .outro > *,
+  .is-static .sub,
+  .is-static .soon,
+  .is-static .proof,
+  .outro[data-state] .signup,
+  .outro[data-state] .signup-done,
+  .soon-dot {
+    animation: none;
+  }
+}
