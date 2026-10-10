@@ -7,9 +7,8 @@ export function initSections(opts: { reduced: boolean }) {
   navMenu();
   anchors(opts.reduced);
   interestLinks();
-  journeys(opts.reduced);
+  decks(opts.reduced);
   reveals(opts.reduced);
-  if (!opts.reduced) cards3d();
 }
 
 /** Sotto la sezione scura l'header è chiaro, sotto quella chiara (Mist) è Forest, sotto il contatto torna Forest. */
@@ -124,95 +123,6 @@ function interestLinks() {
   });
 }
 
-/** "Cosa facciamo": si vede un percorso alla volta, scelto dalla sua card. Dentro il percorso si scorrono le tre
- *  fasi (1·2·3, avanti e indietro). Senza JavaScript restano visibili tutti i percorsi e tutte le fasi. */
-function journeys(reduced: boolean) {
-  const root = document.documentElement;
-  const toggles = Array.from(document.querySelectorAll<HTMLButtonElement>('.line-toggle[data-journey]'));
-  const empty = document.querySelector<HTMLElement>('.stage-empty');
-  if (!toggles.length) return;
-  root.classList.add('js-steps');
-  const panel = (id: string) => document.getElementById(`journey-${id}`);
-  const scrollStage = (el: HTMLElement) => {
-    const top = el.getBoundingClientRect().top;
-    if (top < innerHeight * 0.6) return;
-    const y = top + scrollY - 80;
-    if (window.__CAPTURE__) jsScroll(y);
-    else scrollTo({ top: y, behavior: reduced ? 'auto' : 'smooth' });
-  };
-  const setPhase = (id: string, n: number) => {
-    const p = panel(id);
-    if (!p) return;
-    const tappe = Array.from(p.querySelectorAll<HTMLElement>('.tappa'));
-    const last = tappe.length;
-    const k = Math.min(last, Math.max(1, n));
-    tappe.forEach((t, i) => t.classList.toggle('is-current', i === k - 1));
-    p.querySelectorAll<HTMLButtonElement>('.step-btn').forEach((b) => {
-      const on = Number(b.dataset.step) === k;
-      if (on) b.setAttribute('aria-current', 'step');
-      else b.removeAttribute('aria-current');
-    });
-    const prev = p.querySelector<HTMLButtonElement>('.step-prev');
-    const next = p.querySelector<HTMLButtonElement>('.step-next');
-    if (prev) prev.disabled = k === 1;
-    if (next) next.disabled = k === last;
-  };
-  const open = (id: string) => {
-    for (const b of toggles) {
-      const on = b.dataset.journey === id;
-      const p = panel(b.dataset.journey!);
-      b.setAttribute('aria-expanded', String(on));
-      b.closest('.line-col')?.classList.toggle('is-open', on);
-      if (p) {
-        p.hidden = !on;
-        p.classList.toggle('is-entering', on && !reduced);
-      }
-    }
-    if (empty) empty.hidden = true;
-    const p = panel(id);
-    if (p) scrollStage(p);
-  };
-  // senza un percorso aperto il vano mostra solo il messaggio, come l'inizio della pagina
-  if (empty) empty.hidden = false;
-  for (const b of toggles) {
-    const id = b.dataset.journey!;
-    const p = panel(id);
-    if (p) p.hidden = true;
-    b.addEventListener('click', () => open(id));
-    setPhase(id, 1);
-  }
-  document.querySelectorAll<HTMLButtonElement>('.journey .step-btn').forEach((b) => {
-    b.addEventListener('click', () => setPhase(b.closest<HTMLElement>('.journey')!.id.replace('journey-', ''), Number(b.dataset.step)));
-  });
-  // tasti freccia tra i passi (sinistra e destra, Home e Fine): come in un controllo a schede
-  document.querySelectorAll<HTMLElement>('.journey .steps').forEach((nav) => {
-    nav.addEventListener('keydown', (e) => {
-      const btns = Array.from(nav.querySelectorAll<HTMLButtonElement>('.step-btn'));
-      const cur = btns.findIndex((b) => b.getAttribute('aria-current') === 'step');
-      const k = e.key;
-      let to = -1;
-      if (k === 'ArrowRight') to = Math.min(btns.length - 1, cur + 1);
-      else if (k === 'ArrowLeft') to = Math.max(0, cur - 1);
-      else if (k === 'Home') to = 0;
-      else if (k === 'End') to = btns.length - 1;
-      if (to < 0 || to === cur) return;
-      e.preventDefault();
-      const j = nav.closest<HTMLElement>('.journey')!;
-      setPhase(j.id.replace('journey-', ''), to + 1);
-      btns[to].focus();
-    });
-  });
-  document.querySelectorAll<HTMLButtonElement>('.journey .step-prev, .journey .step-next').forEach((b) => {
-    b.addEventListener('click', () => {
-      const j = b.closest<HTMLElement>('.journey')!;
-      const cur = j.querySelector<HTMLElement>('.tappa.is-current');
-      const n = Number(cur?.dataset.phase ?? 1) + Number(b.dataset.dir);
-      setPhase(j.id.replace('journey-', ''), n);
-    });
-  });
-}
-
-/** Titoli e blocchi entrano salendo di poco quando arrivano sullo schermo (una volta sola). */
 function reveals(reduced: boolean) {
   if (reduced || !('IntersectionObserver' in window)) return;
   const root = document.documentElement;
@@ -234,35 +144,109 @@ function reveals(reduced: boolean) {
   });
 }
 
-/** Schemi come card 3D: l'inclinazione segue lo scorrimento (--p: 1 al centro dello schermo) e, su desktop, il
- *  puntatore (--mx, --my fra -1 e 1). Si aggiorna solo la card della fase in vista. */
-function cards3d() {
-  let raf = 0;
-  const update = () => {
-    raf = 0;
-    const vh = innerHeight;
-    document.querySelectorAll<HTMLElement>('.tappa.is-current .tappa-fig').forEach((fig) => {
-      const r = fig.getBoundingClientRect();
-      if (r.bottom < 0 || r.top > vh) return;
-      const d = Math.abs(r.top + r.height / 2 - vh / 2) / (vh * 0.65);
-      fig.style.setProperty('--p', Math.max(0, 1 - d).toFixed(3));
+/** "Cosa facciamo": due mazzi di card, uno per modello. Si trascina via la card in cima (o si preme Avanti): prima il
+ *  titolo, poi chi è il modello. Quando i due mazzi sono finiti compaiono i tre passi, con quelli dei due modelli.
+ *  Senza JavaScript restano visibili tutte le card, in colonna. */
+function decks(reduced: boolean) {
+  const root = document.querySelector<HTMLElement>('[data-decks]');
+  const done = document.querySelector<HTMLElement>('.steps-cards');
+  const again = document.querySelector<HTMLButtonElement>('[data-again]');
+  if (!root || !done || !again) return;
+  root.classList.add('is-live');
+  const decks = Array.from(root.querySelectorAll<HTMLElement>('.deck')).map((el) => ({
+    el,
+    cards: Array.from(el.querySelectorAll<HTMLElement>('.dcard')),
+  }));
+  const left = (d: { cards: HTMLElement[] }) => d.cards.filter((c) => !c.classList.contains('is-gone'));
+  const layout = (d: { el: HTMLElement; cards: HTMLElement[] }) => {
+    d.el.classList.toggle('is-empty', left(d).length === 0);
+    left(d).forEach((c, i) => {
+      c.style.setProperty('--y', i ? '18px' : '0px');
+      c.style.setProperty('--s', i ? '0.94' : '1');
+      c.style.zIndex = String(10 - i);
+      c.classList.toggle('is-back', i > 0);
     });
   };
-  const queue = () => (raf ||= requestAnimationFrame(update));
-  addEventListener('scroll', queue, { passive: true });
-  addEventListener('resize', queue);
-  document.addEventListener('click', () => setTimeout(queue, 50));
-  if (matchMedia('(pointer: fine)').matches) {
-    document.addEventListener('pointermove', (e) => {
-      const fig = (e.target as HTMLElement).closest?.<HTMLElement>('.tappa-fig');
-      document.querySelectorAll<HTMLElement>('.tappa-fig').forEach((f) => {
-        if (f !== fig) f.style.removeProperty('--mx'), f.style.removeProperty('--my');
+  decks.forEach(layout);
+  const check = () => {
+    if (!decks.every((d) => left(d).length === 0)) return;
+    root.hidden = true;
+    done.hidden = false;
+    again.hidden = false;
+  };
+  const dismiss = (card: HTMLElement, dir: number) => {
+    const d = decks.find((x) => x.cards.includes(card));
+    if (!d || card.classList.contains('is-leaving')) return;
+    card.classList.add('is-leaving');
+    card.style.setProperty('--x', `${dir * (d.el.offsetWidth + 160)}px`);
+    card.style.setProperty('--r', `${dir * 12}deg`);
+    const finish = () => {
+      if (card.classList.contains('is-gone')) return;
+      card.classList.add('is-gone');
+      layout(d);
+      check();
+    };
+    card.addEventListener('transitionend', finish, { once: true });
+    if (reduced) finish();
+    else setTimeout(finish, 800); // rete di sicurezza se la transizione non arriva
+  };
+  const snap = (card: HTMLElement) => {
+    card.style.setProperty('--x', '0px');
+    card.style.setProperty('--r', '0deg');
+  };
+  decks.forEach((d) =>
+    d.cards.forEach((card) => {
+      let startX = 0;
+      let dragging = false;
+      card.addEventListener('pointerdown', (e) => {
+        if (card !== left(d)[0] || card.classList.contains('is-leaving')) return;
+        dragging = true;
+        startX = e.clientX;
+        card.classList.add('is-drag');
+        card.setPointerCapture(e.pointerId);
       });
-      if (!fig) return;
-      const r = fig.getBoundingClientRect();
-      fig.style.setProperty('--mx', (((e.clientX - r.left) / r.width) * 2 - 1).toFixed(3));
-      fig.style.setProperty('--my', (((e.clientY - r.top) / r.height) * 2 - 1).toFixed(3));
+      card.addEventListener('pointermove', (e) => {
+        if (!dragging) return;
+        const dx = e.clientX - startX;
+        card.style.setProperty('--x', `${dx}px`);
+        card.style.setProperty('--r', `${dx * 0.05}deg`);
+      });
+      const end = (e: PointerEvent) => {
+        if (!dragging) return;
+        dragging = false;
+        card.classList.remove('is-drag');
+        const dx = e.clientX - startX;
+        const limit = Math.min(120, d.el.offsetWidth * 0.22);
+        if (Math.abs(dx) > limit) dismiss(card, Math.sign(dx));
+        else snap(card);
+      };
+      card.addEventListener('pointerup', end);
+      card.addEventListener('pointercancel', () => {
+        if (!dragging) return;
+        dragging = false;
+        card.classList.remove('is-drag');
+        snap(card);
+      });
+    }),
+  );
+  root.querySelectorAll<HTMLButtonElement>('[data-next]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const d = decks.find((x) => x.el.contains(btn));
+      const top = d && left(d)[0];
+      if (top) dismiss(top, 1);
     });
-  }
-  queue();
+  });
+  again.addEventListener('click', () => {
+    decks.forEach((d) =>
+      d.cards.forEach((c) => {
+        c.classList.remove('is-gone', 'is-leaving');
+        c.style.removeProperty('--x');
+        c.style.removeProperty('--r');
+      }),
+    );
+    decks.forEach(layout);
+    root.hidden = false;
+    done.hidden = true;
+    again.hidden = true;
+  });
 }

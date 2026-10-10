@@ -89,120 +89,66 @@
            fasi (Capire, Costruire, Consegnare: è anche il nostro metodo), ognuna con uno schema in prospettiva.
            Gli schemi sono HTML e CSS (src/styles/mockups.css), decorativi (aria-hidden): il significato è nel testo. -->
       <section class="sec sec--approach" id="cosa-facciamo" data-surface="light" aria-labelledby="approach-title">
+        <div class="approach-mark" aria-hidden="true"><!-- symbol:band-mark --></div>
         <div class="sec-head">
           <p class="kicker" data-i18n="approach.k">Cosa facciamo</p>
           <h2 class="sec-title" id="approach-title" data-i18n="approach.t">Due modelli: AI Adoption e AI-native Product Studio.</h2>
         </div>
-        <!-- Le due card sono sempre visibili; i percorsi (tre fasi ciascuno) si aprono uno alla volta con il pulsante
-             della card (src/sections.ts). Senza JavaScript restano aperti tutti e due. -->
-        <div class="lines" id="metodo">
-          <article class="line-col" id="line-1">
-            <div class="line-head">
-              <p class="line-num" data-i18n="line.1.k">01 · AI Adoption</p>
-              <h3 class="line-title" id="line-1-title" data-i18n="line.1.t">Soluzioni AI integrate nei processi del cliente.</h3>
-              <p class="line-text" data-i18n="line.1.s">Individuiamo i processi in cui l’AI incide su costi, tempi o ricavi e la portiamo in produzione, dentro l’operatività del cliente, con un modello legato al risultato. Se le automazioni non bastano, creiamo un prodotto su misura e lo consegniamo chiavi in mano.</p>
-              <ul class="line-tags">
-              <li data-i18n="line.1.tag.1">Workflow AI</li>
-              <li data-i18n="line.1.tag.2">Agenti AI</li>
-              <li data-i18n="line.1.tag.3">Prodotto su misura</li>
-              </ul>
-            </div>
-            <button type="button" class="line-toggle" aria-expanded="false" aria-controls="journey-1" data-journey="1">
-              <span class="lt-open" data-i18n="journey.open">Scopri il percorso</span><span class="lt-close" data-i18n="journey.close">Chiudi il percorso</span><svg class="arrow arrow--down" viewBox="0 0 12 12" aria-hidden="true"><path d="M6 1v9M2.5 6.5 6 10l3.5-3.5" /></svg>
-            </button>
-          </article>
-          <article class="line-col" id="line-2">
-            <div class="line-head">
-              <p class="line-num" data-i18n="line.2.k">02 · AI-native Product Studio</p>
-              <h3 class="line-title" id="line-2-title" data-i18n="line.2.t">Prodotti di nicchia per acquirenti strategici.</h3>
-              <p class="line-text" data-i18n="line.2.s">Scegliamo una nicchia, ne validiamo la domanda, portiamo il prodotto sul mercato e lo cediamo a imprese che vogliono innovare il proprio business. Lo acquistano quando funziona e ha già clienti, senza avviare un progetto interno.</p>
-              <ul class="line-tags">
-              <li data-i18n="line.2.tag.1">Prodotti AI-⁠native</li>
-              <li data-i18n="line.2.tag.2">Lancio sul mercato</li>
-              <li data-i18n="line.2.tag.3">Vendita a imprese</li>
-              </ul>
-            </div>
-            <button type="button" class="line-toggle" aria-expanded="false" aria-controls="journey-2" data-journey="2">
-              <span class="lt-open" data-i18n="journey.open">Scopri il percorso</span><span class="lt-close" data-i18n="journey.close">Chiudi il percorso</span><svg class="arrow arrow--down" viewBox="0 0 12 12" aria-hidden="true"><path d="M6 1v9M2.5 6.5 6 10l3.5-3.5" /></svg>
-            </button>
-          </article>
-          <p class="stage-empty" hidden data-i18n="stage.empty">Scegli un percorso per vederlo passo per passo.</p>
-          <div class="journey" id="journey-1" role="region" aria-labelledby="line-1-title" tabindex="-1">
-            <nav class="steps" aria-label="Fasi del percorso" data-i18n-attr="aria-label:steps.aria">
-              <button type="button" class="step-btn" data-step="1" aria-current="step"><span class="step-num">1</span><span data-i18n="steps.1">x</span></button>
-              <button type="button" class="step-btn" data-step="2"><span class="step-num">2</span><span data-i18n="steps.2">x</span></button>
-              <button type="button" class="step-btn" data-step="3"><span class="step-num">3</span><span data-i18n="steps.3">x</span></button>
-            </nav>
-            <div class="tappa is-current" data-phase="1">
-              <div class="tappa-txt">
-                <p class="tappa-k" data-i18n="phase.1">Phase 1 · Discovery</p>
-                <h4 class="tappa-t" data-i18n="tappa.1.1.t">Troviamo dove l’AI conviene davvero.</h4>
-                <p class="tappa-s" data-i18n="tappa.1.1.s">Mappiamo il processo con chi ci lavora, misuriamo la situazione di partenza (tempi, errori, costi) e stimiamo il beneficio prima di partire. L’obiettivo si concorda ora e si verifica a fine pilota.</p>
-              </div>
-              <div class="tappa-fig"><div class="mkm-stage"><ol class="mkm-flow"><li class="mkm-node"><span class="mkm-n">01</span><span class="mkm-l" data-i18n="mkm.1.1.1">Processo attuale</span></li><li class="mkm-node"><span class="mkm-n">02</span><span class="mkm-l" data-i18n="mkm.1.1.2">Dati di partenza</span></li><li class="mkm-node"><span class="mkm-n">03</span><span class="mkm-l" data-i18n="mkm.1.1.3">Beneficio stimato</span></li><li class="mkm-node"><span class="mkm-n">04</span><span class="mkm-l" data-i18n="mkm.1.1.4">Obiettivo concordato</span></li></ol></div></div>
-            </div>
-            <div class="tappa" data-phase="2">
-              <div class="tappa-txt">
-                <p class="tappa-k" data-i18n="phase.2">Phase 2 · Engineering</p>
-                <h4 class="tappa-t" data-i18n="tappa.1.2.t">La portiamo in produzione.</h4>
-                <p class="tappa-s" data-i18n="tappa.1.2.s">Integriamo l’agente nei sistemi che usate già (email, ERP, CRM), con controlli umani sulle decisioni, test su dati reali e monitoraggio continuo. Restiamo accanto al team dopo l’avvio.</p>
-              </div>
-              <div class="tappa-fig"><div class="mkm-stage"><ol class="mkm-flow"><li class="mkm-node"><span class="mkm-n">01</span><span class="mkm-l" data-i18n="mkm.1.2.1">Automazione nei sistemi</span></li><li class="mkm-node"><span class="mkm-n">02</span><span class="mkm-l" data-i18n="mkm.1.2.2">Controllo umano</span></li><li class="mkm-node"><span class="mkm-n">03</span><span class="mkm-l" data-i18n="mkm.1.2.3">Monitoraggio dei risultati</span></li></ol></div></div>
-            </div>
-            <div class="tappa" data-phase="3">
-              <div class="tappa-txt">
-                <p class="tappa-k" data-i18n="phase.3">Phase 3 · Deployment</p>
-                <h4 class="tappa-t" data-i18n="tappa.1.3.t">Se le automazioni non bastano, un prodotto su misura.</h4>
-                <p class="tappa-s" data-i18n="tappa.1.3.s">Costruiamo un’applicazione dedicata: requisiti condivisi, sviluppo a rilasci, integrazione nei sistemi dell’azienda. Alla consegna il cliente riceve codice, documentazione e formazione del team.</p>
-              </div>
-              <div class="tappa-fig"><div class="mkm-stage"><ol class="mkm-flow"><li class="mkm-node"><span class="mkm-n">01</span><span class="mkm-l" data-i18n="mkm.1.3.1">Rilascio</span></li><li class="mkm-node"><span class="mkm-n">02</span><span class="mkm-l" data-i18n="mkm.1.3.2">Formazione del team</span></li><li class="mkm-node"><span class="mkm-n">03</span><span class="mkm-l" data-i18n="mkm.1.3.3">Passaggio di consegne</span></li></ol></div></div>
-            </div>
-                        <div class="journey-foot">
-              <div class="step-nav">
-                <button type="button" class="step-prev" data-dir="-1"><span data-i18n="steps.prev">Fase precedente</span></button>
-                <button type="button" class="step-next" data-dir="1"><span data-i18n="steps.next">Fase successiva</span></button>
-              </div>
-<a class="line-link" href="#signup-email" data-interest="transform"><span data-i18n="line.1.link">Parliamo di un tuo processo</span><svg class="arrow" viewBox="0 0 12 12" aria-hidden="true"><path d="M1 6h9M6.5 2.5 10 6l-3.5 3.5" /></svg></a>
-            </div>
+        <!-- Due mazzi di card, uno per modello. Si trascina via la card in cima (o si preme Avanti): prima il titolo,
+             poi chi è il modello e cosa fa. Quando i due mazzi sono finiti compaiono i tre passi, uno per card, con il
+             passo dei due modelli. Senza JavaScript restano visibili tutte le card, in colonna. -->
+        <div class="decks" data-decks>
+          <div class="deck" data-deck="1">
+            <article class="dcard dcard--lime">
+              <p class="dcard-k" data-i18n="model.1.k">Modello 01</p>
+              <h3 class="dcard-t" data-i18n="model.1.name">AI Adoption</h3>
+              <p class="dcard-hint" data-i18n="deck.hint">Trascina o scorri</p>
+            </article>
+            <article class="dcard dcard--lime">
+              <p class="dcard-k" data-i18n="model.1.k">Modello 01</p>
+              <h3 class="dcard-t dcard-t--sm" data-i18n="model.1.name">AI Adoption</h3>
+              <p class="dcard-p" data-i18n="model.1.what">Individuiamo i processi in cui l’AI incide su costi, tempi o ricavi e la portiamo in produzione, nei sistemi del cliente.</p>
+              <p class="dcard-who" data-i18n="model.1.who">Per PMI e corporate che vogliono risultati misurabili nei processi che già hanno.</p>
+              <a class="line-link" href="#signup-email" data-interest="transform"><span data-i18n="line.1.link">Parliamo di un tuo processo</span><svg class="arrow" viewBox="0 0 12 12" aria-hidden="true"><path d="M1 6h9M6.5 2.5 10 6l-3.5 3.5" /></svg></a>
+            </article>
+            <div class="deck-foot"><button type="button" class="deck-next" data-next><span data-i18n="deck.next">Avanti</span> <svg class="arrow" viewBox="0 0 12 12" aria-hidden="true"><path d="M1 6h9M6.5 2.5 10 6l-3.5 3.5" /></svg></button></div>
           </div>
-          <div class="journey" id="journey-2" role="region" aria-labelledby="line-2-title" tabindex="-1">
-            <nav class="steps" aria-label="Fasi del percorso" data-i18n-attr="aria-label:steps.aria">
-              <button type="button" class="step-btn" data-step="1" aria-current="step"><span class="step-num">1</span><span data-i18n="steps.1">x</span></button>
-              <button type="button" class="step-btn" data-step="2"><span class="step-num">2</span><span data-i18n="steps.2">x</span></button>
-              <button type="button" class="step-btn" data-step="3"><span class="step-num">3</span><span data-i18n="steps.3">x</span></button>
-            </nav>
-            <div class="tappa is-current" data-phase="1">
-              <div class="tappa-txt">
-                <p class="tappa-k" data-i18n="phase.1">Phase 1 · Discovery</p>
-                <h4 class="tappa-t" data-i18n="tappa.2.1.t">Troviamo la nicchia.</h4>
-                <p class="tappa-s" data-i18n="tappa.2.1.s">Valutiamo le nicchie su tre criteri: problema ricorrente, urgenza e chi paga. Prima di costruire verifichiamo la domanda con interviste e aziende pilota.</p>
-              </div>
-              <div class="tappa-fig"><div class="mkm-stage"><ol class="mkm-flow"><li class="mkm-node"><span class="mkm-n">01</span><span class="mkm-l" data-i18n="mkm.2.1.1">Nicchia</span></li><li class="mkm-node"><span class="mkm-n">02</span><span class="mkm-l" data-i18n="mkm.2.1.2">Problema ricorrente</span></li><li class="mkm-node"><span class="mkm-n">03</span><span class="mkm-l" data-i18n="mkm.2.1.3">Domanda verificata</span></li><li class="mkm-node"><span class="mkm-n">04</span><span class="mkm-l" data-i18n="mkm.2.1.4">Vai / non vai</span></li></ol></div></div>
-            </div>
-            <div class="tappa" data-phase="2">
-              <div class="tappa-txt">
-                <p class="tappa-k" data-i18n="phase.2">Phase 2 · Engineering</p>
-                <h4 class="tappa-t" data-i18n="tappa.2.2.t">Lo portiamo sul mercato.</h4>
-                <p class="tappa-s" data-i18n="tappa.2.2.s">Realizziamo il prodotto AI-native, lo lanciamo e lo facciamo crescere fino a una base di clienti paganti. Seguiamo utilizzo e feedback a ogni rilascio.</p>
-              </div>
-              <div class="tappa-fig"><div class="mkm-stage"><ol class="mkm-flow"><li class="mkm-node"><span class="mkm-n">01</span><span class="mkm-l" data-i18n="mkm.2.2.1">Prototipo</span></li><li class="mkm-node"><span class="mkm-n">02</span><span class="mkm-l" data-i18n="mkm.2.2.2">Pilota con aziende</span></li><li class="mkm-node"><span class="mkm-n">03</span><span class="mkm-l" data-i18n="mkm.2.2.3">Primi clienti paganti</span></li></ol></div></div>
-            </div>
-            <div class="tappa" data-phase="3">
-              <div class="tappa-txt">
-                <p class="tappa-k" data-i18n="phase.3">Phase 3 · Deployment</p>
-                <h4 class="tappa-t" data-i18n="tappa.2.3.t">Lo acquista un’impresa che vuole innovare.</h4>
-                <p class="tappa-s" data-i18n="tappa.2.3.s">L’impresa compra quando il prodotto funziona e ha già clienti, senza avviare un progetto interno: riceve prodotto, codice, dati, clienti e roadmap, con affiancamento per il passaggio.</p>
-              </div>
-              <div class="tappa-fig"><div class="mkm-stage"><ol class="mkm-flow"><li class="mkm-node"><span class="mkm-n">01</span><span class="mkm-l" data-i18n="mkm.2.3.1">Codice e dati</span></li><li class="mkm-node"><span class="mkm-n">02</span><span class="mkm-l" data-i18n="mkm.2.3.2">Clienti e roadmap</span></li><li class="mkm-node"><span class="mkm-n">03</span><span class="mkm-l" data-i18n="mkm.2.3.3">Affiancamento</span></li></ol></div></div>
-            </div>
-                        <div class="journey-foot">
-              <div class="step-nav">
-                <button type="button" class="step-prev" data-dir="-1"><span data-i18n="steps.prev">Fase precedente</span></button>
-                <button type="button" class="step-next" data-dir="1"><span data-i18n="steps.next">Fase successiva</span></button>
-              </div>
-<a class="line-link" href="#signup-email" data-interest="build"><span data-i18n="line.2.link">Parliamo di un tuo prodotto</span><svg class="arrow" viewBox="0 0 12 12" aria-hidden="true"><path d="M1 6h9M6.5 2.5 10 6l-3.5 3.5" /></svg></a>
-            </div>
+          <div class="deck deck--forest" data-deck="2">
+            <article class="dcard dcard--forest">
+              <p class="dcard-k" data-i18n="model.2.k">Modello 02</p>
+              <h3 class="dcard-t" data-i18n="model.2.name">AI-native Product Studio</h3>
+              <p class="dcard-hint" data-i18n="deck.hint">Trascina o scorri</p>
+            </article>
+            <article class="dcard dcard--forest">
+              <p class="dcard-k" data-i18n="model.2.k">Modello 02</p>
+              <h3 class="dcard-t dcard-t--sm" data-i18n="model.2.name">AI-native Product Studio</h3>
+              <p class="dcard-p" data-i18n="model.2.what">Scegliamo una nicchia, ne validiamo la domanda, costruiamo il prodotto AI-native e lo cediamo a chi lo vuole già sul mercato.</p>
+              <p class="dcard-who" data-i18n="model.2.who">Per imprese e acquirenti strategici che vogliono un prodotto AI già validato, senza costruirlo da zero.</p>
+              <a class="line-link" href="#signup-email" data-interest="build"><span data-i18n="line.2.link">Parliamo di un tuo prodotto</span><svg class="arrow" viewBox="0 0 12 12" aria-hidden="true"><path d="M1 6h9M6.5 2.5 10 6l-3.5 3.5" /></svg></a>
+            </article>
+            <div class="deck-foot"><button type="button" class="deck-next" data-next><span data-i18n="deck.next">Avanti</span> <svg class="arrow" viewBox="0 0 12 12" aria-hidden="true"><path d="M1 6h9M6.5 2.5 10 6l-3.5 3.5" /></svg></button></div>
           </div>
+        </div>
+        <div class="steps-cards" hidden>
+          <p class="steps-cards-k" data-i18n="steps.cards.label">I tre passi di ciascun modello</p>
+          <ol class="steps-grid">
+            <li class="step-card">
+              <p class="step-card-k" data-i18n="phase.1">Phase 1 · Discovery</p>
+              <div class="step-row step-row--lime"><span class="step-row-m" data-i18n="model.1.name">AI Adoption</span><span class="step-row-t" data-i18n="tappa.1.1.t">Troviamo dove l’AI conviene davvero.</span></div>
+              <div class="step-row step-row--forest"><span class="step-row-m" data-i18n="model.2.name">AI-native Product Studio</span><span class="step-row-t" data-i18n="tappa.2.1.t">Troviamo la nicchia.</span></div>
+            </li>
+            <li class="step-card">
+              <p class="step-card-k" data-i18n="phase.2">Phase 2 · Engineering</p>
+              <div class="step-row step-row--lime"><span class="step-row-m" data-i18n="model.1.name">AI Adoption</span><span class="step-row-t" data-i18n="tappa.1.2.t">La portiamo in produzione.</span></div>
+              <div class="step-row step-row--forest"><span class="step-row-m" data-i18n="model.2.name">AI-native Product Studio</span><span class="step-row-t" data-i18n="tappa.2.2.t">Lo portiamo sul mercato.</span></div>
+            </li>
+            <li class="step-card">
+              <p class="step-card-k" data-i18n="phase.3">Phase 3 · Deployment</p>
+              <div class="step-row step-row--lime"><span class="step-row-m" data-i18n="model.1.name">AI Adoption</span><span class="step-row-t" data-i18n="tappa.1.3.t">Se le automazioni non bastano, un prodotto su misura.</span></div>
+              <div class="step-row step-row--forest"><span class="step-row-m" data-i18n="model.2.name">AI-native Product Studio</span><span class="step-row-t" data-i18n="tappa.2.3.t">Lo acquista un’impresa che vuole innovare.</span></div>
+            </li>
+          </ol>
+          <button type="button" class="decks-again" hidden data-again><span data-i18n="deck.again">Ricomincia</span></button>
         </div>
       </section>
 
