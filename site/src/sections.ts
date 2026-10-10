@@ -235,34 +235,55 @@ function decks(reduced: boolean) {
       c.classList.toggle('is-hidden', i >= VISIBLE);
     });
   decks.forEach(layout);
+  // verso l'esterno della pagina: il mazzo a sinistra esce a sinistra, quello a destra a destra (su telefono, in
+  // colonna, a destra)
+  const outward = (d: Deck) => {
+    const r = d.el.getBoundingClientRect();
+    return r.left + r.width / 2 < innerWidth / 2 - 1 ? -1 : 1;
+  };
 
-  /** la card esce dal lato indicato, poi torna in fondo al mazzo senza sparire */
+  /** la card si sposta di lato, poi rientra dietro il mazzo (come si mescola un mazzo vero): un solo movimento
+   *  continuo, mentre le altre avanzano di un posto. Il passaggio aspetta la fine della trasformazione, non di
+   *  un'altra transizione della card (ombra, opacità) che finirebbe prima e la fermerebbe a metà. */
   const cycle = (d: Deck, dir: number) => {
     const card = d.order[0];
     if (!card || card.classList.contains('is-leaving')) return;
     card.classList.remove('is-tilt');
     card.classList.add('is-leaving');
-    card.style.setProperty('--x', `${dir * (d.el.offsetWidth + 200)}px`);
-    card.style.setProperty('--r', `${dir * 10}deg`);
-    let finished = false;
-    const finish = () => {
-      if (finished) return;
-      finished = true;
-      // la card torna in fondo ferma, senza transizione: il movimento visibile è quello delle altre card
-      card.style.transition = 'none';
-      card.classList.remove('is-leaving');
-      card.style.setProperty('--x', '0px');
-      card.style.setProperty('--r', '0deg');
-      card.style.setProperty('--tx', '0deg');
-      card.style.setProperty('--ty', '0deg');
+    card.style.setProperty('--tx', '0deg');
+    card.style.setProperty('--ty', '0deg');
+    const back = () => {
+      // dietro tutte le altre, poi in fondo al mazzo: il ritorno usa la transizione normale della card
+      card.style.zIndex = '0';
+      card.style.transition = '';
       d.order.push(d.order.shift()!);
       layout(d);
-      void card.offsetWidth; // applica la posizione prima di riattivare la transizione
-      card.style.transition = '';
+      card.style.setProperty('--x', '0px');
+      card.style.setProperty('--r', '0deg');
+      // resta visibile mentre rientra; si nasconde solo quando è già dietro le altre
+      card.classList.remove('is-hidden');
+      setTimeout(() => {
+        card.classList.remove('is-leaving');
+        card.classList.toggle('is-hidden', d.order.indexOf(card) >= VISIBLE);
+      }, 600);
     };
-    card.addEventListener('transitionend', finish, { once: true });
-    if (reduced) finish();
-    else setTimeout(finish, 800); // rete di sicurezza se la transizione non arriva
+    if (reduced) {
+      card.style.setProperty('--x', '0px');
+      back();
+      return;
+    }
+    card.style.transition = 'transform 0.36s cubic-bezier(0.3, 0.7, 0.4, 1)';
+    card.style.setProperty('--x', `${dir * Math.round(card.offsetWidth * 0.68)}px`);
+    card.style.setProperty('--r', `${dir * 6}deg`);
+    let done = false;
+    const out = (e?: TransitionEvent) => {
+      if (done || (e && (e.target !== card || e.propertyName !== 'transform'))) return;
+      done = true;
+      card.removeEventListener('transitionend', out);
+      back();
+    };
+    card.addEventListener('transitionend', out);
+    setTimeout(out, 450); // rete di sicurezza se la transizione non arriva
   };
 
   decks.forEach((d) => {
@@ -299,7 +320,7 @@ function decks(reduced: boolean) {
           cycle(d, Math.sign(dx)); // trascinata via
         } else if (Math.abs(dx) < 6) {
           snapBack();
-          cycle(d, 1); // un semplice clic sulla card in cima
+          cycle(d, outward(d)); // un semplice clic sulla card in cima: esce verso l'esterno
         } else {
           snapBack();
         }
@@ -317,7 +338,7 @@ function decks(reduced: boolean) {
     d.el.addEventListener('keydown', (e) => {
       if (!['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Enter', ' '].includes(e.key)) return;
       e.preventDefault();
-      cycle(d, e.key === 'ArrowLeft' || e.key === 'ArrowUp' ? -1 : 1);
+      cycle(d, e.key === 'ArrowLeft' || e.key === 'ArrowUp' ? -1 : e.key === 'ArrowRight' || e.key === 'ArrowDown' ? 1 : outward(d));
     });
   });
 
