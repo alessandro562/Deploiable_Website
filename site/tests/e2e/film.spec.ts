@@ -7,6 +7,17 @@ const LIME = [200, 242, 90];
 const FOREST = [16, 38, 27];
 const LOCK_T = LOCK[0]; // clic dell'ultima barra: lo schermo passa al Lime
 const near = (px: number[], ref: number[], tol: number) => ref.forEach((v, i) => expect(Math.abs(px[i] - v)).toBeLessThanOrEqual(tol));
+// Lime con la luce (src/gl/engine.ts): centro più chiaro, bordi nel Lime profondo. Come nello shader (three.js),
+// il Lime si mescola in spazio lineare e torna sRGB. r = distanza dal centro in unità dell'ellisse 55% × 85%;
+// oltre l'ellisse resta il Lime profondo.
+const toLin = (c: number) => {
+  const x = c / 255;
+  return x <= 0.04045 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4;
+};
+const toSrgb = (l: number) => 255 * (l <= 0.0031308 ? 12.92 * l : 1.055 * l ** (1 / 2.4) - 0.055);
+const LIME_HI = LIME.map((c) => toLin(c) + (1 - toLin(c)) * 0.35); // Lime schiarito verso il bianco al 35%
+const LIME_EDGE = [176, 221, 60].map(toLin); // COLORS.limeDeep
+const limeAt = (r: number) => LIME_HI.map((h, i) => toSrgb(h + (LIME_EDGE[i] - h) * Math.min(1, r)));
 
 test('parte in WebGL, senza errori; l\'hero riempie esattamente la prima schermata', async ({ page }) => {
   const errors = await openFilm(page);
@@ -58,11 +69,11 @@ test('colori del brand: barre Lime metallico su Forest, poi al clic logo Forest 
   near(meanColor(bars), LIME, 30);
   await seek(page, LOCK_T - 0.05);
   near(await sample(page, 0.03, 0.03, 8), FOREST, 2);
-  await seek(page, LOCK_T + 0.05); // il clic dell'ultima barra: lo schermo passa al Lime
-  near(await sample(page, 0.03, 0.03, 8), LIME, 2);
+  await seek(page, LOCK_T + 0.05); // il clic dell'ultima barra: lo schermo passa al Lime, con la sua luce
+  near(await sample(page, 0.03, 0.03, 8), limeAt(1), 3);
   await seek(page, END);
-  // finale: fondo Lime al valore, logo Forest metallico: in media resta Forest
-  near(await sample(page, 0.03, 0.5, 8), LIME, 2);
+  // finale: fondo Lime con la luce, logo Forest metallico: in media resta Forest
+  near(await sample(page, 0.03, 0.5, 8), limeAt(0.855), 4);
   const ink = await darkPixels(page, 0, 0, 0.5, 0.2, 1);
   expect(ink.length).toBeGreaterThan(150);
   near(meanColor(ink), FOREST, 14);
@@ -180,7 +191,7 @@ for (const tier of ['high', 'mid', 'mobile']) {
     const ink = await darkPixels(page, 0, 0, 0.5, 0.2, 1);
     expect(ink.length).toBeGreaterThan(150);
     near(meanColor(ink), FOREST, 20);
-    near(await sample(page, 0.03, 0.5, 8), LIME, 3);
+    near(await sample(page, 0.03, 0.5, 8), limeAt(0.855), 4);
     expect(errors).toEqual([]);
   });
 }
@@ -263,7 +274,7 @@ test('dettagli: testo secondario in Moss scurito pieno, Satoshi per i titoli e G
   // Satoshi per titoli e frase principale, Geist per i testi piccoli
   for (const sel of ['.line--black'])
     expect(await css(sel, 'font-family'), sel).toMatch(/^"?Satoshi/);
-  for (const sel of ['.soon--top', '.sub', '.act-cta'])
+  for (const sel of ['.soon--top', '.sub', '.hero .act-cta'])
     expect(await css(sel, 'font-family'), sel).toMatch(/^"?Geist/);
   expect(await css('.soon--top', 'text-transform')).toBe('uppercase');
   // etichetta del sistema (--t-label): Geist 500, maiuscolo spaziato

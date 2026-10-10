@@ -18,6 +18,7 @@ import { COLORS } from '../config/brand';
 import { BarGeometry, DEPTH as BAR_DEPTH } from './symbol/barGeometry';
 import { createStudioMaterial } from './symbol/studioMaterial';
 import { PIVOT, REST, SYMBOL_H, SYMBOL_W } from './symbol/symbolSpec';
+import { DURATION } from './timeline';
 
 // Il racconto a scorrimento sotto l'hero (sezione .story dell'HTML), in uno "studio infinito": pavimento e
 // parete raccordati in curva, luce morbida, ombre sotto le barre. Il 3D segue lo scorrimento, avanti e indietro;
@@ -351,7 +352,9 @@ export class Story {
     const L = this.lay;
     const r = this.section.getBoundingClientRect();
     this.rect = { top: r.top, bottom: r.bottom };
-    this.visible = r.bottom > 0 && r.top < height;
+    // durante l'intro il simbolo sta al centro dello schermo: la fascia non lo copre finché l'intro non è finita
+    // o finché non è salita in cima (fascia pinnata, che copre lo schermo da sola)
+    this.visible = r.bottom > 0 && r.top < height && (time >= DURATION || r.top <= 0);
     // la fascia è sticky in cima: dove sta adesso, senza leggerla dal layout
     const pinTop = Math.max(r.top, Math.min(0, r.bottom - L.pinH));
     const target = (-r.top / Math.max(1, r.height - L.pinH)) * (STAGES - 1);

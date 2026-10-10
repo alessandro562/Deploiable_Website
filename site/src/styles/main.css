@@ -200,12 +200,15 @@ p {
   z-index: 10;
 }
 .hero {
+  min-height: 100svh;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: var(--gap);
-  /* sopra lo spazio dell'header; la hero finisce con la CTA, senza vuoto sotto */
-  padding: calc(var(--pad-top) + var(--logo-w) * 0.19 + var(--s-5)) var(--pad-x) calc(var(--pad-top) + var(--logo-w) * 0.19);
+  /* sopra lo spazio dell'header; sotto un po' di più: il centro ottico sta sopra il centro geometrico.
+     Alta quanto lo schermo: il racconto parte sotto la prima schermata, e l'intro (il simbolo al centro) resta libera. */
+  padding: calc(var(--pad-top) + var(--logo-w) * 0.19 + var(--s-5)) var(--pad-x) calc(var(--pad-top) + var(--logo-w) * 0.19 + var(--s-5) + 4svh);
 }
 /* Su telefono il contenuto è più alto dello schermo: un po' d'aria in più fra l'header e la frase */
 @media (max-width: 640px) {
