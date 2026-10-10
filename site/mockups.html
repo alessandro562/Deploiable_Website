@@ -21,11 +21,52 @@
   </head>
   <body>
     <div class="board">
-      <figure class="desk"><div class="slot"></div><figcaption>01 · processi · desktop, 560 px</figcaption></figure>
-      <figure class="phone"><div class="slot"></div><figcaption>telefono, colonna da 342 px</figcaption></figure>
+      <figure class="desk"><div class="slot" data-tpl="mk-01-1"></div><figcaption>01 · tappa 1 · analisi dei processi · desktop, 560 px</figcaption></figure>
+      <figure class="phone"><div class="slot" data-tpl="mk-01-1"></div><figcaption>telefono, colonna da 342 px</figcaption></figure>
+      <figure class="desk"><div class="slot" data-tpl="mk-01-2"></div><figcaption>01 · tappa 2 · in produzione (approvato)</figcaption></figure>
     </div>
 
-    <template id="mk-processi">
+    <template id="mk-01-1">
+      <div class="mk" aria-hidden="true">
+        <div class="mk-fit">
+          <div class="mk-stage">
+            <div class="mk-layer mk-panel mk-flow">
+              <div class="mk-flow-head">
+                <div>
+                  <div class="mk-k">Analisi · Ufficio acquisti</div>
+                  <div class="mk-t">Dove l’AI incide</div>
+                </div>
+                <span class="mk-pill mk-pill--done"><svg class="mk-ico" viewBox="0 0 24 24" style="width:1.1em;height:1.1em"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Analisi completata</span>
+              </div>
+              <div class="mk-table">
+                <div class="mk-thead"><span>Attività</span><span>Volume</span><span>Impatto</span></div>
+                <div class="mk-trow is-pick"><div><div class="mk-b">Inserimento ordini da email</div><div class="mk-s">Manuale, ogni giorno</div></div><span class="mk-vol"><i style="width:88%"></i></span><span class="mk-pill mk-pill--high">Alto</span></div>
+                <div class="mk-trow"><div><div class="mk-b">Verifica prezzi a listino</div><div class="mk-s">Su ogni ordine</div></div><span class="mk-vol"><i style="width:64%"></i></span><span class="mk-pill mk-pill--mid">Medio</span></div>
+                <div class="mk-trow"><div><div class="mk-b">Solleciti ai fornitori</div><div class="mk-s">Settimanale</div></div><span class="mk-vol"><i style="width:40%"></i></span><span class="mk-pill mk-pill--mid">Medio</span></div>
+                <div class="mk-trow"><div><div class="mk-b">Archiviazione documenti</div><div class="mk-s">Mensile</div></div><span class="mk-vol"><i style="width:22%"></i></span><span class="mk-pill mk-pill--low">Basso</span></div>
+              </div>
+            </div>
+
+            <div class="mk-panel mk-sources">
+              <span class="mk-src"><svg class="mk-ico" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20c.6-3.4 3-5 6-5s5.4 1.6 6 5M16 4.5a3 3 0 0 1 0 6M18 15c1.6.6 2.7 2.2 3 5"/></svg>Interviste</span>
+              <span class="mk-src"><svg class="mk-ico" viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v12c0 1.7 3.1 3 7 3s7-1.3 7-3V6M5 12c0 1.7 3.1 3 7 3s7-1.3 7-3"/></svg>Dati ERP</span>
+              <span class="mk-src"><svg class="mk-ico" viewBox="0 0 24 24"><path d="M7 3h7l4 4v14H7zM14 3v4h4"/></svg>Documenti</span>
+            </div>
+
+            <div class="mk-panel mk-goal">
+              <div class="mk-k">Obiettivo concordato</div>
+              <div class="mk-t">Tempo di evasione ordini</div>
+              <div class="mk-rows">
+                <div class="mk-row"><span>Misura di partenza</span><b class="mk-ok"><svg class="mk-ico" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Rilevata</b></div>
+                <div class="mk-row"><span>Misura in produzione</span><b>Ogni mese</b></div>
+                <div class="mk-row"><span>Compenso</span><b class="mk-accent">Legato al risultato</b></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </template>
+    <template id="mk-01-2">
       <div class="mk" aria-hidden="true">
         <div class="mk-fit">
           <div class="mk-stage">
@@ -84,8 +125,7 @@
       </div>
     </template>
     <script>
-      const t = document.getElementById('mk-processi');
-      document.querySelectorAll('.slot').forEach((s) => s.appendChild(t.content.cloneNode(true)));
+      document.querySelectorAll('.slot').forEach((s) => s.appendChild(document.getElementById(s.dataset.tpl).content.cloneNode(true)));
     </script>
   </body>
 </html>

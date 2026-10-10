@@ -134,3 +134,40 @@
 }
 .mk-src { display: inline-flex; align-items: center; gap: 0.45em; font-size: 1.05em; font-weight: 600; }
 .mk-src + .mk-src { padding-left: 0.9em; border-left: 0.1em solid var(--mk-line); }
+
+/* ——— 01 · tappa 1: analisi dei processi ——— */
+.mk-table { padding-top: 0.8em; }
+.mk-thead, .mk-trow {
+  display: grid;
+  grid-template-columns: 1fr 9em 6.4em;
+  align-items: center;
+  gap: 1.2em;
+  padding: 0 1em;
+}
+.mk-thead { font-size: 0.9em; letter-spacing: 0.08em; text-transform: uppercase; color: var(--mk-faint); font-weight: 600; padding-bottom: 0.6em; }
+.mk-trow { padding-top: 1.05em; padding-bottom: 1.05em; border-radius: 1em; }
+.mk-trow + .mk-trow { box-shadow: 0 -0.1em 0 var(--mk-line); }
+.mk-trow.is-pick { background: rgb(200 242 90 / 0.22); box-shadow: inset 0 0 0 0.1em rgb(16 38 27 / 0.12); }
+.mk-trow.is-pick + .mk-trow { box-shadow: none; }
+.mk-vol { height: 0.55em; border-radius: 99em; background: var(--mk-sunk); box-shadow: inset 0 0 0 0.1em var(--mk-line); overflow: hidden; }
+.mk-vol i { display: block; height: 100%; border-radius: inherit; background: #4f6a55; }
+.is-pick .mk-vol i { background: #10261b; }
+.mk-trow .mk-pill { justify-self: start; }
+.mk-pill--high { background: #10261b; color: #c8f25a; }
+.mk-pill--mid { background: rgb(143 165 150 / 0.22); color: var(--mk-ink); }
+.mk-pill--low { background: transparent; color: var(--mk-soft); box-shadow: inset 0 0 0 0.1em rgb(16 38 27 / 0.14); }
+
+/* scheda dell'obiettivo concordato (modello legato al risultato) */
+.mk-goal {
+  position: absolute;
+  right: -9.5em;
+  bottom: -4.2em;
+  width: 21em;
+  padding: 1.5em 1.6em 1.5em;
+  transform: translateZ(6em);
+}
+.mk-goal .mk-t { font-size: 1.35em; margin: 0.35em 0 0.2em; }
+.mk-goal .mk-rows { margin: 1.2em 0 0; }
+.mk-row b.mk-ok { display: inline-flex; align-items: center; gap: 0.35em; }
+.mk-row b.mk-ok svg { width: 1.1em; height: 1.1em; }
+.mk-row b.mk-accent { background: #c8f25a; color: #10261b; padding: 0.1em 0.6em; border-radius: 99em; }
