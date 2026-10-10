@@ -286,3 +286,14 @@
     animation: none;
   }
 }
+
+/* titolo sopra il modulo: dice perché conviene compilarlo (la CTA è il pulsante) */
+.form-title {
+  margin-bottom: var(--s-4);
+  font: var(--t-lead);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  text-align: center;
+  text-wrap: balance;
+  color: var(--ink-strong);
+}

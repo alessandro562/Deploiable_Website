@@ -17,8 +17,8 @@ const TITLE = {
   en: 'Built to work. Ready to be yours.',
 };
 const SUB = {
-  it: 'Portiamo l’AI in produzione nei processi delle aziende e nei prodotti che costruiamo, partendo da un numero concordato.',
-  en: 'We put AI into production in companies’ processes and in the products we build, starting from an agreed number.',
+  it: 'Mettiamo l’AI al lavoro nei processi delle aziende e nei prodotti che costruiamo.',
+  en: 'We put AI to work in companies’ processes and in the products we build.',
 };
 
 // il "word joiner" (U+2060) tiene unito "AI-native" a capo; nei meta non serve
@@ -196,6 +196,7 @@ const DICT = {
     'form.company.label': 'Azienda',
     'form.company.placeholder': 'Azienda',
     'form.submit': 'Prenota una call',
+    'form.title': 'Scopri dove l’AI conviene davvero nella tua azienda.',
     'form.consent.pre': 'Ho letto l’',
     'form.consent.link': 'informativa privacy',
     'form.consent.post': ' e acconsento al trattamento dei miei dati per essere ricontattato/a.',
@@ -444,6 +445,7 @@ const DICT = {
     'form.company.label': 'Company',
     'form.company.placeholder': 'Company',
     'form.submit': 'Book a call',
+    'form.title': 'Find out where AI really pays off in your company.',
     'form.consent.pre': 'I have read the ',
     'form.consent.link': 'privacy notice',
     'form.consent.post': ' and consent to the processing of my data in order to be contacted.',
