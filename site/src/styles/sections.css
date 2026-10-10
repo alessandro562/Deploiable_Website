@@ -1070,3 +1070,14 @@ h3 {
 @media (prefers-reduced-motion: reduce) {
   .tappa-fig .mk-stage { transition: none; }
 }
+
+/* Telefono: lo schema riempie la larghezza della colonna e il contenitore segue il contenuto, senza fasce vuote
+   sopra e sotto (il desktop resta com'è) */
+@media (max-width: 860px) {
+  .tappa-fig .mk {
+    aspect-ratio: 560 / 330;
+  }
+  .tappa-fig .mk-stage {
+    scale: 1.15;
+  }
+}
