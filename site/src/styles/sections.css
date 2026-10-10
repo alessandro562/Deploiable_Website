@@ -1103,3 +1103,102 @@ h3 {
     margin-top: 0;
   }
 }
+
+/* ---------- Schema del metodo: una fase è una sequenza di passi, senza caso reale ---------- */
+.tappa-fig .mkm-stage {
+  position: relative;
+  padding: var(--s-6);
+  border: 1px solid rgb(16 38 27 / 0.1);
+  border-radius: 14px;
+  background: #fcfdf9;
+  box-shadow:
+    0 2.4em 3em -1.4em rgb(16 38 27 / 0.28),
+    0 0.4em 0.8em rgb(16 38 27 / 0.1);
+  /* piano inclinato che si raddrizza allo scorrimento (--p, da src/sections.ts), appena sul puntatore */
+  transform:
+    translateZ(calc(-10em * (1 - var(--p, 1))))
+    rotateX(calc(10deg + 14deg * (1 - var(--p, 1)) + var(--my, 0) * -4deg))
+    rotateY(calc(-6deg - 10deg * (1 - var(--p, 1)) + var(--mx, 0) * 5deg));
+  transition: transform 0.12s linear;
+}
+.mkm-flow {
+  display: flex;
+  align-items: stretch;
+  gap: var(--s-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.mkm-node {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+  padding: var(--s-4);
+  border: 1px solid rgb(16 38 27 / 0.14);
+  border-radius: 10px;
+  background: var(--mist);
+}
+/* il risultato della fase è pieno: è dove il passaggio porta */
+.mkm-node:last-child {
+  background: var(--forest);
+  border-color: var(--forest);
+}
+.mkm-node:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: calc(var(--s-3) * -1);
+  width: var(--s-3);
+  height: 1px;
+  background: var(--forest);
+}
+.mkm-n {
+  font: 500 12px / 1 var(--text);
+  letter-spacing: 0.12em;
+  color: var(--moss-ink);
+}
+.mkm-l {
+  font: 700 16px / 1.25 var(--sans);
+  letter-spacing: -0.01em;
+  color: var(--forest);
+}
+.mkm-node:last-child .mkm-n {
+  color: var(--lime);
+}
+.mkm-node:last-child .mkm-l {
+  color: var(--mist);
+}
+@media (prefers-reduced-motion: reduce) {
+  .tappa-fig .mkm-stage { transition: none; }
+}
+/* telefono: i passi scendono in colonna, con un filo fra l'uno e l'altro; le etichette restano leggibili */
+@media (max-width: 860px) {
+  .tappa-fig .mkm-stage {
+    padding: var(--s-5);
+    transform: none;
+  }
+  .mkm-flow {
+    flex-direction: column;
+    gap: var(--s-4);
+  }
+  .mkm-node {
+    flex-direction: row;
+    align-items: center;
+    gap: var(--s-4);
+    padding: var(--s-3) var(--s-4);
+  }
+  .mkm-node:not(:last-child)::after {
+    top: auto;
+    right: auto;
+    bottom: calc(var(--s-4) * -1);
+    left: calc(var(--s-4) + 6px);
+    width: 1px;
+    height: var(--s-4);
+  }
+  .mkm-l {
+    font-size: 15px;
+  }
+}
