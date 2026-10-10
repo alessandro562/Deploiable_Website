@@ -179,8 +179,8 @@ async function phases(id, speed = 1) {
   for (let i = 0; i < 3; i++) {
     const y = await page.evaluate(([id, i]) => document.querySelectorAll(`#journey-${id} .tappa`)[i].getBoundingClientRect().top + scrollY, [id, i]);
     const sway = mobile ? null : (k) => ({ x: 1040 + Math.sin((i + k) * 2.3) * 120, y: 520 + Math.cos((i + k) * 1.9) * 90, o: 1 });
-    await scroll(y - HEADER - (mobile ? 8 : 40), 1.5 * speed, ease, sway);
-    await hold(1.7 * speed);
+    await scroll(y - HEADER - (mobile ? 8 : 40), 1.2 * speed, ease, sway);
+    await hold(1.3 * speed);
   }
 }
 /** contatto: il modulo e l'invio (all'indirizzo finto, intercettato sopra) */
@@ -194,7 +194,7 @@ async function contact(email, company) {
   await press('.consent-box');
   await hold(0.3);
   await press('.signup button[type=submit]');
-  await hold(2.0);
+  await hold(1.6);
 }
 
 if (!mobile) {
@@ -205,54 +205,52 @@ if (!mobile) {
   await move(cta.x, cta.y, 1.0); // passaggio sul pulsante principale
   await hold(0.6);
   await press('.hero-ctas .btn--line'); // "Scopri il nostro approccio": porta alle due card
-  await hold(1.6);
+  await hold(1.3);
   // le due card: si leggono, poi si apre il percorso dei processi
   const c2 = await center('.line-col .line-title', 1);
-  await move(c2.x, c2.y, 0.9);
-  await hold(0.8);
+  await move(c2.x, c2.y, 0.7);
+  await hold(0.5);
   await press('.line-toggle[data-journey="1"]');
-  await hold(1.6);
-  await phases(1);
+  await hold(1.2);
+  await phases(1, 0.9);
   // in fondo al percorso: si passa al Product Studio
-  await scroll((await top('#journey-1 .journey-foot')) - 560, 1.2);
-  await hold(0.4);
+  await scroll((await top('#journey-1 .journey-foot')) - 560, 0.9);
+  await hold(0.2);
   await press('#journey-1 [data-journey-switch="2"]');
-  await hold(1.5);
-  await phases(2, 0.75);
+  await hold(1.1);
+  await phases(2, 0.6);
   // dal percorso al contatto, con la strada già scelta
-  await scroll((await top('#journey-2 .journey-foot')) - 560, 1.0);
+  await scroll((await top('#journey-2 .journey-foot')) - 560, 0.8);
   await press('#journey-2 .line-link');
-  await hold(1.6);
+  await hold(1.2);
   await scroll(Math.min((await top('#contact')) + 120, await maxY()), 0.8);
   await contact('giulia@azienda.it', 'Azienda Spa');
-  await scroll(await maxY(), 1.2);
-  await move(1280, 820, 0.6);
-  await hold(1.2);
+  await scroll(await maxY(), 0.9);
+  await move(1280, 820, 0.4);
+  await hold(0.8);
 } else {
   // ---------------------------------------------------------------- telefono, 390 × 844
   await hold(8.4);
   await press('.nav-toggle'); // menu
-  await hold(0.8);
+  await hold(0.6);
   await press('.nav-list a', 0); // "Approccio": porta alle due card
-  await hold(1.4);
+  await hold(1.0);
   // in inglese da qui in poi
   await press('[data-lang="en"]');
-  await hold(1.0);
-  await scroll((await top('#line-2')) - HEADER, 1.6);
-  await hold(0.6);
+  await hold(0.7);
+  await scroll((await top('#line-2')) - HEADER, 1.2);
+  await hold(0.3);
   await press('.line-toggle[data-journey="2"]');
-  await hold(1.4);
-  await phases(2, 0.8);
-  await scroll((await top('#journey-2 .journey-foot')) - 420, 1.0);
+  await hold(1.0);
+  await phases(2, 0.6);
+  await scroll((await top('#journey-2 .journey-foot')) - 420, 0.8);
   await press('#journey-2 [data-journey-close="2"]'); // chiude e torna alle card
-  await hold(1.4);
-  await scroll(await top('#contact'), 1.6);
-  await hold(0.4);
-  await scroll((await top('#contact')) + 380, 1.0);
+  await hold(1.0);
+  await scroll((await top('#contact')) + 380, 1.4);
   await press('.path', 1);
   await contact('giulia@company.com', 'Company Ltd');
-  await scroll(await maxY(), 1.0);
-  await hold(1.2);
+  await scroll(await maxY(), 0.8);
+  await hold(0.8);
 }
 
 console.log(`${kind}: ${frame} fotogrammi, ${(frame / FPS).toFixed(1)} s; errori: ${errors.length ? errors.join(' | ') : 'nessuno'}`);
