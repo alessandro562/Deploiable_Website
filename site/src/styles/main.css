@@ -740,14 +740,6 @@ p {
   display: block;
   font-weight: 900;
 }
-/* il secondo pilastro: i prodotti, una riga sotto la frase */
-.act-note {
-  max-width: 36em;
-  margin: calc(-1 * var(--s-3)) auto var(--s-6);
-  font: var(--t-body);
-  text-wrap: balance;
-  color: var(--moss-ink);
-}
 .act-cta {
   display: inline-flex;
   align-items: center;
