@@ -21,9 +21,9 @@
   </head>
   <body>
     <div class="board">
-      <figure class="desk"><div class="slot" data-tpl="mk-01-3"></div><figcaption>01 · tappa 3 · prodotto su misura, chiavi in mano · desktop, 560 px</figcaption></figure>
-      <figure class="phone"><div class="slot" data-tpl="mk-01-3"></div><figcaption>telefono, colonna da 342 px</figcaption></figure>
-      <figure class="desk"><div class="slot" data-tpl="mk-01-1"></div><figcaption>01 · tappa 1 · analisi dei processi (approvato)</figcaption></figure>
+      <figure class="desk"><div class="slot" data-tpl="mk-01-1"></div><figcaption>01 · tappa 1 · mappa del processo · desktop, 560 px</figcaption></figure>
+      <figure class="phone"><div class="slot" data-tpl="mk-01-1"></div><figcaption>telefono, colonna da 342 px</figcaption></figure>
+      <figure class="desk"><div class="slot" data-tpl="mk-01-3"></div><figcaption>01 · tappa 3 (da rifare come schema)</figcaption></figure>
       <figure class="desk"><div class="slot" data-tpl="mk-01-2"></div><figcaption>01 · tappa 2 · in produzione (approvato)</figcaption></figure>
     </div>
 
@@ -85,30 +85,33 @@
       <div class="mk" aria-hidden="true">
         <div class="mk-fit">
           <div class="mk-stage">
-            <div class="mk-layer mk-panel mk-flow">
+            <div class="mk-layer mk-panel mk-map">
               <div class="mk-flow-head">
                 <div>
-                  <div class="mk-k">Analisi · Ufficio acquisti</div>
-                  <div class="mk-t">Dove l’AI incide</div>
+                  <div class="mk-k">Mappa del processo · oggi</div>
+                  <div class="mk-t">Ordini ai fornitori</div>
                 </div>
-                <span class="mk-pill mk-pill--done"><svg class="mk-ico" viewBox="0 0 24 24" style="width:1.1em;height:1.1em"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Analisi completata</span>
+                <span class="mk-pill mk-pill--wait">Analisi</span>
               </div>
-              <div class="mk-table">
-                <div class="mk-thead"><span>Attività</span><span>Volume</span><span>Impatto</span></div>
-                <div class="mk-trow is-pick"><div><div class="mk-b">Inserimento ordini da email</div><div class="mk-s">Manuale, ogni giorno</div></div><span class="mk-vol"><i style="width:88%"></i></span><span class="mk-pill mk-pill--high">Alto</span></div>
-                <div class="mk-trow"><div><div class="mk-b">Verifica prezzi a listino</div><div class="mk-s">Su ogni ordine</div></div><span class="mk-vol"><i style="width:64%"></i></span><span class="mk-pill mk-pill--mid">Medio</span></div>
-                <div class="mk-trow"><div><div class="mk-b">Solleciti ai fornitori</div><div class="mk-s">Settimanale</div></div><span class="mk-vol"><i style="width:40%"></i></span><span class="mk-pill mk-pill--mid">Medio</span></div>
-                <div class="mk-trow"><div><div class="mk-b">Archiviazione documenti</div><div class="mk-s">Mensile</div></div><span class="mk-vol"><i style="width:22%"></i></span><span class="mk-pill mk-pill--low">Basso</span></div>
+              <div class="mk-flowmap">
+                <div class="mk-n"><svg class="mk-ico" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg><div><div class="mk-b">Ricezione</div><div class="mk-s">Email e PDF</div></div></div>
+                <span class="mk-link"></span>
+                <div class="mk-n mk-n--hot"><svg class="mk-ico" viewBox="0 0 24 24"><rect x="2.5" y="6" width="19" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10"/></svg><div><div class="mk-b">Inserimento</div><div class="mk-s">A mano</div></div><span class="mk-flag">!</span></div>
+                <span class="mk-link"></span>
+                <div class="mk-n"><svg class="mk-ico" viewBox="0 0 24 24"><path d="M9 4h6M9 4a2 2 0 0 0-2 2H5v15h14V6h-2a2 2 0 0 0-2-2M8.5 13.5l2.5 2.5 4.5-4.5"/></svg><div><div class="mk-b">Verifica</div><div class="mk-s">Prezzi a listino</div></div></div>
+                <span class="mk-link"></span>
+                <div class="mk-n"><svg class="mk-ico" viewBox="0 0 24 24"><circle cx="10" cy="8" r="3.5"/><path d="M3.5 20c.8-3.6 3.4-5.5 6.5-5.5 1.5 0 2.9.4 4 1.3M15.5 18.5l2 2 4-4"/></svg><div><div class="mk-b">Approvazione</div><div class="mk-s">Responsabile</div></div></div>
+                <div class="mk-note"><div><div class="mk-b">Punto critico</div><div class="mk-s">Dati copiati a mano, ogni giorno.</div></div></div>
               </div>
             </div>
 
             <div class="mk-panel mk-sources">
               <span class="mk-src"><svg class="mk-ico" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20c.6-3.4 3-5 6-5s5.4 1.6 6 5M16 4.5a3 3 0 0 1 0 6M18 15c1.6.6 2.7 2.2 3 5"/></svg>Interviste</span>
-              <span class="mk-src"><svg class="mk-ico" viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v12c0 1.7 3.1 3 7 3s7-1.3 7-3V6M5 12c0 1.7 3.1 3 7 3s7-1.3 7-3"/></svg>Dati ERP</span>
+              <span class="mk-src"><svg class="mk-ico" viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v12c0 1.7 3.1 3 7 3s7-1.3 7-3V6M5 12c0 1.7 3.1 3 7 3s7-1.3 7-3"/></svg>Dati</span>
               <span class="mk-src"><svg class="mk-ico" viewBox="0 0 24 24"><path d="M7 3h7l4 4v14H7zM14 3v4h4"/></svg>Documenti</span>
             </div>
 
-            <div class="mk-panel mk-goal">
+            <div class="mk-panel mk-goal mk-goal--low">
               <div class="mk-k">Obiettivo concordato</div>
               <div class="mk-t">Tempo di evasione ordini</div>
               <div class="mk-rows">
