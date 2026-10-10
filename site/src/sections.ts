@@ -44,9 +44,12 @@ function headerSurface() {
       const r = hit.el.getBoundingClientRect();
       const cs = getComputedStyle(hit.el);
       header.style.setProperty('--sec-x', `${r.left}px`);
-      header.style.setProperty('--sec-y', `${r.top}px`);
+      // se la sezione comincia dentro la barra, l'alone parte dal bordo alto della barra: niente striscia della
+      // sezione precedente sopra (lo spostamento del centro è di pochi pixel e dura solo il passaggio)
+      const top = Math.min(r.top, 0);
+      header.style.setProperty('--sec-y', `${top}px`);
       header.style.setProperty('--sec-w', `${r.width}px`);
-      header.style.setProperty('--sec-h', `${r.height}px`);
+      header.style.setProperty('--sec-h', `${r.bottom - top}px`);
       for (const k of ['--lit-hi', '--lit-base', '--lit-x', '--lit-y']) {
         const v = cs.getPropertyValue(k).trim();
         if (v) header.style.setProperty(k, v);
