@@ -342,7 +342,7 @@ test('contatto: strada scelta, validazione, avviso email personale, invio ad App
   await expect(page.locator('#signup-consent')).toBeChecked();
 
   // la strada: un link del racconto la preseleziona, nel modulo si può cambiare
-  await page.click('.chap-link[data-interest="transform"]');
+  await page.click('.line-link[data-interest="transform"]');
   await expect(page.locator('input[name="interest"][value="transform"]')).toBeChecked();
   await page.click('.path:has(input[value="build"])');
   await expect(page.locator('input[name="interest"][value="build"]')).toBeChecked();

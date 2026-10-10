@@ -49,9 +49,8 @@ for (const path of pages) {
     const out = [];
     const sel = [
       '.lang button, .nav-list a, .soon, .claim .line, .sub, .hero-ctas .btn span, .proof-line',
-      '.kicker, .chap-title, .chap-text, .chap-paths li, .chap-claim span, .chap-claim strong, .chap-big, .chap-link span',
-      '.sec-title, .sec-lead, .sec-note, .cap-title, .cap-text, .step-num, .step-title, .step-text',
-      '.case-tag, .case-title, .case-text, .flow-step, .flow-arrow, .flow-plus',
+      '.kicker, .sec-title, .sec-lead, .sec-note, .line-num, .line-title, .line-text, .line-tags li, .line-link span',
+      '.step-num, .step-title, .step-text',
       '.contact-title, .contact-lead, .offer-title, .offer, .paths-legend, .path-num, .path-title, .path-text',
       '.signup-row input, .signup button, .consent-text, .consent a, .signup-note, .foot p, .foot dt, .foot dd, .foot a',
       '.doc-body p, .doc-body h2, .doc-draft, .doc-updated, .doc-back a',

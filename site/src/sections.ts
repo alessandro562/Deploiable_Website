@@ -1,22 +1,16 @@
-// Le sezioni dopo l'hero: header sopra le fasce scure, menu su telefono, scelta della strada nel modulo,
-// frammenti animati del sistema (src/system/minis.ts), testi che entrano quando arrivano sullo schermo.
-// Funziona con e senza 3D; con prefers-reduced-motion tutto è fermo e già visibile.
-import { Scene } from './system/engine';
-import { frame, type CamKey } from './system/camera';
-import { MINIS } from './system/minis';
-import { lang, onLangChange } from './i18n';
+// Le sezioni dopo l'hero: header sopra le fasce, menu su telefono, scelta della strada nel modulo, ancore,
+// entrata dei blocchi. Nessun 3D: le figure sono immagini statiche (public/assets/mockups).
+// Con prefers-reduced-motion tutto è fermo e già visibile.
 
 export function initSections(opts: { reduced: boolean }) {
   headerSurface();
   navMenu();
   anchors(opts.reduced);
   interestLinks();
-  flows();
   reveals(opts.reduced);
-  minis(opts.reduced);
 }
 
-/** Sopra le sezioni scure l'header passa al vetro scuro, sopra il contatto torna chiaro. */
+/** Sotto la sezione scura l'header è chiaro, sotto quella chiara (Mist) è Forest, sotto il contatto torna Forest. */
 function headerSurface() {
   const root = document.documentElement;
   const header = document.querySelector<HTMLElement>('.top');
@@ -37,6 +31,7 @@ function headerSurface() {
     if (hit === under) return;
     under = hit;
     root.classList.toggle('is-dark-under', hit === 'dark');
+    root.classList.toggle('is-light-under', hit === 'light');
     root.classList.toggle('is-lime-under', hit === 'lime');
     root.dataset.under = hit;
   };
@@ -127,48 +122,11 @@ function interestLinks() {
   });
 }
 
-/** Le catene degli esempi ("A + B → C") diventano passaggi distinti; il testo per i lettori di schermo resta. */
-function flows() {
-  const els = Array.from(document.querySelectorAll<HTMLElement>('[data-flow]'));
-  const build = () => {
-    for (const el of els) {
-      const text = el.textContent ?? '';
-      const frag = document.createDocumentFragment();
-      // per i lettori di schermo la catena resta una frase; i passaggi disegnati sono solo per gli occhi
-      const sr = document.createElement('span');
-      sr.className = 'sr-only';
-      sr.textContent = text;
-      frag.append(sr);
-      text.split('→').forEach((step, i, all) => {
-        step.split('+').forEach((part, j, parts) => {
-          const s = document.createElement('span');
-          s.className = i === all.length - 1 ? 'flow-step flow-step--out' : 'flow-step';
-          s.textContent = part.trim();
-          s.setAttribute('aria-hidden', 'true');
-          frag.append(s);
-          if (j < parts.length - 1) frag.append(sym('+', 'flow-plus'));
-        });
-        if (i < all.length - 1) frag.append(sym('→', 'flow-arrow'));
-      });
-      el.replaceChildren(frag);
-    }
-  };
-  const sym = (t: string, cls: string) => {
-    const s = document.createElement('span');
-    s.className = cls;
-    s.textContent = t;
-    s.setAttribute('aria-hidden', 'true');
-    return s;
-  };
-  build();
-  onLangChange(build);
-}
-
 /** Titoli e blocchi entrano salendo di poco quando arrivano sullo schermo (una volta sola). */
 function reveals(reduced: boolean) {
   if (reduced || !('IntersectionObserver' in window)) return;
   const root = document.documentElement;
-  const els = Array.from(document.querySelectorAll<HTMLElement>('.sec-head, .cap, .step, .case, .contact-head, .signup-box'));
+  const els = Array.from(document.querySelectorAll<HTMLElement>('.sec-head, .line-col, .step, .contact-head, .signup-box'));
   root.classList.add('rv-on');
   const io = new IntersectionObserver(
     (entries) => {
@@ -184,117 +142,4 @@ function reveals(reduced: boolean) {
     el.classList.add('rv');
     io.observe(el);
   });
-}
-
-interface MiniState {
-  box: HTMLElement;
-  host: HTMLElement;
-  svg: SVGSVGElement;
-  scene: Scene;
-  cam: CamKey;
-  v: number;
-  goal: number;
-  seen: boolean;
-  hover: boolean;
-  center: boolean;
-  visible: boolean;
-}
-
-/** I frammenti: entrano quando arrivano sullo schermo, si attivano al passaggio del mouse (o al centro dello
- *  schermo su telefono). Disegnati solo quando sono visibili. */
-function minis(reduced: boolean) {
-  const boxes = Array.from(document.querySelectorAll<HTMLElement>('[data-mini]'));
-  const all: MiniState[] = [];
-  const fine = matchMedia('(hover: hover) and (pointer: fine)').matches;
-  for (const box of boxes) {
-    const make = MINIS[box.dataset.mini ?? ''];
-    if (!make) continue;
-    const m = make();
-    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    box.appendChild(svg);
-    const scene = new Scene(svg, m.spec);
-    scene.setLang(lang());
-    const host = box.closest<HTMLElement>('.cap, .step, .case') ?? box;
-    const st: MiniState = { box, host, svg, scene, cam: m.cam, v: reduced ? 1 : 0, goal: reduced ? 1 : 0, seen: reduced, hover: false, center: false, visible: false };
-    all.push(st);
-    if (!reduced && fine) {
-      host.addEventListener('pointerenter', () => ((st.hover = true), wake()));
-      host.addEventListener('pointerleave', () => ((st.hover = false), wake()));
-    }
-  }
-  const draw = (s: MiniState, time: number) => {
-    const w = s.box.clientWidth;
-    const h = s.box.clientHeight;
-    if (!w || !h) return;
-    s.svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
-    s.scene.set(s.v);
-    s.scene.draw(frame(s.cam, { x: 6, y: 6, w: w - 12, h: h - 12 }), time);
-  };
-  onLangChange((l) => {
-    for (const s of all) {
-      s.scene.setLang(l);
-      draw(s, time);
-    }
-  });
-  let time = 0.6;
-  for (const s of all) draw(s, time);
-  new ResizeObserver(() => all.forEach((s) => draw(s, time))).observe(document.body);
-  if (reduced) return;
-
-  // entrata e visibilità
-  const vis = new IntersectionObserver(
-    (entries) => {
-      for (const e of entries) {
-        const s = all.find((x) => x.box === e.target);
-        if (!s) continue;
-        s.visible = e.isIntersecting;
-        if (e.isIntersecting && e.intersectionRatio > 0.3) s.seen = true;
-      }
-      wake();
-    },
-    { threshold: [0, 0.3, 0.6] },
-  );
-  // su telefono (niente passaggio del mouse) il frammento al centro dello schermo è attivo
-  const mid = new IntersectionObserver(
-    (entries) => {
-      for (const e of entries) {
-        const s = all.find((x) => x.box === e.target);
-        if (s) s.center = e.isIntersecting;
-      }
-      wake();
-    },
-    { rootMargin: '-38% 0px -38% 0px' },
-  );
-  for (const s of all) {
-    vis.observe(s.box);
-    if (!fine) mid.observe(s.box);
-  }
-
-  let running = false;
-  let last = 0;
-  const loop = (now: number) => {
-    const dt = Math.min(0.1, (now - (last || now)) / 1000);
-    last = now;
-    time += dt;
-    let any = false;
-    for (const s of all) {
-      if (!s.visible) continue;
-      any = true;
-      s.goal = !s.seen ? 0 : s.hover || s.center ? 2 : 1;
-      const before = s.v;
-      // 0 → 1 in circa 0,8 s, 1 ↔ 2 in circa 0,5 s
-      const speed = s.v < 1 ? 1.25 : 2;
-      s.v = s.v < s.goal ? Math.min(s.goal, s.v + dt * speed) : Math.max(s.goal, s.v - dt * speed);
-      if (s.v !== before) draw(s, time);
-      else s.scene.tick(time);
-    }
-    if (any) requestAnimationFrame(loop);
-    else running = false;
-  };
-  function wake() {
-    if (running) return;
-    running = true;
-    last = 0;
-    requestAnimationFrame(loop);
-  }
 }

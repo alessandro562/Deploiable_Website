@@ -15,23 +15,8 @@ interface DeploiableHooks {
   state?: () => { tw: number; caret: boolean; t: number; roll: number[]; bgIn: number[]; bgSlide: number[]; sweep: number[]; letters: number[] };
 }
 
-interface NarrativeHooks {
-  /** avanzamento attuale della scena (0..7) e quello indicato dallo scorrimento */
-  p: () => number;
-  target: () => number;
-  /** tempo fisso per impulsi e indicatori (null: tempo reale) */
-  freeze: (t: number | null) => void;
-  /** porta subito la scena all'avanzamento dello scorrimento (senza inseguimento) */
-  jump: () => void;
-  /** posizione di scorrimento del capitolo i all'avanzamento c */
-  yFor: (i: number, c: number) => number;
-  /** scorre fino al capitolo i, all'avanzamento c (0..1) del capitolo */
-  seekChapter: (i: number, c: number) => void;
-}
-
 interface Window {
   /** registrazione fotogramma per fotogramma (scripts/capture.mjs): scorrimenti in JavaScript, non nativi */
   __CAPTURE__?: boolean;
   __DEPLOIABLE__?: DeploiableHooks;
-  __NARR__?: NarrativeHooks;
 }

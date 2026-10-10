@@ -4,32 +4,19 @@ Landing di Deploiable (marchio di WDA srl). Posizionamento su due pilastri di pa
 (ridisegnare i processi esistenti e integrarli nei sistemi dell'azienda) e **AI-native Product Studio** (costruire
 prodotti software AI su misura), con un solo standard di arrivo: **AI in produzione**.
 
-La pagina, dall'alto:
+La pagina, dall'alto (versione in revisione, branch `v2-redesign`):
 
-1. **Hero**: l'intro 3D del logo (sotto), poi la headline bilingue ("Dai problemi di business / all'AI in
-   produzione." · "From business problems / to production AI.") con la macchina da scrivere sulla seconda riga,
-   il sottotitolo con le due anime, due pulsanti (contatto, racconto) e la prova sociale.
-2. **Il racconto** (`#approach`, `src/narrative.ts`): un solo sistema in 2.5D che evolve mentre si scorre
-   (scorrimento nativo, nessun blocco). Problema → due strade → processo trasformato (persona ed Excel si
-   comprimono nell'AI, l'approvazione resta alla persona) → prodotto che si assembla fino a un'interfaccia vera →
-   convergenza in uno stack in produzione nel contesto reale → integrazione con ERP, CRM, email, documenti, dati,
-   PowerPoint, Teams e le interfacce d'uscita.
-3. **Cosa realizziamo** (sei forme), **Come lavoriamo** (Comprendiamo · Costruiamo · Mettiamo in produzione),
-   **Esempi** (tre scenari dichiarati come esempi, non casi cliente): ogni figura è un frammento dello stesso sistema.
-4. **Contatto** su Lime: la strada (trasformare un processo / costruire un prodotto AI) e il modulo.
+1. **Hero**: l'intro 3D del logo (invariata), la headline bilingue "Dai problemi di business / all'AI in produzione."
+   con la macchina da scrivere sulla seconda riga, il sottotitolo, due pulsanti e la prova sociale.
+2. **Cosa facciamo** (`#cosa-facciamo`, fondo Mist): "Un product lab, due linee di prodotto." Due colonne:
+   - 01 · Processi: soluzioni AI nei processi del cliente; se le automazioni non bastano, un prodotto su misura chiavi in mano.
+   - 02 · Product Studio: prodotti di nicchia costruiti, portati sul mercato e venduti a imprese.
+   Le figure sono SVG piatti e statici in `public/assets/mockups/`, decorativi (alt vuoto).
+3. **Come lavoriamo** (`#metodo`): Comprendiamo · Costruiamo · Mettiamo in produzione.
+4. **Contatto** (`#contact`, Lime): scelta della strada e modulo.
 
-### Il sistema in SVG (`src/system/`)
-
-- `engine.ts` · motore 2.5D: camera con prospettiva "debole" (ogni oggetto prende la scala della sua profondità,
-  le facce restano affini: testi veri e nitidi), lastre estruse con fianchi ombreggiati, ombre a terra,
-  collegamenti ortogonali che si disegnano, impulsi di dati, ordinamento per profondità. Stati chiave interpolati.
-- `journey.ts` · gli otto stati chiave del racconto, in composizione orizzontale (desktop) e verticale (telefono).
-- `minis.ts` · i frammenti delle sezioni (entrata, riposo, attivo al passaggio del mouse o al centro dello schermo).
-- `faces.ts` · ciò che sta sulle facce: l'interfaccia del prodotto, la persona che approva, l'indicatore "live".
-- `camera.ts` · inquadratura: dagli stati chiave della camera ai parametri a schermo.
-
-Il racconto e le sezioni non dipendono dal 3D: funzionano anche senza WebGL. Con `prefers-reduced-motion` la
-scena non si muove e ogni capitolo ha la sua immagine ferma, disegnata dallo stesso motore. Peso: ~15 KB gzip.
+Non ci sono più il racconto a scorrimento né la sezione esempi: sono nella storia del branch (commit 69b6d1a) per
+ripensarli più avanti, a step approvati.
 
 ## L'animazione (circa 6,6 secondi, poi resta ferma e "viva")
 
@@ -78,7 +65,7 @@ Parametri URL: `?tier=high|mid|mobile|minimal` (cambia solo nitidezza: densità 
   headline (ricostruita in lettere per la macchina da scrivere) e le catene degli esempi.
   L'etichetta del lancio è la costante `LAUNCH` (oggi solo "Coming soon", senza data).
 - **Modulo** (`src/signup.ts`): strada scelta (facoltativa, `interest`: `transform` | `build`), email aziendale,
-  azienda, consenso privacy obbligatorio. I link "Parliamo di un tuo processo / prodotto" del racconto la
+  azienda, consenso privacy obbligatorio. I link "Parliamo di un tuo processo / prodotto" di "Cosa facciamo" la
   preselezionano. Invio a Google Apps Script → Google Sheet (`integrations/apps-script/`, colonna "Interesse"),
   URL nella variabile di repository `SIGNUP_ENDPOINT`.
 - **Privacy**: `privacy.html` (bozza ex art. 13 GDPR, bilingue, da validare). Footer con i dati di WDA srl.
@@ -98,9 +85,8 @@ Parametri URL: `?tier=high|mid|mobile|minimal` (cambia solo nitidezza: densità 
 - `src/gl/engine.ts` · renderer semplice: niente post-produzione, niente tone mapping.
 - `src/main.ts`, `src/core/capabilities.ts` · scelta tra animazione 3D e versione statica.
 - `scripts/align.mjs` · misura sui pixel l'allineamento del finale (centri del logo e delle due righe, spazi) a nove formati di schermo.
-- `src/narrative.ts` · il racconto: avanzamento dai capitoli, camera, inclinazione col puntatore, immagini ferme.
-- `src/sections.ts` · header sopra le fasce scure, menu su telefono, link interni, frammenti, entrate dei blocchi.
-- `scripts/v2-shots.mjs` · fotogrammi del racconto e delle sezioni; `scripts/deliver-shots.mjs` · screenshot IT/EN;
+- `src/sections.ts` · header sopra le fasce (scure, chiare), menu su telefono, link interni, entrate dei blocchi.
+- `scripts/deliver-shots.mjs` · screenshot IT/EN (da aggiornare allo step 6);
   `scripts/perf.mjs` · LCP, CLS, task lunghi e fluidità; `scripts/capture.mjs` · video fotogramma per fotogramma.
 
 ## Versione statica

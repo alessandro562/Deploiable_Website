@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 360" width="560" height="360" fill="none">
+  <!-- 01 · processi: un processo, l'AI che lo porta in produzione, l'approvazione della persona.
+       Figura provvisoria (step 1): forme piatte, nessun testo, tre colori del brand. -->
+  <ellipse cx="280" cy="232" rx="262" ry="12" fill="#10261B" opacity="0.07"/>
+
+  <!-- collegamenti -->
+  <path d="M180 194H215M345 194H380" stroke="#10261B" stroke-width="2.5" stroke-linecap="round"/>
+  <circle cx="180" cy="194" r="4" fill="#10261B"/>
+  <circle cx="215" cy="194" r="4" fill="#10261B"/>
+  <circle cx="345" cy="194" r="4" fill="#10261B"/>
+  <circle cx="380" cy="194" r="4" fill="#10261B"/>
+
+  <!-- 1 · processo -->
+  <path d="M64 150H194L180 164H50Z" fill="#DDE3D6"/>
+  <rect x="50" y="164" width="130" height="60" rx="8" fill="#C9D1C2"/>
+
+  <!-- 2 · AI: il blocco scuro con il piano in Lime -->
+  <path d="M229 150H359L345 164H215Z" fill="#C8F25A"/>
+  <rect x="215" y="164" width="130" height="60" rx="8" fill="#10261B"/>
+
+  <!-- 3 · approvazione della persona -->
+  <path d="M394 150H524L510 164H380Z" fill="#B9C6BA"/>
+  <rect x="380" y="164" width="130" height="60" rx="8" fill="#8FA596"/>
+  <circle cx="445" cy="186" r="7" stroke="#10261B" stroke-width="2"/>
+  <path d="M432 204q13-19 26 0" stroke="#10261B" stroke-width="2" stroke-linecap="round"/>
+
+  <!-- prodotto su misura, chiavi in mano -->
+  <rect x="50" y="270" width="460" height="44" rx="22" stroke="#10261B" stroke-width="1.5" stroke-dasharray="5 6"/>
+  <circle cx="76" cy="292" r="8" fill="#C8F25A"/>
+  <path d="M96 292H230" stroke="#10261B" stroke-width="6" stroke-linecap="round"/>
+  <path d="M250 292H330" stroke="#8FA596" stroke-width="6" stroke-linecap="round"/>
+</svg>

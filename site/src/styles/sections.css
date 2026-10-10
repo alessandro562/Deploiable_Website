@@ -14,6 +14,17 @@
   color: var(--mist);
   color-scheme: dark;
 }
+[data-surface='light'] {
+  --bg: var(--mist);
+  --ink-light: var(--forest);
+  --ink-strong: var(--forest);
+  --ink-soft: var(--moss-ink);
+  --ink-body: var(--forest);
+  --hair: rgb(16 38 27 / 0.16);
+  background: var(--mist);
+  color: var(--forest);
+  color-scheme: light;
+}
 [data-surface='lime'] {
   --bg: var(--lime);
   --ink-light: var(--forest);
@@ -264,257 +275,6 @@ h3 {
   margin: 0;
 }
 
-/* ---------- Il racconto (src/narrative.ts) ---------- */
-.narr {
-  position: relative;
-  z-index: 10;
-  scroll-margin-top: 0;
-}
-.narr-stage {
-  display: none;
-}
-.narr-ground {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 2000px;
-  height: 2000px;
-  transform-origin: 0 0;
-  background: radial-gradient(circle, rgb(143 165 150 / 0.55) 1.2px, transparent 1.9px) 0 0 / 44px 44px;
-  -webkit-mask-image: radial-gradient(closest-side, #000 30%, rgb(0 0 0 / 0.4) 62%, transparent 100%);
-  mask-image: radial-gradient(closest-side, #000 30%, rgb(0 0 0 / 0.4) 62%, transparent 100%);
-  opacity: 0.45;
-  will-change: transform;
-  pointer-events: none;
-}
-.narr-svg {
-  position: relative;
-  display: block;
-  width: 100%;
-  height: 100%;
-  /* livello proprio: la scena si ridisegna nel suo spazio, anche quando la fascia fissa cambia posizione
-     (senza, dopo un salto di scorrimento restavano pezzi di fotogrammi vecchi fuori dalle zone ridisegnate) */
-  will-change: transform;
-}
-.chap {
-  position: relative;
-  display: flex;
-  align-items: center;
-  padding: var(--s-8) var(--pad-x);
-}
-.chap-body {
-  position: relative;
-  width: min(100%, 560px);
-  margin-left: max(0px, calc((100vw - var(--content)) / 2 - var(--pad-x)));
-}
-.chap-title {
-  margin-top: var(--s-4);
-  font: var(--t-h2);
-  letter-spacing: var(--track-h2);
-  text-wrap: balance;
-  color: var(--mist);
-}
-.chap-text {
-  margin-top: var(--s-5);
-  max-width: 34em;
-  font: var(--t-lead);
-  text-wrap: pretty;
-  color: var(--ink-body);
-}
-/* le due strade, numerate come nei capitoli che seguono */
-.chap-paths {
-  display: grid;
-  margin: var(--s-6) 0 0;
-  padding: 0;
-  list-style: none;
-  border-top: 1px solid var(--hair);
-}
-.chap-paths li {
-  display: flex;
-  align-items: baseline;
-  gap: var(--s-4);
-  padding: var(--s-4) 0;
-  border-bottom: 1px solid var(--hair);
-  font: 700 20px / 1.2 var(--sans);
-  letter-spacing: -0.015em;
-  color: var(--mist);
-}
-.chap-path-num {
-  font: var(--t-label);
-  letter-spacing: var(--track-label);
-  color: var(--lime);
-}
-/* la firma del processo trasformato: i due pesi dell'hero */
-.chap-claim {
-  margin-top: var(--s-6);
-  font: 300 clamp(22px, 2vw, 28px) / 1.1 var(--sans);
-  letter-spacing: -0.03em;
-  color: var(--mist);
-}
-.chap-claim strong {
-  font-weight: 900;
-  color: var(--lime);
-}
-.chap-big {
-  margin-top: var(--s-5);
-  font: 900 clamp(40px, 4.4vw, 66px) / 1 var(--sans);
-  letter-spacing: -0.04em;
-  text-wrap: balance;
-  color: var(--lime);
-}
-.chap-link {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--s-2);
-  min-height: 44px;
-  margin-top: var(--s-4);
-  font: var(--t-button);
-  color: var(--lime);
-  text-decoration: underline;
-  text-decoration-color: rgb(200 242 90 / 0.4);
-  text-underline-offset: 4px;
-  text-decoration-thickness: 1px;
-  transition: text-decoration-color var(--dur-ui) var(--ease);
-}
-@media (hover: hover) {
-  .chap-link:hover {
-    text-decoration-color: currentColor;
-  }
-  .chap-link:hover .arrow {
-    transform: translateX(3px);
-  }
-}
-.chap-fig {
-  display: none;
-}
-
-/* con il movimento: la scena resta ferma, i capitoli le scorrono accanto */
-.narr-live .narr-stage {
-  display: block;
-  position: sticky;
-  top: 0;
-  height: 100vh;
-  height: 100svh;
-  overflow: hidden;
-}
-/* a sinistra la scena sfuma nel Forest: ciò che passa dietro la colonna di testo non disturba la lettura */
-.narr-live .narr-stage::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: linear-gradient(90deg, var(--forest) 0, var(--forest) calc(max(0px, (100vw - var(--content)) / 2) + 300px), rgb(16 38 27 / 0) calc(max(0px, (100vw - var(--content)) / 2) + 620px));
-}
-.narr-live .narr-chaps {
-  position: relative;
-  margin-top: -100vh;
-  margin-top: -100svh;
-}
-.narr-live .chap {
-  min-height: 100vh;
-  min-height: 100svh;
-  padding-block: var(--s-9);
-}
-.narr-live .chap-body {
-  width: min(36vw, 450px);
-}
-.narr-live .chap:last-child {
-  min-height: 115svh;
-}
-/* telefono e tablet in verticale: schermo diviso. La scena resta ferma in alto, i testi scorrono sotto e le
-   passano dietro: la scena non viene mai coperta (stessa regola di src/narrative.ts) */
-@media (max-width: 759px), (max-aspect-ratio: 9/10) {
-  .narr-live .narr-stage {
-    z-index: 2;
-    height: 58vh;
-    height: 58svh;
-    background: var(--forest);
-  }
-  .narr-live .narr-stage::after {
-    background: linear-gradient(180deg, rgb(16 38 27 / 0) 86%, var(--forest) 100%);
-  }
-  .narr-live .narr-chaps {
-    z-index: 1;
-    margin-top: 0;
-  }
-  .narr-live .chap {
-    align-items: flex-start;
-    min-height: 80vh;
-    min-height: 80svh;
-    padding: var(--s-3) var(--pad-x) 0;
-  }
-  .narr-live .chap:last-child {
-    min-height: 60svh;
-  }
-  .narr-live .chap-body {
-    width: 100%;
-    max-width: 560px;
-    margin: 0 auto;
-  }
-  .narr-live .chap-title {
-    margin-top: var(--s-3);
-    font-size: clamp(26px, 7vw, 36px);
-  }
-  .narr-live .chap-text {
-    margin-top: var(--s-3);
-    font: var(--t-body);
-  }
-  .narr-live .chap-big {
-    margin-top: var(--s-3);
-    font-size: clamp(30px, 8.4vw, 44px);
-  }
-  .narr-live .chap-paths {
-    margin-top: var(--s-4);
-  }
-  .narr-live .chap-paths li {
-    padding: var(--s-3) 0;
-    font-size: 17px;
-  }
-  .narr-live .chap-claim {
-    margin-top: var(--s-3);
-    font-size: 20px;
-  }
-  .narr-live .chap-link {
-    margin-top: var(--s-2);
-  }
-}
-
-/* movimento ridotto: ogni capitolo con la sua immagine ferma accanto */
-.narr-still .chap {
-  display: grid;
-  grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
-  gap: var(--s-7);
-  max-width: calc(var(--content) + 2 * var(--pad-x));
-  margin: 0 auto;
-  padding-block: var(--s-8);
-  border-top: 1px solid var(--hair);
-}
-.narr-still .chap:first-child {
-  border-top: 0;
-}
-.narr-still .chap-body {
-  margin: 0;
-  width: auto;
-}
-.narr-still .chap-fig {
-  display: block;
-  aspect-ratio: 4 / 3;
-}
-.chap-fig svg {
-  display: block;
-  width: 100%;
-  height: 100%;
-}
-@media (max-width: 759px) {
-  .narr-still .chap {
-    grid-template-columns: minmax(0, 1fr);
-    gap: var(--s-5);
-  }
-  .narr-still .chap-fig {
-    order: -1;
-  }
-}
-
 /* ---------- Sezioni dopo il racconto ---------- */
 .sec {
   position: relative;
@@ -522,13 +282,11 @@ h3 {
   padding: clamp(88px, 13vh, 152px) var(--pad-x);
   scroll-margin-top: 0;
 }
-.sec--method,
-.sec--cases {
+.sec--method {
   padding-top: clamp(64px, 9vh, 112px);
 }
 /* filo sottile fra due sezioni scure, largo quanto il contenuto */
-.sec--method::before,
-.sec--cases::before {
+.sec--method::before {
   content: '';
   position: absolute;
   top: 0;
@@ -561,79 +319,6 @@ h3 {
   color: var(--sage);
 }
 
-/* Cosa realizziamo: una griglia di sei celle che condividono i fili, come una tavola tecnica */
-.caps {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  max-width: var(--content);
-  margin: 0 auto;
-  padding: 0;
-  list-style: none;
-  border-top: 1px solid var(--hair);
-  border-left: 1px solid var(--hair);
-}
-.cap {
-  padding: var(--s-5) var(--s-5) var(--s-6);
-  border-right: 1px solid var(--hair);
-  border-bottom: 1px solid var(--hair);
-  transition: background-color var(--dur-state) var(--ease);
-}
-@media (hover: hover) {
-  .cap:hover {
-    background: rgb(28 58 42 / 0.45);
-  }
-}
-.cap-fig {
-  aspect-ratio: 16 / 10;
-  margin: 0 calc(-1 * var(--s-2)) var(--s-4);
-}
-.cap-fig svg,
-.step-fig svg,
-.case-fig svg {
-  display: block;
-  width: 100%;
-  height: 100%;
-  will-change: transform; /* livello proprio: gli impulsi ridisegnano solo il frammento, non la scheda */
-}
-.cap-title {
-  font: var(--t-h3);
-  letter-spacing: -0.01em;
-  color: var(--mist);
-}
-.cap-text {
-  margin-top: var(--s-2);
-  font: var(--t-body);
-  font-size: 16px;
-  text-wrap: pretty;
-  color: var(--ink-body);
-}
-@media (max-width: 980px) {
-  .caps {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-@media (max-width: 640px) {
-  /* telefono: una colonna, il frammento largo e basso sopra il testo */
-  .caps {
-    grid-template-columns: minmax(0, 1fr);
-    border-left: 0;
-  }
-  .cap {
-    padding: var(--s-4) 0 var(--s-5);
-    border-right: 0;
-  }
-  .cap-fig {
-    aspect-ratio: 16 / 7;
-    margin: 0 0 var(--s-3);
-  }
-  .cap-title {
-    font-size: 19px;
-  }
-  .cap-text {
-    font-size: 16px;
-  }
-}
-
 /* Metodo: tre stati dello stesso stack */
 .steps {
   display: grid;
@@ -643,12 +328,6 @@ h3 {
   margin: 0 auto;
   padding: 0;
   list-style: none;
-}
-.step-fig {
-  aspect-ratio: 4 / 3;
-  border-radius: 14px;
-  background: radial-gradient(120% 90% at 50% 60%, rgb(28 58 42 / 0.55), rgb(28 58 42 / 0) 70%);
-  box-shadow: inset 0 0 0 1px var(--hair);
 }
 .step-num {
   margin-top: var(--s-5);
@@ -674,81 +353,6 @@ h3 {
   .steps {
     grid-template-columns: minmax(0, 1fr);
     gap: var(--s-7);
-  }
-  .step-fig {
-    aspect-ratio: 16 / 10;
-  }
-}
-
-/* Esempi: tre schede con la catena dei passaggi */
-.cases {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--s-4);
-  max-width: var(--content);
-  margin: 0 auto;
-}
-.case {
-  display: flex;
-  flex-direction: column;
-  padding: var(--s-4) var(--s-5) var(--s-5);
-  border-radius: 16px;
-  background: rgb(28 58 42 / 0.5);
-  box-shadow: inset 0 0 0 1px var(--hair);
-}
-.case-fig {
-  aspect-ratio: 16 / 10;
-  margin: 0 calc(-1 * var(--s-3)) var(--s-3);
-}
-.case-tag {
-  font: var(--t-label);
-  letter-spacing: var(--track-label);
-  text-transform: uppercase;
-  color: var(--lime);
-}
-.case-title {
-  margin-top: var(--s-3);
-  font: 700 22px / 1.2 var(--sans);
-  letter-spacing: -0.015em;
-  text-wrap: balance;
-  color: var(--mist);
-}
-.case-text {
-  margin-top: var(--s-3);
-  font: var(--t-body);
-  font-size: 16px;
-  text-wrap: pretty;
-  color: var(--ink-body);
-}
-.case-flow {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 6px;
-  margin-top: auto;
-  padding-top: var(--s-5);
-  font: var(--t-label);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--mist);
-}
-.flow-step {
-  padding: 6px 8px;
-  border-radius: 6px;
-  background: rgb(241 243 234 / 0.07);
-}
-.flow-step--out {
-  background: var(--lime);
-  color: var(--forest);
-}
-.flow-plus,
-.flow-arrow {
-  color: var(--sage);
-}
-@media (max-width: 980px) {
-  .cases {
-    grid-template-columns: minmax(0, 1fr);
-    max-width: 640px;
   }
 }
 
@@ -892,39 +496,129 @@ h3 {
   }
 }
 
-/* ---------- Il sistema in SVG (src/system) ---------- */
-.sys {
-  overflow: hidden; /* i frammenti restano nel loro riquadro (e non allargano la pagina su telefono) */
+/* ---------- Cosa facciamo: due linee di prodotto, subito sotto la hero ---------- */
+.sec--approach {
+  padding-top: clamp(72px, 10vh, 120px);
+  padding-bottom: clamp(80px, 11vh, 128px);
 }
-.sys-label {
-  font-family: var(--text);
-  font-weight: 600;
-  letter-spacing: 0.1em;
+.sec--approach .sec-title {
+  color: var(--forest);
 }
-.sys-text {
-  font-family: var(--text);
-  font-weight: 600;
-  letter-spacing: 0.18em;
+.lines {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--s-8) var(--s-7);
+  max-width: var(--content);
+  margin: 0 auto;
 }
-.sys-ui-text {
-  font-family: var(--sans);
+.line-col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 0;
+  padding-top: var(--s-5);
+  border-top: 1px solid var(--hair);
+}
+/* figura piatta e statica: dimensioni fisse (niente spostamento del layout), decorativa (alt vuoto) */
+.line-fig {
+  display: block;
+  width: 100%;
+  max-width: 560px;
+  height: auto;
+  margin: 0 0 var(--s-6);
+}
+.line-num {
+  font: var(--t-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.line-title {
+  margin-top: var(--s-3);
+  max-width: 18em;
+  font: 700 clamp(26px, 2.6vw, 34px) / 1.12 var(--sans);
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+  color: var(--forest);
+}
+.line-text {
+  margin-top: var(--s-4);
+  max-width: 34em;
+  font: var(--t-body);
+  text-wrap: pretty;
+  color: var(--forest);
+}
+.line-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+  margin: var(--s-5) 0 0;
+  padding: 0;
+  list-style: none;
+}
+.line-tags li {
+  padding: 6px 12px;
+  border-radius: 999px;
+  box-shadow: inset 0 0 0 1px var(--forest);
+  font: var(--t-label);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--forest);
+}
+.line-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  min-height: 44px;
+  margin-top: var(--s-5);
+  font: var(--t-button);
+  color: var(--forest);
+  text-decoration: underline;
+  text-decoration-color: rgb(16 38 27 / 0.45);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+  transition: text-decoration-color var(--dur-ui) var(--ease);
+}
+@media (hover: hover) {
+  .line-link:hover {
+    text-decoration-color: currentColor;
+  }
+  .line-link:hover .arrow {
+    transform: translateX(3px);
+  }
+}
+@media (max-width: 860px) {
+  .lines {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--s-7);
+  }
+}
+
+/* header: su Mist i testi sono Forest (sopra le fasce scure restano chiari, src/sections.ts) */
+.is-light-under .nav {
+  --nav-ink: var(--forest);
+}
+.is-light-under .logo-slot,
+.is-light-under .lang [aria-pressed='true'] {
+  color: var(--forest);
+}
+.is-light-under .lang,
+.is-light-under .lang [aria-pressed='false'] {
+  color: var(--moss-ink);
 }
 
 /* ---------- Ingresso dei blocchi (src/sections.ts) ---------- */
 .rv-on .rv {
-  transition: opacity 0.8s var(--ease), transform 0.8s var(--ease), background-color var(--dur-state) var(--ease);
+  transition: opacity 0.8s var(--ease), transform 0.8s var(--ease);
 }
 .rv-on .rv:not(.in) {
   opacity: 0;
   transform: translateY(18px);
 }
-.rv-on .cap:nth-child(3n + 2),
-.rv-on .step:nth-child(2),
-.rv-on .case:nth-child(2) {
-  transition-delay: 80ms;
+.rv-on .line-col:nth-child(2),
+.rv-on .step:nth-child(2) {
+  transition-delay: 90ms;
 }
-.rv-on .cap:nth-child(3n),
-.rv-on .step:nth-child(3),
-.rv-on .case:nth-child(3) {
-  transition-delay: 160ms;
+.rv-on .step:nth-child(3) {
+  transition-delay: 180ms;
 }

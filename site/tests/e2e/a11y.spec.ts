@@ -32,11 +32,11 @@ test('tastiera: ordine di tabulazione logico e focus sempre visibile', async ({ 
   // la scelta della strada, il modulo, il consenso con il link all'informativa, il footer
   const expected = [
     'a./',
-    ...(mobile ? ['button.nav-toggle'] : ['a#approach', 'a#build', 'a#cases', 'a#contact']),
+    ...(mobile ? ['button.nav-toggle'] : ['a#cosa-facciamo', 'a#metodo', 'a#contact']),
     'lang-it',
     'lang-en',
     'a#contact',
-    'a#approach',
+    'a#cosa-facciamo',
     'a#contact',
     'a#contact',
     'input-interest',
@@ -89,7 +89,7 @@ test('telefono: ogni comando ha un’area di tocco di almeno 44 px in altezza e 
   await page.waitForFunction(() => window.__DEPLOIABLE__?.ready === true);
   await page.waitForTimeout(2500);
   // i link dentro una frase (consenso) hanno la riga come area: restano fuori, come vuole WCAG 2.5.8
-  const sel = ['.logo-slot', '.nav-toggle', '.lang button', '.hero-ctas .btn', '.chap-link', '.path', '#signup-email', '#signup-company', '.signup button[type=submit]', '.foot-link'];
+  const sel = ['.logo-slot', '.nav-toggle', '.lang button', '.hero-ctas .btn', '.line-link', '.path', '#signup-email', '#signup-company', '.signup button[type=submit]', '.foot-link'];
   for (const s of sel) {
     for (const el of await page.locator(s).all()) {
       await el.scrollIntoViewIfNeeded();
@@ -116,7 +116,7 @@ test('tipografia: ogni testo piccolo usa una misura della scala (12, 13, 14, 16,
       const scale = [12, 13, 14, 16, 17];
       // titoli e frasi grandi hanno misure fluide (clamp) e stanno fuori da questo controllo
       const big =
-        '.claim, .claim *, .sub, h2, h3, .chap-text, .chap-paths, .chap-claim, .chap-claim *, .chap-big, .sec-lead, .contact-lead, .path-title, .nav-open .nav-list, .doc-body h1, .doc-lead, .doc-body h2';
+        '.claim, .claim *, .sub, h2, h3, .line-title, .sec-lead, .contact-lead, .path-title, .nav-open .nav-list, .doc-body h1, .doc-lead, .doc-body h2';
       const out: string[] = [];
       for (const el of document.querySelectorAll<HTMLElement>('body *')) {
         if (el.closest(big) || el.closest('script, style, svg, noscript')) continue;

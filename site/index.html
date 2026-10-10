@@ -37,9 +37,8 @@
       <nav class="nav" aria-label="Navigazione principale" data-i18n-attr="aria-label:nav.label">
         <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-list"><span data-i18n="nav.menu">Menu</span><i class="nav-toggle-icon" aria-hidden="true"></i></button>
         <ul class="nav-list" id="nav-list">
-          <li><a href="#approach" data-i18n="nav.approach">Approccio</a></li>
-          <li><a href="#build" data-i18n="nav.build">Cosa realizziamo</a></li>
-          <li><a href="#cases" data-i18n="nav.cases">Esempi</a></li>
+          <li><a href="#cosa-facciamo" data-i18n="nav.approach">Approccio</a></li>
+          <li><a href="#metodo" data-i18n="nav.method">Come lavoriamo</a></li>
           <li><a class="nav-cta" href="#contact" data-i18n="nav.contact">Contatti</a></li>
         </ul>
       </nav>
@@ -57,11 +56,11 @@
           <span class="mask"><span class="line line--light" data-i18n="claim.1">Dai problemi di business</span></span>
           <span class="mask"><span class="line line--black" data-i18n="claim.2">all’AI in produzione.</span></span>
         </h1>
-        <p class="sub" data-i18n="sub">Ripensiamo i processi aziendali e sviluppiamo prodotti AI-⁠native su misura. Dall’analisi alla messa in produzione, integrati nei sistemi che la tua azienda usa già.</p>
+        <p class="sub" data-i18n="sub">Ripensiamo i processi aziendali e costruiamo prodotti AI-native: su misura per le aziende, di nicchia per il mercato. Dall’analisi alla messa in produzione, integrati nei sistemi che la tua azienda usa già.</p>
         <div class="outro">
           <div class="hero-ctas">
             <a class="btn btn--solid" href="#contact"><span class="btn-in"><span data-i18n="cta.primary">Costruiamo ciò che serve</span><svg class="arrow" viewBox="0 0 12 12" aria-hidden="true"><path d="M1 6h9M6.5 2.5 10 6l-3.5 3.5" /></svg></span></a>
-            <a class="btn btn--line" href="#approach"><span class="btn-in"><span data-i18n="cta.secondary">Scopri il nostro approccio</span><svg class="arrow arrow--down" viewBox="0 0 12 12" aria-hidden="true"><path d="M6 1v9M2.5 6.5 6 10l3.5-3.5" /></svg></span></a>
+            <a class="btn btn--line" href="#cosa-facciamo"><span class="btn-in"><span data-i18n="cta.secondary">Scopri il nostro approccio</span><svg class="arrow arrow--down" viewBox="0 0 12 12" aria-hidden="true"><path d="M6 1v9M2.5 6.5 6 10l3.5-3.5" /></svg></span></a>
           </div>
         </div>
         <!-- Prova sociale: loghi dei clienti in scorrimento continuo, monocromi nel verde del brand (il file fa da
@@ -88,134 +87,54 @@
         </div>
       </section>
 
-      <!-- Il racconto: un solo sistema che si divide, si trasforma, si assembla, converge e si collega.
-           La scena (src/system/journey.ts) resta ferma mentre i capitoli scorrono; con il movimento ridotto ogni
-           capitolo ha la sua immagine ferma (.chap-fig). -->
-      <section class="narr" id="approach" data-surface="dark" aria-labelledby="n0-title">
-        <div class="narr-stage" aria-hidden="true"><div class="narr-ground"></div><svg class="narr-svg"></svg></div>
-        <div class="narr-chaps">
-          <article class="chap">
-            <div class="chap-body">
-              <p class="kicker" data-i18n="n0.k">Il nostro approccio</p>
-              <h2 class="chap-title" id="n0-title" data-i18n="n0.t">Tutto parte da un problema di business.</h2>
-              <p class="chap-text" data-i18n="n0.s">Non partiamo da uno strumento AI. Partiamo da come lavorano le persone, i dati e i sistemi della tua azienda, e da ciò che serve davvero.</p>
-            </div>
-            <div class="chap-fig" aria-hidden="true"></div>
-          </article>
-          <article class="chap">
-            <div class="chap-body">
-              <p class="kicker" data-i18n="n1.k">Due strade</p>
-              <h2 class="chap-title" data-i18n="n1.t">Due modi per creare valore.</h2>
-              <p class="chap-text" data-i18n="n1.s">A volte la risposta è trasformare il modo in cui lavori oggi. A volte è costruire un prodotto che ancora non esiste. Ti aiutiamo a capire quale strada serve.</p>
-              <ul class="chap-paths">
-                <li><span class="chap-path-num">01</span><span>AI Transformation</span></li>
-                <li><span class="chap-path-num">02</span><span>AI-⁠native Product Studio</span></li>
-              </ul>
-            </div>
-            <div class="chap-fig" aria-hidden="true"></div>
-          </article>
-          <article class="chap">
-            <div class="chap-body">
-              <p class="kicker"><span class="kicker-num">01</span> AI Transformation</p>
-              <h2 class="chap-title" data-i18n="n2.t">Trasformiamo i processi esistenti.</h2>
-              <p class="chap-text" data-i18n="n2.s">Individuiamo i processi inefficienti, li riprogettiamo con AI e automazione e li integriamo nei sistemi che la tua azienda utilizza già.</p>
-              <p class="chap-claim" lang="en"><span>Stop doing </span><strong>what AI can do.</strong></p>
-              <a class="chap-link" href="#contact" data-interest="transform"><span data-i18n="n2.link">Parliamo di un tuo processo</span><svg class="arrow" viewBox="0 0 12 12" aria-hidden="true"><path d="M1 6h9M6.5 2.5 10 6l-3.5 3.5" /></svg></a>
-            </div>
-            <div class="chap-fig" aria-hidden="true"></div>
-          </article>
-          <article class="chap">
-            <div class="chap-body">
-              <p class="kicker"><span class="kicker-num">02</span> AI-⁠native Product Studio</p>
-              <h2 class="chap-title" data-i18n="n3.t">Costruiamo ciò che ancora non esiste.</h2>
-              <p class="chap-text" data-i18n="n3.s">Quando i software esistenti non bastano, progettiamo e sviluppiamo applicazioni AI-⁠native, strumenti interni e piattaforme su misura per i bisogni, i dati e le persone della tua azienda.</p>
-              <a class="chap-link" href="#contact" data-interest="build"><span data-i18n="n3.link">Parliamo di un tuo prodotto</span><svg class="arrow" viewBox="0 0 12 12" aria-hidden="true"><path d="M1 6h9M6.5 2.5 10 6l-3.5 3.5" /></svg></a>
-            </div>
-            <div class="chap-fig" aria-hidden="true"></div>
-          </article>
-          <article class="chap">
-            <div class="chap-body">
-              <p class="kicker" data-i18n="n4.k">In produzione</p>
-              <h2 class="chap-title" data-i18n="n4.t">Sfide diverse. Un unico risultato.</h2>
-              <p class="chap-big" data-i18n="n4.big">AI pronta per il mondo reale.</p>
-              <p class="chap-text" data-i18n="n4.s">Non solo prototipi. Progettiamo soluzioni AI per operare con utenti reali, dati aziendali e infrastrutture esistenti.</p>
-            </div>
-            <div class="chap-fig" aria-hidden="true"></div>
-          </article>
-          <article class="chap">
-            <div class="chap-body">
-              <p class="kicker" data-i18n="n5.k">Integrazione</p>
-              <h2 class="chap-title" data-i18n="n5.t">Integrata nel modo in cui la tua azienda lavora.</h2>
-              <p class="chap-text" data-i18n="n5.s">L’AI non richiede sempre un nuovo strumento. Integriamo le soluzioni nei software che i tuoi team usano già, oppure sviluppiamo un’applicazione dedicata quando il problema lo richiede.</p>
-            </div>
-            <div class="chap-fig" aria-hidden="true"></div>
-          </article>
-        </div>
-      </section>
-
-      <!-- Cosa realizziamo: sei forme concrete, ognuna con un frammento dello stesso sistema (src/system/minis.ts) -->
-      <section class="sec sec--build" id="build" data-surface="dark" aria-labelledby="build-title">
+      <!-- Cosa facciamo: le due linee di prodotto, subito sotto la hero. Le figure sono immagini statiche
+           (public/assets/mockups), decorative: il significato è nel testo. -->
+      <section class="sec sec--approach" id="cosa-facciamo" data-surface="light" aria-labelledby="approach-title">
         <div class="sec-head">
-          <p class="kicker" data-i18n="build.k">Cosa realizziamo</p>
-          <h2 class="sec-title" id="build-title" data-i18n="build.t">Cosa realizziamo, concretamente.</h2>
-          <p class="sec-lead" data-i18n="build.s">Dalla singola automazione al prodotto completo: scegliamo la forma giusta per il problema, poi la costruiamo e la mettiamo in produzione.</p>
+          <p class="kicker" data-i18n="approach.k">Cosa facciamo</p>
+          <h2 class="sec-title" id="approach-title" data-i18n="approach.t">Un product lab, due linee di prodotto.</h2>
         </div>
-        <ul class="caps">
-          <li class="cap"><div class="cap-fig" data-mini="workflows" aria-hidden="true"></div><h3 class="cap-title" data-i18n="cap.1.t">AI Workflow</h3><p class="cap-text" data-i18n="cap.1.s">Automatizzano attività operative ripetitive e coordinano i sistemi esistenti.</p></li>
-          <li class="cap"><div class="cap-fig" data-mini="agents" aria-hidden="true"></div><h3 class="cap-title" data-i18n="cap.2.t">Agenti AI</h3><p class="cap-text" data-i18n="cap.2.s">Sistemi che svolgono compiti definiti usando dati, strumenti e decisioni controllate.</p></li>
-          <li class="cap"><div class="cap-fig" data-mini="tools" aria-hidden="true"></div><h3 class="cap-title" data-i18n="cap.3.t">Strumenti AI interni</h3><p class="cap-text" data-i18n="cap.3.s">Applicazioni costruite su misura per supportare i team aziendali.</p></li>
-          <li class="cap"><div class="cap-fig" data-mini="products" aria-hidden="true"></div><h3 class="cap-title" data-i18n="cap.4.t">Prodotti AI-⁠native</h3><p class="cap-text" data-i18n="cap.4.s">Prodotti software su misura, con l’AI al centro delle loro funzionalità.</p></li>
-          <li class="cap"><div class="cap-fig" data-mini="interfaces" aria-hidden="true"></div><h3 class="cap-title" data-i18n="cap.5.t">Interfacce AI</h3><p class="cap-text" data-i18n="cap.5.s">Copilot, add-in e interfacce dedicate, collegati ai software che già usi.</p></li>
-          <li class="cap"><div class="cap-fig" data-mini="systems" aria-hidden="true"></div><h3 class="cap-title" data-i18n="cap.6.t">Sistemi AI e integrazioni</h3><p class="cap-text" data-i18n="cap.6.s">Il software, le connessioni ai dati e i componenti operativi che servono a far funzionare le soluzioni AI.</p></li>
-        </ul>
+        <div class="lines">
+          <article class="line-col">
+            <img class="line-fig" src="assets/mockups/processi.svg" width="560" height="360" alt="" aria-hidden="true" />
+            <p class="line-num" data-i18n="line.1.k">01 · Per i processi delle aziende</p>
+            <h3 class="line-title" data-i18n="line.1.t">Soluzioni AI integrate nei processi del cliente.</h3>
+            <p class="line-text" data-i18n="line.1.s">Individuiamo i processi in cui l’AI incide su costi, tempi o ricavi e la portiamo in produzione, dentro l’operatività del cliente, con un modello legato al risultato. Se le automazioni non bastano, creiamo un prodotto su misura e lo consegniamo chiavi in mano.</p>
+            <ul class="line-tags">
+              <li data-i18n="line.1.tag.1">Workflow AI</li>
+              <li data-i18n="line.1.tag.2">Agenti AI</li>
+              <li data-i18n="line.1.tag.3">Prodotto su misura</li>
+            </ul>
+            <a class="line-link" href="#contact" data-interest="transform"><span data-i18n="line.1.link">Parliamo di un tuo processo</span><svg class="arrow" viewBox="0 0 12 12" aria-hidden="true"><path d="M1 6h9M6.5 2.5 10 6l-3.5 3.5" /></svg></a>
+          </article>
+          <article class="line-col">
+            <img class="line-fig" src="assets/mockups/prodotto.svg" width="560" height="360" alt="" aria-hidden="true" />
+            <p class="line-num" data-i18n="line.2.k">02 · Product Studio</p>
+            <h3 class="line-title" data-i18n="line.2.t">Prodotti di nicchia per acquirenti strategici.</h3>
+            <p class="line-text" data-i18n="line.2.s">Troviamo la nicchia, costruiamo il prodotto AI-⁠native e lo portiamo sul mercato. L’azienda lo acquista quando funziona e ha già clienti, senza avviare un progetto interno. Lo vendiamo a imprese che vogliono innovare per ampliare o integrare il proprio business.</p>
+            <ul class="line-tags">
+              <li data-i18n="line.2.tag.1">Prodotti AI-⁠native</li>
+              <li data-i18n="line.2.tag.2">Lancio sul mercato</li>
+              <li data-i18n="line.2.tag.3">Vendita a imprese</li>
+            </ul>
+            <a class="line-link" href="#contact" data-interest="build"><span data-i18n="line.2.link">Parliamo di un tuo prodotto</span><svg class="arrow" viewBox="0 0 12 12" aria-hidden="true"><path d="M1 6h9M6.5 2.5 10 6l-3.5 3.5" /></svg></a>
+          </article>
+        </div>
       </section>
 
-      <!-- Metodo: lo stesso stack in tre stati (da disegnare, in costruzione, in produzione) -->
-      <section class="sec sec--method" id="method" data-surface="dark" aria-labelledby="method-title">
+      <!-- Come lavoriamo: tre passi. Versione compatta, senza figure (step 4 del piano). -->
+      <section class="sec sec--method" id="metodo" data-surface="dark" aria-labelledby="method-title">
         <div class="sec-head">
           <p class="kicker" data-i18n="method.k">Come lavoriamo</p>
           <h2 class="sec-title" id="method-title" data-i18n="method.t">Comprendiamo. Costruiamo. Mettiamo in produzione.</h2>
         </div>
         <ol class="steps">
-          <li class="step"><div class="step-fig" data-mini="understand" aria-hidden="true"></div><p class="step-num">01</p><h3 class="step-title" data-i18n="step.1.t">Comprendiamo</h3><p class="step-text" data-i18n="step.1.s">Analizziamo processi, utenti, dati, sistemi e opportunità.</p></li>
-          <li class="step"><div class="step-fig" data-mini="construct" aria-hidden="true"></div><p class="step-num">02</p><h3 class="step-title" data-i18n="step.2.t">Costruiamo</h3><p class="step-text" data-i18n="step.2.s">Progettiamo e sviluppiamo la soluzione più adatta: workflow, agente, applicazione o prodotto AI-⁠native.</p></li>
-          <li class="step"><div class="step-fig" data-mini="deploy" aria-hidden="true"></div><p class="step-num">03</p><h3 class="step-title" data-i18n="step.3.t">Mettiamo in produzione</h3><p class="step-text" data-i18n="step.3.s">Integriamo, testiamo, rilasciamo, monitoriamo e miglioriamo nel tempo.</p></li>
+          <li class="step"><p class="step-num">01</p><h3 class="step-title" data-i18n="step.1.t">Comprendiamo</h3><p class="step-text" data-i18n="step.1.s">Analizziamo processi, utenti, dati, sistemi e opportunità.</p></li>
+          <li class="step"><p class="step-num">02</p><h3 class="step-title" data-i18n="step.2.t">Costruiamo</h3><p class="step-text" data-i18n="step.2.s">Progettiamo e sviluppiamo la soluzione più adatta: workflow, agente, applicazione o prodotto AI-⁠native.</p></li>
+          <li class="step"><p class="step-num">03</p><h3 class="step-title" data-i18n="step.3.t">Mettiamo in produzione</h3><p class="step-text" data-i18n="step.3.s">Integriamo, testiamo, rilasciamo, monitoriamo e miglioriamo nel tempo.</p></li>
         </ol>
       </section>
-
-      <!-- Esempi: scenari illustrativi, dichiarati come tali (nessun cliente, risultato o numero inventato) -->
-      <section class="sec sec--cases" id="cases" data-surface="dark" aria-labelledby="cases-title">
-        <div class="sec-head">
-          <p class="kicker" data-i18n="cases.k">Esempi</p>
-          <h2 class="sec-title" id="cases-title" data-i18n="cases.t">Dall’opportunità a un sistema che funziona.</h2>
-          <p class="sec-note" data-i18n="cases.note">Scenari di esempio, non casi cliente.</p>
-        </div>
-        <div class="cases">
-          <article class="case">
-            <div class="case-fig" data-mini="finance" aria-hidden="true"></div>
-            <p class="case-tag"><span data-i18n="cases.example">Esempio</span> 01 · Finance</p>
-            <h3 class="case-title" data-i18n="case.1.t">Reporting direzionale</h3>
-            <p class="case-text" data-i18n="case.1.s">Colleghiamo i dati aziendali, calcoliamo i KPI, generiamo l’analisi e prepariamo le presentazioni per il management.</p>
-            <p class="case-flow" data-flow data-i18n="case.1.f">ERP + CRM + dati finance → analisi → presentazione</p>
-          </article>
-          <article class="case">
-            <div class="case-fig" data-mini="operations" aria-hidden="true"></div>
-            <p class="case-tag"><span data-i18n="cases.example">Esempio</span> 02 · Operations</p>
-            <h3 class="case-title" data-i18n="case.2.t">Pianificazione intelligente dei turni</h3>
-            <p class="case-text" data-i18n="case.2.s">Combiniamo regole operative, disponibilità del personale ed esigenze di business per proporre turni ottimizzati, che il manager approva.</p>
-            <p class="case-flow" data-flow data-i18n="case.2.f">persone + vincoli + disponibilità → sistema AI → approvazione del manager</p>
-          </article>
-          <article class="case">
-            <div class="case-fig" data-mini="studio" aria-hidden="true"></div>
-            <p class="case-tag"><span data-i18n="cases.example">Esempio</span> 03 · Product Studio</p>
-            <h3 class="case-title" data-i18n="case.3.t">Applicazione AI su misura</h3>
-            <p class="case-text" data-i18n="case.3.s">Trasformiamo un bisogno specifico in un’applicazione AI-⁠native, con logica, interfaccia e integrazioni dedicate, fino alla messa in produzione.</p>
-            <p class="case-flow" data-flow data-i18n="case.3.f">bisogno di business → design del prodotto → applicazione AI → messa in produzione</p>
-          </article>
-        </div>
-      </section>
-
-      <!-- Contatto: due strade, un modulo. La strada scelta arriva con la richiesta (campo interest). -->
+          <!-- Contatto: due strade, un modulo. La strada scelta arriva con la richiesta (campo interest). -->
       <section class="sec sec--contact" id="contact" data-surface="lime" aria-labelledby="contact-title">
         <div class="contact">
           <div class="contact-head">
