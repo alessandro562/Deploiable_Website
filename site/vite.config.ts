@@ -13,10 +13,14 @@ function brandHtml(): Plugin {
         `<svg class="${cls}" viewBox="${brand.logo.viewBox}" role="img" aria-label="${title}" fill="currentColor">` +
         `<g class="logo-symbol">${bars(brand.logo.bars)}</g>` +
         `<path class="logo-lettering" transform="${brand.logo.lettering.transform}" d="${brand.logo.lettering.d}"/></svg>`;
+      const wordmark = (cls: string) =>
+        `<svg class="${cls}" viewBox="${brand.logo.viewBox}" aria-hidden="true" fill="currentColor">` +
+        `<path class="logo-lettering" transform="${brand.logo.lettering.transform}" d="${brand.logo.lettering.d}"/></svg>`;
       const symbol = (cls: string) =>
         `<svg class="${cls}" viewBox="${brand.symbol.viewBox}" aria-hidden="true" fill="currentColor">${bars(brand.symbol.bars)}</svg>`;
       return html
         .replace(/<!--\s*logo:(\w[\w-]*)\s*-->/g, (_, cls) => logo(cls, 'Deploiable'))
+        .replace(/<!--\s*wordmark:(\w[\w-]*)\s*-->/g, (_, cls) => wordmark(cls))
         .replace(/<!--\s*symbol:(\w[\w-]*)\s*-->/g, (_, cls) => symbol(cls));
     },
   };

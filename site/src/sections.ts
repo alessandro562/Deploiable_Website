@@ -145,6 +145,29 @@ function reveals(reduced: boolean) {
   });
 }
 
+/** La scritta del marchio nelle card: il logo intero ha il simbolo accanto, qui si ritaglia il solo lettering sul suo
+ *  contenuto reale (la posizione del percorso è nel sistema di coordinate del logo). */
+function cropWordmarks() {
+  document.querySelectorAll<SVGSVGElement>('.dcard-brand').forEach((svg) => {
+    const path = svg.querySelector<SVGGraphicsElement>('.logo-lettering');
+    if (!path) return;
+    const bb = path.getBBox();
+    const t = path.transform.baseVal.consolidate()?.matrix;
+    const m = t ? new DOMMatrix([t.a, t.b, t.c, t.d, t.e, t.f]) : new DOMMatrix();
+    const corners = [
+      [bb.x, bb.y],
+      [bb.x + bb.width, bb.y],
+      [bb.x, bb.y + bb.height],
+      [bb.x + bb.width, bb.y + bb.height],
+    ].map(([x, y]) => new DOMPoint(x, y).matrixTransform(m));
+    const x0 = Math.min(...corners.map((c) => c.x));
+    const y0 = Math.min(...corners.map((c) => c.y));
+    const x1 = Math.max(...corners.map((c) => c.x));
+    const y1 = Math.max(...corners.map((c) => c.y));
+    svg.setAttribute('viewBox', `${x0} ${y0} ${x1 - x0} ${y1 - y0}`);
+  });
+}
+
 /** "Cosa facciamo": due mazzi di card, uno per modello, che girano in loop. La card in cima si trascina via, si clicca
  *  o si cambia con le frecce da tastiera: torna in fondo al mazzo, che non si svuota mai. Con il mouse la card in
  *  primo piano si inclina seguendo il puntatore. I link dentro le card restano link. Senza JavaScript le card restano
@@ -153,6 +176,7 @@ function decks(reduced: boolean) {
   const root = document.querySelector<HTMLElement>('[data-decks]');
   if (!root) return;
   root.classList.add('is-live');
+  cropWordmarks();
   const VISIBLE = 3; // quante card si vedono impilate
   const canTilt = !reduced && matchMedia('(hover: hover) and (pointer: fine)').matches;
   type Deck = { el: HTMLElement; order: HTMLElement[] };

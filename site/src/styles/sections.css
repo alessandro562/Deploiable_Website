@@ -1308,11 +1308,11 @@ h3 {
   }
 }
 
-/* ---------- Cosa facciamo: due mazzi di card che girano in loop; titolo, spiegazione e tre fasi per modello ---------- */
+/* ---------- Cosa facciamo: due mazzi di card che girano in loop; sfondo uniforme per colore ---------- */
 .sec--approach {
   overflow: hidden;
 }
-/* il logo sfumato sul fondo, grande, fuori dal flusso: solo una traccia, non un elemento da leggere */
+/* il logo sfumato sul fondo: solo una traccia, non un elemento da leggere */
 .approach-mark {
   position: absolute;
   right: -12%;
@@ -1341,7 +1341,7 @@ h3 {
   margin-top: clamp(40px, 6vw, 72px);
   margin-bottom: 48px;
 }
-/* altezza della pila; sotto, una riga con il pulsante e i puntini */
+/* altezza della pila */
 .decks.is-live {
   --stack: clamp(500px, 48vw, 560px);
 }
@@ -1353,7 +1353,7 @@ h3 {
   height: var(--stack);
   border-radius: 28px;
 }
-/* il mazzo si sceglie con la tastiera: contorno chiaro, senza altri segnali */
+/* il mazzo si sceglie con la tastiera: contorno chiaro, nessun altro segnale */
 .deck:focus-visible {
   outline: 2px solid var(--forest);
   outline-offset: 10px;
@@ -1365,14 +1365,13 @@ h3 {
   justify-content: space-between;
   gap: var(--s-5);
   min-height: 340px;
-  padding: clamp(28px, 3vw, 44px);
+  padding: clamp(26px, 2.8vw, 40px);
   border-radius: 28px;
   overflow: hidden;
   isolation: isolate;
   box-shadow:
     0 44px 64px -32px rgb(16 38 27 / 0.5),
-    0 2px 6px rgb(16 38 27 / 0.08),
-    inset 0 1px 0 rgb(255 255 255 / 0.28);
+    0 2px 6px rgb(16 38 27 / 0.08);
   transform: translate3d(calc(var(--sx, 0px) + var(--x, 0px)), var(--sy, 0px), 0)
     rotateX(var(--tx, 0deg)) rotateY(var(--ty, 0deg)) rotate(var(--r, 0deg)) scale(var(--s, 1));
   transition:
@@ -1384,21 +1383,13 @@ h3 {
   user-select: none;
   -webkit-user-select: none;
 }
-/* luce dall'alto a destra: la card ha un volume, non è una scheda piatta */
-.dcard::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background: radial-gradient(70% 60% at 100% 0%, rgb(255 255 255 / 0.22), transparent 62%);
-  pointer-events: none;
-}
+/* sfondo uniforme: tutte le card gialle hanno lo stesso colore, tutte le verdi lo stesso */
 .dcard--lime {
-  background: linear-gradient(158deg, #dcf98a 0%, var(--lime) 50%, #b2e23f 100%);
+  background: var(--lime);
   color: var(--forest);
 }
 .dcard--forest {
-  background: linear-gradient(158deg, #25503a 0%, var(--forest) 68%);
+  background: var(--forest);
   color: var(--mist);
 }
 .dcard.is-drag {
@@ -1411,8 +1402,7 @@ h3 {
   transition: transform 0.35s var(--ease), box-shadow 0.35s var(--ease);
   box-shadow:
     0 56px 70px -34px rgb(16 38 27 / 0.55),
-    0 2px 6px rgb(16 38 27 / 0.08),
-    inset 0 1px 0 rgb(255 255 255 / 0.3);
+    0 2px 6px rgb(16 38 27 / 0.08);
 }
 .decks.is-live .dcard {
   position: absolute;
@@ -1425,20 +1415,43 @@ h3 {
 .decks.is-live .dcard.is-hidden {
   opacity: 0;
 }
-.dcard-k {
+/* il simbolo Deploiable come sfondo: una traccia sola, in basso a destra, quasi invisibile */
+.dcard-mark {
+  position: absolute;
+  right: -7%;
+  bottom: -9%;
+  z-index: -1;
+  width: 64%;
+  height: auto;
+  color: currentColor;
+  opacity: 0.06;
+  pointer-events: none;
+}
+/* in alto: la scritta del marchio a sinistra, l'etichetta del passo a destra */
+.dcard-top {
   display: flex;
   align-items: center;
-  gap: 10px;
-  font: 500 12px / 1 var(--text);
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  opacity: 0.8;
+  justify-content: space-between;
+  gap: var(--s-4);
 }
-.dcard-k::before {
-  content: '';
-  width: 6px;
-  height: 6px;
-  background: currentColor;
+.dcard-brand {
+  display: block;
+  flex: none;
+  width: auto;
+  height: 16px;
+  color: currentColor;
+}
+.dcard-k {
+  font: 500 12px / 1 var(--text);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-align: right;
+  opacity: 0.75;
+}
+.dcard-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-4);
 }
 /* titoli grandi: il nome del modello e il nome del passo sono il primo livello di lettura */
 .dcard-t {
@@ -1470,19 +1483,6 @@ h3 {
   letter-spacing: 0.14em;
   text-transform: uppercase;
   opacity: 0.65;
-}
-/* numero della fase in trasparenza, dietro al testo */
-.dcard--phase::after {
-  content: attr(data-n);
-  position: absolute;
-  right: -0.06em;
-  bottom: -0.2em;
-  z-index: -1;
-  font: 700 clamp(180px, 22vw, 320px) / 1 var(--sans);
-  letter-spacing: -0.07em;
-  color: currentColor;
-  opacity: 0.07;
-  pointer-events: none;
 }
 .dcard-hint {
   display: inline-flex;
@@ -1535,6 +1535,9 @@ h3 {
   }
   .dcard-t--step {
     font-size: clamp(36px, 10vw, 52px);
+  }
+  .dcard-mark {
+    width: 72%;
   }
   .approach-mark {
     width: 110vw;
