@@ -394,8 +394,8 @@ test('hero: il blocco dei testi è centrato in altezza (centro ottico appena sop
   await openFilm(page, '', 'high');
   await seek(page, END);
   const top = (await page.locator('.claim').boundingBox())!.y;
-  const proof = (await page.locator('.proof').boundingBox())!;
-  const bottom = proof.y + proof.height;
+  const outro = (await page.locator('.outro').boundingBox())!;
+  const bottom = outro.y + outro.height;
   const h = page.viewportSize()!.height;
   // su telefono i testi sono più alti dello schermo: conta l'aria fra l'header e la frase, non il centro
   if (page.viewportSize()!.width <= 640) {
@@ -466,30 +466,6 @@ test('header fisso: in cima trasparente col logo 3D, scorrendo barra di vetro co
   expect(await svgOpacity()).toBe('0');
 });
 
-test('prova sociale: riga di credibilità e loghi dei clienti in loop sotto i pulsanti', async ({ page }) => {
-  const logoResponses: number[] = [];
-  page.on('response', (r) => r.url().includes('/assets/clients/') && logoResponses.push(r.status()));
-  await openFilm(page, '', 'high');
-  await seek(page, END);
-  await expect(page.locator('.proof-line')).toHaveText('70+ clienti dal 2021');
-  // quattro loghi con il loro nome (la seconda copia della traccia è nascosta ai lettori di schermo)
-  const named = page.getByRole('img', { name: /Comtel|Braga Moro|Marchiani|Junker/ });
-  await expect(named).toHaveCount(4);
-  await expect(page.locator('.clients')).not.toContainText('[CLIENTE_');
-  await expect(page.locator('.clients')).not.toContainText(/green ?stone/i);
-  const form = (await page.locator('.hero-ctas').boundingBox())!;
-  const proof = (await page.locator('.proof').boundingBox())!;
-  expect(proof.y).toBeGreaterThan(form.y + form.height);
-  // la traccia scorre
-  const x = () => page.locator('.clients-track').first().evaluate((el) => el.getBoundingClientRect().x);
-  const x0 = await x();
-  await page.waitForTimeout(600);
-  expect(Math.abs((await x()) - x0)).toBeGreaterThan(5);
-  expect(logoResponses.length).toBeGreaterThan(0);
-  expect(logoResponses.every((s) => s === 200)).toBe(true);
-  await page.click('[data-lang="en"]');
-  await expect(page.locator('.proof-line')).toHaveText('70+ clients since 2021');
-});
 
 test('macchina da scrivere: la seconda riga si cancella e si riscrive in ciclo, senza spostarsi, in tutte e due le lingue', async ({ page }) => {
   await openFilm(page, '', 'high');

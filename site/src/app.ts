@@ -34,8 +34,8 @@ export async function start(caps: Capabilities) {
   const claim = Array.from(document.querySelectorAll<HTMLElement>('.claim .line'));
   const sweep = document.querySelector<HTMLElement>('.sweep')!;
   const outro = document.querySelector<HTMLElement>('.outro')!;
-  // sottotitolo, etichetta, pulsanti, prova sociale e navigazione entrano uno dopo l'altro
-  const outroItems = [['.sub'], ['.soon'], ['.hero-ctas'], ['.proof']].map((sel) => sel.map((q) => document.querySelector<HTMLElement>(q)!));
+  // sottotitolo, etichetta, pulsanti e navigazione entrano uno dopo l'altro
+  const outroItems = [['.sub'], ['.soon'], ['.hero-ctas']].map((sel) => sel.map((q) => document.querySelector<HTMLElement>(q)!));
   const navEl = document.querySelector<HTMLElement>('.nav')!;
   const heroEl = document.querySelector<HTMLElement>('.hero')!;
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches || new URLSearchParams(location.search).get('motion') === 'reduced';

@@ -704,95 +704,6 @@ p {
   to { stroke-dashoffset: 0; }
 }
 
-/* ---------- Prova sociale: una riga e cinque loghi, sotto il modulo ---------- */
-.proof {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--s-4);
-  width: min(100%, 720px);
-  margin-top: calc(var(--gap) * 0.5);
-  opacity: 0; /* entra per ultima, con il blocco iscrizione (src/app.ts) */
-}
-.proof-num {
-  /* il numero è la prova: il peso più forte di Geist, nel verde del testo principale */
-  font-weight: 700;
-  color: var(--ink-strong);
-}
-.proof-line {
-  font: var(--t-small);
-  text-align: center;
-  color: var(--ink-soft);
-}
-.clients {
-  /* le due copie della traccia scorrono insieme: quando la prima è uscita, la seconda è esattamente al suo posto */
-  display: flex;
-  width: min(100%, 680px);
-  overflow: hidden;
-  /* dissolvenza ai due lati */
-  mask-image: linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent);
-}
-.clients-track {
-  display: flex;
-  flex: none;
-  align-items: center;
-  gap: var(--s-8);
-  margin: 0;
-  padding: 0 var(--s-6);
-  list-style: none;
-  animation: clients-loop 28s linear infinite;
-}
-.clients:hover .clients-track {
-  animation-play-state: paused;
-}
-@keyframes clients-loop {
-  to { transform: translateX(-100%); }
-}
-.client {
-  display: flex;
-  align-items: center;
-  height: 40px;
-}
-/* il logo è una maschera: si vede solo la sua forma, nel verde scuro del brand */
-.client-logo {
-  display: block;
-  height: var(--h, 24px);
-  width: calc(var(--h, 24px) * var(--ar, 3));
-  background: var(--ink-soft);
-  /* l'immagine della maschera è nello stile in linea di ogni logo (index.html) */
-  -webkit-mask-position: center;
-  mask-position: center;
-  -webkit-mask-size: contain;
-  mask-size: contain;
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
-}
-@media (max-width: 480px) {
-  .clients-track {
-    gap: var(--s-7);
-    padding: 0 var(--s-5);
-  }
-  .client-logo {
-    height: calc(var(--h, 24px) * 0.85);
-    width: calc(var(--h, 24px) * 0.85 * var(--ar, 3));
-  }
-}
-/* senza movimento: una fila ferma e centrata, la copia non serve */
-@media (prefers-reduced-motion: reduce) {
-  .clients {
-    justify-content: center;
-    mask-image: none;
-  }
-  .clients-track {
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: var(--s-4) var(--s-7);
-    animation: none;
-  }
-  .clients-track[aria-hidden='true'] {
-    display: none;
-  }
-}
 
 /* ---------- Footer: dati societari e privacy, discreto ---------- */
 /* Footer: dati societari in colonne con etichetta, separati dalla pagina da un filo sottile */
@@ -1017,10 +928,6 @@ p {
 .is-static .outro {
   visibility: visible;
 }
-.is-static .proof {
-  opacity: 1;
-  animation: fade-up 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) 1.74s both;
-}
 .is-static .soon {
   opacity: 1;
   animation: fade-up 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) 1.3s both;
@@ -1082,7 +989,6 @@ p {
   .is-static .outro > *,
   .is-static .sub,
   .is-static .soon,
-  .is-static .proof,
   .signup-box[data-state] .signup,
   .signup-box[data-state] .signup-done,
   .soon-dot {

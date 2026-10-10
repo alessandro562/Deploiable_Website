@@ -76,12 +76,6 @@ test('movimento ridotto: niente 3D, niente animazioni in loop', async ({ page })
   expect(await page.locator('.soon-dot').evaluate((el) => getComputedStyle(el).animationName)).toBe('none');
 });
 
-test('movimento ridotto: i loghi dei clienti restano fermi, in una sola fila', async ({ page }) => {
-  await page.goto('/');
-  await page.waitForFunction(() => window.__DEPLOIABLE__?.ready === true);
-  expect(await page.locator('.clients-track').first().evaluate((el) => getComputedStyle(el).animationName)).toBe('none');
-  await expect(page.locator('.clients-track[aria-hidden="true"]')).toBeHidden();
-});
 
 test('telefono: ogni comando ha un’area di tocco di almeno 44 px in altezza e in larghezza', async ({ page }, info) => {
   test.skip(info.project.name !== 'mobile', 'solo telefono');
