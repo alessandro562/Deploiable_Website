@@ -298,3 +298,35 @@
 .mk-note .mk-b { font-size: 1.08em; }
 .mk-note .mk-s { color: var(--mk-ink); opacity: 0.75; }
 .mk-goal--low { bottom: -10.5em; }
+
+/* ——— schemi del metodo: piano a fasi (prodotto su misura) ——— */
+.mk-gantt { margin-top: 1.4em; display: grid; gap: 0.2em; }
+.mk-grow { display: grid; grid-template-columns: 11.5em 1fr; align-items: center; gap: 1em; padding: 0.75em 0; }
+.mk-grow + .mk-grow { border-top: 0.1em solid var(--mk-line); }
+.mk-grow .mk-b { font-size: 1.08em; }
+.mk-track {
+  position: relative;
+  height: 2.2em;
+  border-radius: 0.7em;
+  background:
+    repeating-linear-gradient(90deg, transparent 0 calc(25% - 0.1em), rgb(16 38 27 / 0.08) calc(25% - 0.1em) 25%),
+    var(--mk-sunk);
+}
+.mk-span {
+  position: absolute;
+  top: 0.35em;
+  bottom: 0.35em;
+  border-radius: 0.5em;
+  background: #4f6a55;
+}
+.mk-span--dark { background: #10261b; }
+.mk-span--lime { background: #c8f25a; box-shadow: inset 0 0 0 0.1em rgb(16 38 27 / 0.2); }
+.mk-thead--gantt { grid-template-columns: 11.5em 1fr; padding: 0; margin-top: 1.4em; }
+.mk-thead--gantt > span:last-child { display: grid; grid-template-columns: repeat(4, 1fr); }
+.mk-src .mk-arrow { color: var(--mk-soft); }
+.mk-src--lime { background: #c8f25a; padding: 0.25em 0.7em; border-radius: 99em; }
+/* nel piano la consegna scende sotto la linea del tempo, così la fase finale in Lime resta visibile */
+.mk-deliver--plan { bottom: -13.2em; padding: 1.3em 1.5em 1.4em; }
+.mk-deliver--plan .mk-checks { gap: 0.6em; margin-top: 1em; }
+.mk-grow { padding: 0.6em 0; }
+.mk-track { height: 2em; }
