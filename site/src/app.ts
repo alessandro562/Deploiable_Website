@@ -6,7 +6,6 @@ import { Stage } from './gl/stage';
 import { DURATION, LOCK, ROLL_DUR, createState, rollAt, stateAt, typewriter } from './gl/choreography';
 import { PALETTES, type PaletteName } from './config/brand';
 import { Color } from 'three';
-import { Backdrop } from './gl/backdrop';
 import { onLangChange } from './i18n';
 import { SILENZIO_A } from './gl/timeline';
 
@@ -31,7 +30,6 @@ export async function start(caps: Capabilities) {
   const canvas = document.querySelector<HTMLCanvasElement>('canvas.gl')!;
   const engine = new Engine(canvas, quality, testMode);
   const stage = new Stage(engine.scene);
-  const backdrop = new Backdrop(engine.bgScene);
 
   const claim = Array.from(document.querySelectorAll<HTMLElement>('.claim .line'));
   const sweep = document.querySelector<HTMLElement>('.sweep')!;
@@ -40,6 +38,18 @@ export async function start(caps: Capabilities) {
   const outroItems = [['.sub'], ['.soon'], ['.hero-ctas'], ['.proof']].map((sel) => sel.map((q) => document.querySelector<HTMLElement>(q)!));
   const navEl = document.querySelector<HTMLElement>('.nav')!;
   const heroEl = document.querySelector<HTMLElement>('.hero')!;
+  const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches || new URLSearchParams(location.search).get('motion') === 'reduced';
+  // il simbolo della hero parte quando l'intro è finita: il canvas compare sopra la versione statica
+  const heroSymbol = document.querySelector<HTMLElement>('.hero-symbol')!;
+  const heroCanvas = heroSymbol.querySelector<HTMLCanvasElement>('.hero-canvas')!;
+  setTimeout(() => {
+    import('./hero-symbol')
+      .then((m) => {
+        m.startHeroSymbol(heroSymbol, heroCanvas, reducedMotion);
+        heroSymbol.classList.add('is-live');
+      })
+      .catch(() => {});
+  }, (DURATION + 0.2) * 1000);
   const slotEl = document.querySelector<HTMLElement>('.logo-slot')!;
 
   // Macchina da scrivere sulla seconda riga ("to production AI."): ogni lettera è uno <span>; quelle "cancellate"
@@ -96,21 +106,12 @@ export async function start(caps: Capabilities) {
   let paused = false;
 
   // I testi che la supergrafica non deve mai toccare (in coordinate della pagina, non della finestra).
-  const textSel = '.lang, .nav, .claim .line, .sub, .soon, .hero-ctas, .proof, .clients';
   let scrollY = window.scrollY;
   let moved = true; // la pagina si è mossa dall'ultimo disegno: il segnaposto del logo va rimisurato
   const measureSlot = () => {
     scrollY = window.scrollY;
     const r = slotEl.getBoundingClientRect();
     stage.setSlot({ cx: r.left + r.width / 2, cy: r.top + r.height / 2, w: r.width });
-  };
-  const measureTexts = () => {
-    const y = window.scrollY;
-    const rects = Array.from(document.querySelectorAll<HTMLElement>(textSel))
-      .map((el) => el.getBoundingClientRect())
-      .filter((r) => r.width > 0 && r.height > 0)
-      .map((r) => ({ x0: r.left, y0: r.top + y, x1: r.right, y1: r.bottom + y }));
-    backdrop.layout(rects, engine.width, engine.height);
   };
 
   // Palette: "forest" (barre Lime su Forest), "lime" (barre Forest su Lime) oppure "flip" (Forest fino al clic
@@ -122,7 +123,6 @@ export async function start(caps: Capabilities) {
     if (name === current) return;
     current = name;
     stage.setPalette(name);
-    backdrop.setPalette(name);
     (engine.bgScene.background as Color).set(PALETTES[name].background);
     // il cambio di palette è un taglio netto: nessuna transizione CSS deve sfumarlo
     const root = document.documentElement;
@@ -179,7 +179,6 @@ export async function start(caps: Capabilities) {
     state.az *= amp;
     state.el *= amp;
     stage.apply(state, engine.camera, engine.width, engine.height);
-    backdrop.apply(state, engine.bgCamera, engine.width, engine.height, scrollY);
     claim.forEach((el, i) => {
       const p = Math.min(1, Math.max(0, state.claim * 1.25 - i * 0.25));
       el.style.transform = `translate3d(0, ${((1 - p) * 150).toFixed(2)}%, 0)`;
@@ -209,18 +208,15 @@ export async function start(caps: Capabilities) {
   const measureHero = () => (heroBottom = heroEl.offsetTop + heroEl.offsetHeight);
   measureHero();
   measureSlot();
-  measureTexts();
   // Stato iniziale: testo nascosto prima del primo disegno, poi si attende font e shader.
   stateAt(0, state);
   claim.forEach((el) => (el.style.transform = 'translate3d(0, 150%, 0)'));
   await document.fonts.ready;
-  measureTexts(); // con i font veri le righe hanno la loro larghezza definitiva
   measureHero();
   measureCaret();
   // Riscaldamento: shader e geometrie vengono compilati e caricati sulla GPU ora, con la pagina ancora
   // nel Forest iniziale, così nessun scatto arriva all'incastro (9,2 s) o al lampo (10,2 s).
   stage.forceVisible();
-  backdrop.forceVisible();
   await engine.warmup();
   engine.render();
   draw();
@@ -242,7 +238,6 @@ export async function start(caps: Capabilities) {
   window.addEventListener('resize', () => {
     engine.resize();
     measureSlot();
-    measureTexts();
     measureCaret();
     measureHero();
     twShown = -1; // ridisegna il cursore nella nuova posizione
@@ -269,7 +264,7 @@ export async function start(caps: Capabilities) {
   onLangChange(() => {
     buildTw();
     twShown = -1;
-    requestAnimationFrame(() => (measureCaret(), measureTexts(), measureHero(), draw()));
+    requestAnimationFrame(() => (measureCaret(), measureHero(), draw()));
   });
   document.addEventListener('visibilitychange', () => {
     paused = document.hidden;
@@ -286,7 +281,6 @@ export async function start(caps: Capabilities) {
   hooks.play = () => {
     playing = true;
   };
-  hooks.backdrop = () => ({ ...backdrop.box });
   hooks.state = () => ({ tw: twShown, caret: twCaret, t: state.t, roll: [...state.roll], bgIn: [...state.bgIn], bgSlide: [...state.bgSlide], sweep: [state.sweepHead, state.sweepTail], letters: [...state.letters] });
   hooks.ready = true;
 }

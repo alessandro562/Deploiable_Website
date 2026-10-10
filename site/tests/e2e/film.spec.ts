@@ -5,7 +5,6 @@ import { brightPixels, brightness, canvasHash, darkPixels, meanColor, openFilm, 
 
 const LIME = [200, 242, 90];
 const FOREST = [16, 38, 27];
-const LIME_DEEP = [176, 221, 60];
 const LOCK_T = LOCK[0]; // clic dell'ultima barra: lo schermo passa al Lime
 const near = (px: number[], ref: number[], tol: number) => ref.forEach((v, i) => expect(Math.abs(px[i] - v)).toBeLessThanOrEqual(tol));
 
@@ -114,37 +113,6 @@ test('dopo la fine il logo gira in ciclo e torna identico, pixel per pixel', asy
   }
 });
 
-test('supergrafica: entra con la linea del finale e continua a muoversi, Lime Deep su Lime', async ({ page }) => {
-  await openFilm(page);
-  const st = () => page.evaluate(() => window.__DEPLOIABLE__!.state!());
-  await seek(page, TIMES.deploy);
-  expect((await st()).bgIn).toEqual([0, 0, 0]);
-  await seek(page, END);
-  expect((await st()).bgIn.every((v) => v === 1)).toBe(true);
-  // su telefono in verticale non c'è spazio libero dai testi: la supergrafica va dietro, in tinta leggerissima
-  const bd = await page.evaluate(() => window.__DEPLOIABLE__!.backdrop!());
-  expect(bd.visible).toBe(true);
-  if (bd.soft) {
-    expect(page.viewportSize()!.width).toBeLessThanOrEqual(820);
-    return;
-  }
-  // il fondo contiene Lime Deep esatto (la faccia frontale della supergrafica) e Lime esatto
-  const vp = page.viewportSize()!;
-  const png = PNG.sync.read(await page.screenshot());
-  let deep = 0;
-  for (let i = 0; i < png.data.length; i += 4 * 7) {
-    const px = [png.data[i], png.data[i + 1], png.data[i + 2]];
-    if (px.every((v, k) => Math.abs(v - LIME_DEEP[k]) <= 2)) deep++;
-  }
-  expect(deep / (vp.width * vp.height / 7), 'quota di Lime Deep').toBeGreaterThan(0.01);
-  // si muove: due istanti del ciclo danno fotogrammi diversi
-  await seek(page, LOOP_START + LOOP_PERIOD / 2 + 0.6);
-  expect((await st()).bgSlide[0]).toBeGreaterThan(0.1);
-  const h1 = await canvasHash(page);
-  await seek(page, LOOP_START + LOOP_PERIOD * 2 + 0.2);
-  expect(await canvasHash(page)).not.toBe(h1);
-});
-
 test('nessun bagliore: i lampi bianchi del metallo restano piccoli riflessi, in nessun momento', async ({ page }) => {
   await openFilm(page);
   for (const t of [TIMES.linea, TIMES.segreto, TIMES.deploy, LOCK_T + 0.05, TIMES.silenzio, TIMES.linea_finale, TIMES.logo, END]) {
@@ -238,7 +206,7 @@ test('il naming compare alla fine, lettera dopo lettera da sinistra a destra', a
   expect((await letters()).every((v) => v === 1)).toBe(true);
 });
 
-test('allineamento: logo 3D nel segnaposto dell\'header, frase centrata sulla pagina (misura sui pixel)', async ({ page }) => {
+test('allineamento: logo 3D nel segnaposto dell\'header; frase centrata sul telefono, allineata al logo sul desktop (misura sui pixel)', async ({ page }) => {
   await openFilm(page, '', 'high');
   await seek(page, END);
   const rects = await page.evaluate(() => {
@@ -259,10 +227,17 @@ test('allineamento: logo 3D nel segnaposto dell\'header, frase centrata sulla pa
   const logo = inkLeft(slot.x - 4, slot.y - 4, slot.x + slot.w + 4, slot.y + slot.h + 4);
   expect(Math.abs(logo.L - slot.x), 'bordo sinistro del logo 3D contro il segnaposto').toBeLessThanOrEqual(2);
   expect(Math.abs(logo.R - (slot.x + slot.w)), 'bordo destro del logo 3D contro il segnaposto').toBeLessThanOrEqual(2);
-  const mid = png.width / 2;
-  for (const [i, l] of lines.entries()) {
+  if (page.viewportSize()!.width >= 900) {
+    // desktop: la frase sta nella colonna sinistra, la riga in grassetto attacca il bordo del logo
+    const l = lines[1];
     const ink = inkLeft(l.x - 4, l.y, l.x + l.w + 4, l.y + l.h);
-    expect(Math.abs((ink.L + ink.R) / 2 - mid), `centro della riga ${i + 1} contro il centro della pagina`).toBeLessThanOrEqual(2);
+    expect(Math.abs(ink.L - slot.x), 'bordo sinistro della frase contro il logo 3D').toBeLessThanOrEqual(2);
+  } else {
+    const mid = png.width / 2;
+    for (const [i, l] of lines.entries()) {
+      const ink = inkLeft(l.x - 4, l.y, l.x + l.w + 4, l.y + l.h);
+      expect(Math.abs((ink.L + ink.R) / 2 - mid), `centro della riga ${i + 1} contro il centro della pagina`).toBeLessThanOrEqual(2);
+    }
   }
 });
 
@@ -452,90 +427,6 @@ test('la frase non è mai tagliata: discendenti e ascendenti interi dentro la ma
   }
 });
 
-test('la supergrafica non tocca mai un testo, a nessuna larghezza', async ({ page }) => {
-  test.setTimeout(180_000);
-  await openFilm(page, '', 'high');
-  for (const [w, h] of [[2000, 934], [1440, 900], [1280, 720], [1024, 768], [768, 1024], [390, 844], [360, 740], [844, 390]]) {
-    await page.setViewportSize({ width: w, height: h });
-    await page.waitForTimeout(150);
-    for (const t of [END, LOOP_START + LOOP_PERIOD / 2 + 0.7]) {
-      await seek(page, t);
-      const sg = await page.evaluate(() => window.__DEPLOIABLE__!.backdrop!());
-      // su schermi stretti va dietro ai testi in modalità soft (verificata dal test sul contrasto qui sotto)
-      if (sg.soft) {
-        expect(w <= 820 || h > w, `${w}x${h}: soft solo su schermi stretti`).toBe(true);
-        expect(sg.visible).toBe(true);
-        continue;
-      }
-      if (w >= 1024) expect(sg.visible, `${w}x${h}: visibile su desktop`).toBe(true);
-      if (!sg.visible) continue;
-      const texts = await page.evaluate(() =>
-        Array.from(document.querySelectorAll<HTMLElement>('.lang, .claim .line, .sub, .soon, .offer, .signup, .signup-note, .proof-line, .clients'))
-          .map((el) => el.getBoundingClientRect())
-          .map((r) => ({ x0: r.left, y0: r.top + scrollY, x1: r.right, y1: r.bottom + scrollY })),
-      );
-      for (const r of texts) {
-        const overlap = r.x0 < sg.x1 && r.x1 > sg.x0 && r.y0 < sg.y1 && r.y1 > sg.y0;
-        expect(overlap, `${w}x${h} t=${t}: supergrafica sopra un testo`).toBe(false);
-      }
-      // e sui pixel: dentro i riquadri dei testi non c'è la faccia Lime Deep della supergrafica
-      // (i campi del modulo sono Lime Deep di loro: si nascondono per la misura)
-      await page.addStyleTag({ content: '.signup-field { visibility: hidden !important; }' });
-      const png = PNG.sync.read(await page.screenshot());
-      await page.evaluate(() => document.querySelectorAll('style').forEach((s) => s.textContent?.includes('.signup-field { visibility') && s.remove()));
-      let deep = 0;
-      for (const r of texts)
-        for (let y = Math.max(0, Math.floor(r.y0)); y < Math.min(png.height, Math.ceil(r.y1)); y++)
-          for (let x = Math.max(0, Math.floor(r.x0)); x < Math.min(png.width, Math.ceil(r.x1)); x++) {
-            const i = (y * png.width + x) * 4;
-            if (Math.abs(png.data[i] - LIME_DEEP[0]) <= 3 && Math.abs(png.data[i + 1] - LIME_DEEP[1]) <= 3 && Math.abs(png.data[i + 2] - LIME_DEEP[2]) <= 3) deep++;
-          }
-      expect(deep, `${w}x${h} t=${t}: pixel Lime Deep sotto i testi`).toBe(0);
-    }
-  }
-});
-
-test('su telefono la supergrafica dietro ai testi non toglie contrasto (≥ 4,5:1 sui pixel)', async ({ page }) => {
-  test.setTimeout(120_000);
-  await openFilm(page, '', 'high');
-  const lum = (c: number[]) => {
-    const f = (v: number) => ((v /= 255) <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4);
-    return 0.2126 * f(c[0]) + 0.7152 * f(c[1]) + 0.0722 * f(c[2]);
-  };
-  const ratio = (a: number[], b: number[]) => {
-    const [x, y] = [lum(a), lum(b)].sort((m, n) => n - m);
-    return (x + 0.05) / (y + 0.05);
-  };
-  for (const [w, h] of [[390, 844], [360, 740]]) {
-    await page.setViewportSize({ width: w, height: h });
-    await page.waitForTimeout(150);
-    for (const t of [END, LOOP_START + LOOP_PERIOD / 2 + 0.7]) {
-      await seek(page, t);
-      expect((await page.evaluate(() => window.__DEPLOIABLE__!.backdrop!())).soft, `${w}x${h}`).toBe(true);
-      // colore di ogni testo e suo riquadro, poi si nascondono i testi per leggere il fondo sotto
-      const texts = await page.evaluate(() =>
-        Array.from(document.querySelectorAll<HTMLElement>('.claim .line, .sub, .soon, .offer, .consent-text, .proof-line')).map((el) => {
-          const r = el.getBoundingClientRect();
-          const c = getComputedStyle(el).color.match(/\d+/g)!.slice(0, 3).map(Number);
-          return { sel: el.className, c, x0: r.left, y0: r.top, x1: r.right, y1: r.bottom };
-        }),
-      );
-      await page.addStyleTag({ content: '.page, .page *, .top, .lang { visibility: hidden !important; }' });
-      const png = PNG.sync.read(await page.screenshot());
-      await page.evaluate(() => document.querySelectorAll('style').forEach((s) => s.textContent?.includes('visibility: hidden !important') && s.remove()));
-      for (const r of texts) {
-        let worst = 21;
-        for (let y = Math.max(0, Math.floor(r.y0)); y < Math.min(png.height, Math.ceil(r.y1)); y += 2)
-          for (let x = Math.max(0, Math.floor(r.x0)); x < Math.min(png.width, Math.ceil(r.x1)); x += 2) {
-            const i = (y * png.width + x) * 4;
-            worst = Math.min(worst, ratio(r.c, [png.data[i], png.data[i + 1], png.data[i + 2]]));
-          }
-        expect(worst, `${w}x${h} t=${t} ${r.sel}`).toBeGreaterThanOrEqual(4.5);
-      }
-    }
-  }
-});
-
 test('apertura: si parte dall\'alto e il vetro dell\'header non compare durante l\'intro', async ({ page }) => {
   await openFilm(page, '', 'high');
   await page.evaluate(() => scrollTo(0, 400));
@@ -605,9 +496,9 @@ test('macchina da scrivere: la seconda riga si cancella e si riscrive in ciclo, 
   const st = () => page.evaluate(() => window.__DEPLOIABLE__!.state!());
   const visible = () => page.locator('.tw .ch:not(.off)').count();
   // il titolo resta intero per i lettori di schermo, qualunque cosa mostri la macchina da scrivere
-  await expect(page.getByRole('heading', { level: 1 })).toHaveAccessibleName(/Dai problemi di business\s*all’AI in produzione\./);
+  await expect(page.getByRole('heading', { level: 1 })).toHaveAccessibleName(/Built to work\.\s*Ready to be yours\./);
   await seek(page, END);
-  const n = 'all’AI in produzione.'.length; // 21
+  const n = 'Ready to be yours.'.length; // 18, uguale in italiano e in inglese
   expect(await visible()).toBe(n);
   const full = (await page.locator('.tw').boundingBox())!;
   await seek(page, TW_START + TW_HOLD + TW_ERASE * 2.5);
@@ -623,8 +514,8 @@ test('macchina da scrivere: la seconda riga si cancella e si riscrive in ciclo, 
   // cambiando lingua la riga si ridivide in lettere
   await page.click('[data-lang="en"]');
   await seek(page, END);
-  expect(await visible()).toBe('to production AI.'.length);
-  await expect(page.getByRole('heading', { level: 1 })).toHaveAccessibleName(/From business problems\s*to production AI\./);
+  expect(await visible()).toBe(n);
+  await expect(page.getByRole('heading', { level: 1 })).toHaveAccessibleName(/Built to work\.\s*Ready to be yours\./);
 });
 
 test('il simbolo nell\'header gira quando ci si passa sopra col mouse', async ({ page }) => {
