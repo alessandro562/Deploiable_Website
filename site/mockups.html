@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>Mockup · anteprima di sviluppo</title>
+    <!-- Pagina di sviluppo per rivedere le figure in isolamento. Non è tra gli input del build (vite.config.ts),
+         quindi non va pubblicata. Si apre con `npm run dev` su /mockups.html -->
+    <style>
+      :root { color-scheme: light; }
+      body { margin: 0; background: #f1f3ea; color: #10261b; font: 500 14px/1.5 system-ui, sans-serif; }
+      .board { display: flex; flex-wrap: wrap; gap: 56px; padding: 56px; align-items: flex-start; }
+      figure { margin: 0; }
+      figcaption { margin-top: 14px; font-size: 13px; color: #3f5a46; letter-spacing: 0.02em; }
+      img { display: block; height: auto; }
+      .desk { width: 560px; }
+      .phone { width: 390px; }
+      .dark { background: #10261b; padding: 40px; border-radius: 16px; }
+      .dark figcaption { color: #8fa596; }
+    </style>
+  </head>
+  <body>
+    <div class="board">
+      <figure class="desk">
+        <img src="/assets/mockups/processi.svg" width="560" height="360" alt="" />
+        <figcaption>01 · processi · desktop, 560 px</figcaption>
+      </figure>
+      <figure class="phone">
+        <img src="/assets/mockups/processi.svg" width="390" alt="" />
+        <figcaption>telefono, 390 px</figcaption>
+      </figure>
+    </div>
+  </body>
+</html>
