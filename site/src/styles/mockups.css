@@ -338,7 +338,7 @@
 .mk-score i { width: 0.8em; height: 0.8em; border-radius: 50%; background: rgb(16 38 27 / 0.12); }
 .mk-score i.on { background: #4f6a55; }
 .is-pick .mk-score i.on { background: #10261b; }
-.mk-tag { display: inline-block; margin-left: 0.6em; font-size: 0.8em; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; background: #10261b; color: #c8f25a; padding: 0.2em 0.6em; border-radius: 99em; vertical-align: 0.15em; }
+.mk-tag { display: inline-block; margin-left: 0.6em; font-size: 0.85em; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; background: #10261b; color: #c8f25a; padding: 0.2em 0.6em; border-radius: 99em; vertical-align: 0.15em; }
 .mk-goal--mid { bottom: -8.6em; }
 
 /* ——— 02 · tappa 2: percorso sul mercato (tappe sulla linea, curva di utilizzo) ——— */

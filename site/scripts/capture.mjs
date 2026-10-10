@@ -31,7 +31,7 @@ const page = await ctx.newPage();
 const errors = [];
 page.on('pageerror', (e) => errors.push(e.message));
 page.on('console', (m) => m.type() === 'error' && errors.push(m.text()));
-// l'intro è disegnata con seek() a ogni fotogramma; il resto (racconto, frammenti, scorrimenti) segue page.clock
+// l'intro è disegnata con seek() a ogni fotogramma; il resto (entrate, percorsi, scorrimenti) segue page.clock
 // il modulo invia a un indirizzo finto, intercettato qui: nessuna richiesta arriva a sistemi veri
 await page.route('https://form.mock/**', (r) => r.fulfill({ status: 200, body: 'ok' }));
 await page.addInitScript((mobile) => {
@@ -60,7 +60,7 @@ await cdp.send('Animation.setPlaybackRate', { playbackRate: rate });
 
 // avvio: si fa girare il tempo finché il 3D è pronto (fotogrammi non catturati: solo la preparazione)
 for (let i = 0; i < 600; i++) {
-  if (await page.evaluate(() => window.__DEPLOIABLE__?.ready === true && !!window.__NARR__)) break;
+  if (await page.evaluate(() => window.__DEPLOIABLE__?.ready === true)) break;
   await page.clock.runFor(50);
   await page.waitForTimeout(50);
 }
@@ -171,32 +171,30 @@ async function type(sel, text) {
     await shot();
   }
 }
-const yFor = (i, c) => page.evaluate(([i, c]) => window.__NARR__.yFor(i, c), [i, c]);
-const top = (id) => page.evaluate((id) => document.getElementById(id).getBoundingClientRect().top + scrollY, id);
+const top = (sel) => page.evaluate((sel) => document.querySelector(sel).getBoundingClientRect().top + scrollY, sel);
 const maxY = () => page.evaluate(() => document.documentElement.scrollHeight - innerHeight);
-
-/** il racconto: per ogni capitolo, il testo entra e la scena cambia, poi una pausa di lettura */
-async function narrative(speed = 1) {
-  const two = [false, false, true, true, false, false];
-  for (let i = 0; i < 6; i++) {
-    const sway = (k) => (mobile ? null : { x: 1000 + Math.sin((i + k) * 2.1) * 200, y: 470 + Math.cos((i + k) * 1.7) * 110, o: 1 });
-    if (two[i] && mobile) {
-      // su telefono i due passaggi finiscono entro metà capitolo (src/narrative.ts)
-      await scroll(await yFor(i, 0.21), 2.0 * speed, ease, sway);
-      await scroll(await yFor(i, 0.25), 0.8 * speed, (k) => k, sway);
-      await scroll(await yFor(i, 0.47), 2.6 * speed, ease, sway);
-      await scroll(await yFor(i, 0.55), 1.8 * speed, (k) => k, sway);
-    } else if (two[i]) {
-      await scroll(await yFor(i, 0.36), 2.4 * speed, ease, sway);
-      await scroll(await yFor(i, 0.42), 1.0 * speed, (k) => k, sway);
-      await scroll(await yFor(i, 0.86), 2.6 * speed, ease, sway);
-      await scroll(await yFor(i, 0.93), 1.4 * speed, (k) => k, sway);
-    } else {
-      const a = mobile ? 0.48 : i === 0 ? 0.5 : 0.56;
-      await scroll(await yFor(i, a), 2.8 * speed, ease, sway);
-      await scroll(await yFor(i, a + (mobile ? 0.06 : 0.1)), 1.8 * speed, (k) => k, sway);
-    }
+const HEADER = 72;
+/** le tre fasi di un percorso aperto: per ognuna lo schema entra, poi una pausa di lettura */
+async function phases(id, speed = 1) {
+  for (let i = 0; i < 3; i++) {
+    const y = await page.evaluate(([id, i]) => document.querySelectorAll(`#journey-${id} .tappa`)[i].getBoundingClientRect().top + scrollY, [id, i]);
+    const sway = mobile ? null : (k) => ({ x: 1040 + Math.sin((i + k) * 2.3) * 120, y: 520 + Math.cos((i + k) * 1.9) * 90, o: 1 });
+    await scroll(y - HEADER - (mobile ? 8 : 40), 1.5 * speed, ease, sway);
+    await hold(1.7 * speed);
   }
+}
+/** contatto: il modulo e l'invio (all'indirizzo finto, intercettato sopra) */
+async function contact(email, company) {
+  await page.evaluate(() => (document.querySelector('.signup').dataset.endpoint = 'https://form.mock/exec'));
+  await press('#signup-email');
+  await type('#signup-email', email);
+  await press('#signup-company');
+  await type('#signup-company', company);
+  if (mobile) await page.evaluate(() => document.activeElement.blur());
+  await press('.consent-box');
+  await hold(0.3);
+  await press('.signup button[type=submit]');
+  await hold(2.0);
 }
 
 if (!mobile) {
@@ -204,86 +202,57 @@ if (!mobile) {
   await hold(8.4); // intro: il logo 3D, il passaggio al Lime, la frase che si scrive, i pulsanti
   await move(720, 600, 0.2);
   const cta = await center('.hero-ctas .btn--solid');
-  await move(cta.x, cta.y, 1.2); // passaggio sul pulsante principale
-  await hold(1.0);
-  await press('.hero-ctas .btn--line'); // "Scopri il nostro approccio": porta al racconto
+  await move(cta.x, cta.y, 1.0); // passaggio sul pulsante principale
+  await hold(0.6);
+  await press('.hero-ctas .btn--line'); // "Scopri il nostro approccio": porta alle due card
   await hold(1.6);
-  await narrative(1);
-  // cosa realizziamo: passaggio su tre forme
-  await scroll(await top('build'), 1.6);
-  await hold(1.2);
-  for (const i of [0, 3, 1]) {
-    const c = await center('.cap', i);
-    await move(c.x, c.y - 40, 0.8);
-    await hold(0.9);
-  }
-  await scroll((await top('build')) + 520, 1.6);
-  await hold(1.0);
-  // metodo
-  await scroll(await top('method'), 1.6);
-  await hold(2.2);
-  const s2 = await center('.step', 1);
-  await move(s2.x, s2.y - 80, 0.8);
+  // le due card: si leggono, poi si apre il percorso dei processi
+  const c2 = await center('.line-col .line-title', 1);
+  await move(c2.x, c2.y, 0.9);
   await hold(0.8);
-  // esempi
-  await scroll(await top('cases'), 1.6);
-  await hold(1.4);
-  const c3 = await center('.case', 2);
-  await move(c3.x, c3.y - 60, 0.9);
-  await hold(1.2);
-  // contatto: la strada, il modulo, l'invio (all'indirizzo finto)
-  await scroll(Math.min(await top('contact'), await maxY()), 1.6);
-  await hold(0.8);
-  await press('.path', 1);
-  await hold(0.5);
-  await page.evaluate(() => (document.querySelector('.signup').dataset.endpoint = 'https://form.mock/exec'));
-  await press('#signup-email');
-  await type('#signup-email', 'giulia@azienda.it');
-  await press('#signup-company');
-  await type('#signup-company', 'Azienda Spa');
-  await press('.consent-box');
-  await hold(0.3);
-  await press('.signup button[type=submit]');
-  await hold(2.2);
-  await scroll(await maxY(), 1.4);
-  await move(1280, 820, 0.8);
+  await press('.line-toggle[data-journey="1"]');
   await hold(1.6);
+  await phases(1);
+  // in fondo al percorso: si passa al Product Studio
+  await scroll((await top('#journey-1 .journey-foot')) - 560, 1.2);
+  await hold(0.4);
+  await press('#journey-1 [data-journey-switch="2"]');
+  await hold(1.5);
+  await phases(2, 0.75);
+  // dal percorso al contatto, con la strada già scelta
+  await scroll((await top('#journey-2 .journey-foot')) - 560, 1.0);
+  await press('#journey-2 .line-link');
+  await hold(1.6);
+  await scroll(Math.min((await top('#contact')) + 120, await maxY()), 0.8);
+  await contact('giulia@azienda.it', 'Azienda Spa');
+  await scroll(await maxY(), 1.2);
+  await move(1280, 820, 0.6);
+  await hold(1.2);
 } else {
   // ---------------------------------------------------------------- telefono, 390 × 844
   await hold(8.4);
   await press('.nav-toggle'); // menu
-  await hold(1.2);
-  await press('.nav-list a', 0); // "Approccio": porta al racconto
-  await hold(1.8);
-  await narrative(0.72);
-  // cambio di lingua, poi il resto in inglese
-  await scroll(await top('build'), 1.4);
-  await hold(0.6);
-  await press('[data-lang="en"]');
-  await hold(1.4);
-  await scroll((await top('build')) + 760, 2.6);
-  await scroll((await top('build')) + 1500, 2.4);
-  await scroll(await top('method'), 1.4);
-  await hold(1.0);
-  await scroll((await top('method')) + 700, 2.0);
-  await scroll(await top('cases'), 1.4);
-  await hold(1.0);
-  await scroll((await top('cases')) + 900, 2.6);
-  await scroll(await top('contact'), 1.6);
   await hold(0.8);
-  await scroll((await top('contact')) + 380, 1.2);
-  await press('.path', 1);
-  await page.evaluate(() => (document.querySelector('.signup').dataset.endpoint = 'https://form.mock/exec'));
-  await press('#signup-email');
-  await type('#signup-email', 'giulia@company.com');
-  await press('#signup-company');
-  await type('#signup-company', 'Company Ltd');
-  await page.evaluate(() => document.activeElement.blur());
-  await press('.consent-box');
-  await press('.signup button[type=submit]');
-  await hold(2.0);
-  await scroll(await maxY(), 1.2);
+  await press('.nav-list a', 0); // "Approccio": porta alle due card
   await hold(1.4);
+  // in inglese da qui in poi
+  await press('[data-lang="en"]');
+  await hold(1.0);
+  await scroll((await top('#line-2')) - HEADER, 1.6);
+  await hold(0.6);
+  await press('.line-toggle[data-journey="2"]');
+  await hold(1.4);
+  await phases(2, 0.8);
+  await scroll((await top('#journey-2 .journey-foot')) - 420, 1.0);
+  await press('#journey-2 [data-journey-close="2"]'); // chiude e torna alle card
+  await hold(1.4);
+  await scroll(await top('#contact'), 1.6);
+  await hold(0.4);
+  await scroll((await top('#contact')) + 380, 1.0);
+  await press('.path', 1);
+  await contact('giulia@company.com', 'Company Ltd');
+  await scroll(await maxY(), 1.0);
+  await hold(1.2);
 }
 
 console.log(`${kind}: ${frame} fotogrammi, ${(frame / FPS).toFixed(1)} s; errori: ${errors.length ? errors.join(' | ') : 'nessuno'}`);

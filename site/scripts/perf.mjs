@@ -1,5 +1,5 @@
 // Misure di prestazione sul sito locale (serve npm run preview): LCP, CLS, task lunghi, peso trasferito e
-// fluidità mentre si scorre il racconto. Telefono: CPU rallentata 4× e rete "4G lenta" (CDP).
+// fluidità mentre si scorre un percorso aperto di "Cosa facciamo" fino al contatto. Telefono: CPU rallentata 4× e rete "4G lenta" (CDP).
 //   node scripts/perf.mjs [uscita.json]
 import { chromium } from '@playwright/test';
 import { writeFileSync } from 'node:fs';
@@ -47,7 +47,12 @@ for (const r of runs) {
   // l'intro intera (≈ 10 s) prima di misurare LCP: l'headline compare alla fine dell'intro
   await page.waitForTimeout(r.reduced ? 3000 : 12000);
   const atRest = await page.evaluate(() => ({ ...window.__perf, long: [...window.__perf.long] }));
-  // scorrimento del racconto: 6 capitoli, con la rotellina/il dito, misurando i fotogrammi
+  // si apre il percorso 01 (clic sul pulsante della card), poi si scorre con la rotellina fino al contatto,
+  // misurando i fotogrammi: gli schemi entrano in prospettiva mentre arrivano sullo schermo
+  await page.evaluate(() => scrollTo(0, document.getElementById('cosa-facciamo').offsetTop));
+  await page.waitForTimeout(600);
+  await page.click('.line-toggle[data-journey="1"]');
+  await page.waitForTimeout(1200);
   await page.evaluate(() => {
     window.__frames = [];
     let last = performance.now();
@@ -59,7 +64,7 @@ for (const r of runs) {
     requestAnimationFrame(f);
     window.__perf.long = [];
   });
-  const total = await page.evaluate(() => document.getElementById('build').offsetTop);
+  const total = await page.evaluate(() => document.getElementById('contact').getBoundingClientRect().top);
   const steps = 120;
   for (let i = 1; i <= steps; i++) {
     await page.mouse.wheel(0, total / steps);
