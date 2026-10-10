@@ -1100,12 +1100,31 @@ p {
    stili di testo in :root (--t-*). */
 
 /* ---------- Hero: frase e sottotitolo a sinistra, simbolo 3D a destra (sotto 900 px: simbolo sopra, tutto centrato) ---------- */
+/* La luce della hero: un alone più chiaro dietro il simbolo, solo a palette Lime (dopo il clic, l'intro in Forest resta
+   com'è). Sfuma a trasparente sul bordo della sua ellisse, che tocca i bordi della hero solo in un punto: così non
+   copre il logo 3D in alto (canvas sotto il contenuto) e non lascia righe sotto la hero. */
+.hero {
+  position: relative;
+  isolation: isolate;
+  --hero-lit-pos: 50% 24%;
+  --hero-lit-size: 50% 24%;
+}
+html[data-palette='lime'] .hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(var(--hero-lit-size) at var(--hero-lit-pos), color-mix(in srgb, var(--lime), white 45%) 0%, transparent 100%);
+}
 .hero-symbol {
   position: relative;
   order: -1;
   width: min(54vw, 230px);
   aspect-ratio: 1;
   color: var(--forest);
+  /* ombra morbida sotto il simbolo: lo fa stare nello spazio, non sul fondo */
+  filter: drop-shadow(0 28px 34px rgb(16 38 27 / 0.22));
 }
 /* senza WebGL o con il movimento ridotto resta il simbolo statico (SVG); il canvas lo copre quando è pronto */
 .hero-art,
@@ -1145,6 +1164,8 @@ p {
 }
 @media (min-width: 900px) {
   .hero {
+    --hero-lit-pos: 72% 50%;
+    --hero-lit-size: 72% 50%;
     display: grid;
     grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
     align-items: center;

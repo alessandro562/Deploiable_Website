@@ -3,6 +3,20 @@
    chiude su Lime pieno. Testi, spazi e movimento usano i token di main.css. */
 
 /* ---------- Superfici: ogni sezione porta i suoi colori, indipendenti dalla palette dell'intro ---------- */
+/* Fondo con luce, uguale su ogni superficie (hero Lime, Mist, Lime, Forest): un alone più chiaro dietro il contenuto,
+   con i bordi sullo stesso colore della superficie, così fra una sezione e l'altra non compaiono righe. */
+[data-surface]::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(55% 85% at var(--lit-x, 50%) var(--lit-y, 50%), var(--lit-hi) 0%, var(--lit-base) 100%);
+}
+[data-surface] {
+  position: relative;
+  isolation: isolate;
+}
 [data-surface='dark'] {
   --bg: var(--forest);
   --ink-light: var(--mist);
@@ -10,6 +24,8 @@
   --ink-soft: var(--sage);
   --ink-body: rgb(241 243 234 / 0.78);
   --hair: rgb(241 243 234 / 0.1);
+  --lit-base: var(--forest);
+  --lit-hi: var(--pine);
   background: var(--forest);
   color: var(--mist);
   color-scheme: dark;
@@ -21,6 +37,8 @@
   --ink-soft: var(--moss-ink);
   --ink-body: var(--forest);
   --hair: rgb(16 38 27 / 0.16);
+  --lit-base: var(--mist);
+  --lit-hi: color-mix(in srgb, var(--mist), white 60%);
   background: var(--mist);
   color: var(--forest);
   color-scheme: light;
@@ -34,6 +52,8 @@
   --ink-hover: var(--pine);
   --field-bg: var(--lime-deep);
   --hair: rgb(16 38 27 / 0.18);
+  --lit-base: var(--lime);
+  --lit-hi: color-mix(in srgb, var(--lime), white 45%);
   background: var(--lime);
   color: var(--forest);
   color-scheme: light;
