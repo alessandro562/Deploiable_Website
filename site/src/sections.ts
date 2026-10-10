@@ -145,22 +145,27 @@ function reveals(reduced: boolean) {
   });
 }
 
-/** "Cosa facciamo": due mazzi di card, uno per modello, che girano in loop. La card in cima si trascina via (o si
- *  preme Avanti) e torna in fondo al mazzo: il mazzo non si svuota mai. Senza JavaScript le card restano in colonna. */
+/** "Cosa facciamo": due mazzi di card, uno per modello, che girano in loop. La card in cima si trascina via, si clicca
+ *  o si cambia con le frecce da tastiera: torna in fondo al mazzo, che non si svuota mai. Con il mouse la card in
+ *  primo piano si inclina seguendo il puntatore. I link dentro le card restano link. Senza JavaScript le card restano
+ *  in colonna. */
 function decks(reduced: boolean) {
   const root = document.querySelector<HTMLElement>('[data-decks]');
   if (!root) return;
   root.classList.add('is-live');
   const VISIBLE = 3; // quante card si vedono impilate
+  const canTilt = !reduced && matchMedia('(hover: hover) and (pointer: fine)').matches;
   type Deck = { el: HTMLElement; order: HTMLElement[] };
   const decks: Deck[] = Array.from(root.querySelectorAll<HTMLElement>('.deck')).map((el) => ({
     el,
     order: Array.from(el.querySelectorAll<HTMLElement>('.dcard')),
   }));
+  // le card dietro sbucano in alto a destra
   const layout = (d: Deck) =>
     d.order.forEach((c, i) => {
-      c.style.setProperty('--y', `${i * 18}px`);
-      c.style.setProperty('--s', `${Math.max(0.8, 1 - i * 0.05)}`);
+      c.style.setProperty('--sx', `${i * 10}px`);
+      c.style.setProperty('--sy', `${-i * 14}px`);
+      c.style.setProperty('--s', `${Math.max(0.8, 1 - i * 0.035)}`);
       c.style.zIndex = String(20 - i);
       c.classList.toggle('is-back', i > 0);
       c.classList.toggle('is-hidden', i >= VISIBLE);
@@ -171,6 +176,7 @@ function decks(reduced: boolean) {
   const cycle = (d: Deck, dir: number) => {
     const card = d.order[0];
     if (!card || card.classList.contains('is-leaving')) return;
+    card.classList.remove('is-tilt');
     card.classList.add('is-leaving');
     card.style.setProperty('--x', `${dir * (d.el.offsetWidth + 200)}px`);
     card.style.setProperty('--r', `${dir * 10}deg`);
@@ -183,6 +189,8 @@ function decks(reduced: boolean) {
       card.classList.remove('is-leaving');
       card.style.setProperty('--x', '0px');
       card.style.setProperty('--r', '0deg');
+      card.style.setProperty('--tx', '0deg');
+      card.style.setProperty('--ty', '0deg');
       d.order.push(d.order.shift()!);
       layout(d);
       void card.offsetWidth; // applica la posizione prima di riattivare la transizione
@@ -193,15 +201,22 @@ function decks(reduced: boolean) {
     else setTimeout(finish, 800); // rete di sicurezza se la transizione non arriva
   };
 
-  decks.forEach((d) =>
+  decks.forEach((d) => {
     d.order.forEach((card) => {
       let startX = 0;
       let dragging = false;
+      const snapBack = () => {
+        card.style.setProperty('--x', '0px');
+        card.style.setProperty('--r', '0deg');
+      };
       card.addEventListener('pointerdown', (e) => {
-        if (card !== d.order[0] || card.classList.contains('is-leaving')) return;
+        if (e.button !== 0 || card !== d.order[0] || card.classList.contains('is-leaving')) return;
+        if ((e.target as HTMLElement).closest('a')) return; // un link dentro la card resta un link
         dragging = true;
         startX = e.clientX;
+        d.el.dataset.dragging = '1';
         card.classList.add('is-drag');
+        card.classList.remove('is-tilt');
         card.setPointerCapture(e.pointerId);
       });
       card.addEventListener('pointermove', (e) => {
@@ -210,32 +225,59 @@ function decks(reduced: boolean) {
         card.style.setProperty('--x', `${dx}px`);
         card.style.setProperty('--r', `${dx * 0.05}deg`);
       });
-      const release = (dx: number) => {
+      card.addEventListener('pointerup', (e) => {
+        if (!dragging) return;
         dragging = false;
+        delete d.el.dataset.dragging;
         card.classList.remove('is-drag');
+        const dx = e.clientX - startX;
         if (Math.abs(dx) > Math.min(120, d.el.offsetWidth * 0.22)) {
-          cycle(d, Math.sign(dx));
+          cycle(d, Math.sign(dx)); // trascinata via
+        } else if (Math.abs(dx) < 6) {
+          snapBack();
+          cycle(d, 1); // un semplice clic sulla card in cima
         } else {
-          card.style.setProperty('--x', '0px');
-          card.style.setProperty('--r', '0deg');
+          snapBack();
         }
-      };
-      card.addEventListener('pointerup', (e) => dragging && release(e.clientX - startX));
+      });
       card.addEventListener('pointercancel', () => {
         if (!dragging) return;
         dragging = false;
+        delete d.el.dataset.dragging;
         card.classList.remove('is-drag');
-        card.style.setProperty('--x', '0px');
-        card.style.setProperty('--r', '0deg');
+        snapBack();
       });
-    }),
-  );
-  root.querySelectorAll<HTMLButtonElement>('[data-next]').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const d = decks.find((x) => x.el.contains(btn));
-      if (d) cycle(d, 1);
+    });
+
+    // tastiera: le frecce (o Invio e Spazio) cambiano la card in cima quando il mazzo ha il fuoco
+    d.el.addEventListener('keydown', (e) => {
+      if (!['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Enter', ' '].includes(e.key)) return;
+      e.preventDefault();
+      cycle(d, e.key === 'ArrowLeft' || e.key === 'ArrowUp' ? -1 : 1);
     });
   });
+
+  if (canTilt) {
+    decks.forEach((d) => {
+      d.el.addEventListener('pointermove', (e) => {
+        const card = d.order[0];
+        if (!card || card.classList.contains('is-leaving') || d.el.dataset.dragging === '1') return;
+        const r = card.getBoundingClientRect();
+        const x = (e.clientX - r.left) / r.width - 0.5; // da -0,5 a 0,5
+        const y = (e.clientY - r.top) / r.height - 0.5;
+        card.classList.add('is-tilt');
+        card.style.setProperty('--tx', `${(-y * 8).toFixed(2)}deg`);
+        card.style.setProperty('--ty', `${(x * 10).toFixed(2)}deg`);
+      });
+      d.el.addEventListener('pointerleave', () => {
+        const card = d.order[0];
+        if (!card) return;
+        card.classList.remove('is-tilt');
+        card.style.setProperty('--tx', '0deg');
+        card.style.setProperty('--ty', '0deg');
+      });
+    });
+  }
 }
 
 /** La fascia verde: un clic fa scattare il logo con un giro veloce. */

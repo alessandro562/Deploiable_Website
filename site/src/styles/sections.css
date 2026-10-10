@@ -1339,13 +1339,24 @@ h3 {
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: var(--s-7);
   margin-top: clamp(40px, 6vw, 72px);
-  margin-bottom: 96px;
+  margin-bottom: 48px;
+}
+/* altezza della pila; sotto, una riga con il pulsante e i puntini */
+.decks.is-live {
+  --stack: clamp(500px, 48vw, 560px);
 }
 .deck {
   position: relative;
+  perspective: 1400px;
 }
 .decks.is-live .deck {
-  height: clamp(500px, 48vw, 560px);
+  height: var(--stack);
+  border-radius: 28px;
+}
+/* il mazzo si sceglie con la tastiera: contorno chiaro, senza altri segnali */
+.deck:focus-visible {
+  outline: 2px solid var(--forest);
+  outline-offset: 10px;
 }
 .dcard {
   position: relative;
@@ -1362,8 +1373,8 @@ h3 {
     0 44px 64px -32px rgb(16 38 27 / 0.5),
     0 2px 6px rgb(16 38 27 / 0.08),
     inset 0 1px 0 rgb(255 255 255 / 0.28);
-  transform: translate3d(var(--x, 0px), var(--y, 0px), 0) rotate(var(--r, 0deg)) scale(var(--s, 1));
-  transform-origin: 50% 100%;
+  transform: translate3d(calc(var(--sx, 0px) + var(--x, 0px)), var(--sy, 0px), 0)
+    rotateX(var(--tx, 0deg)) rotateY(var(--ty, 0deg)) rotate(var(--r, 0deg)) scale(var(--s, 1));
   transition:
     transform 0.6s var(--ease),
     opacity 0.5s var(--ease),
@@ -1394,6 +1405,14 @@ h3 {
   transition: none;
   cursor: grabbing;
   box-shadow: 0 60px 80px -36px rgb(16 38 27 / 0.6);
+}
+/* l'inclinazione segue il mouse: più pronta del movimento di scorrimento */
+.dcard.is-tilt {
+  transition: transform 0.35s var(--ease), box-shadow 0.35s var(--ease);
+  box-shadow:
+    0 56px 70px -34px rgb(16 38 27 / 0.55),
+    0 2px 6px rgb(16 38 27 / 0.08),
+    inset 0 1px 0 rgb(255 255 255 / 0.3);
 }
 .decks.is-live .dcard {
   position: absolute;
@@ -1452,6 +1471,19 @@ h3 {
   text-transform: uppercase;
   opacity: 0.65;
 }
+/* numero della fase in trasparenza, dietro al testo */
+.dcard--phase::after {
+  content: attr(data-n);
+  position: absolute;
+  right: -0.06em;
+  bottom: -0.2em;
+  z-index: -1;
+  font: 700 clamp(180px, 22vw, 320px) / 1 var(--sans);
+  letter-spacing: -0.07em;
+  color: currentColor;
+  opacity: 0.07;
+  pointer-events: none;
+}
 .dcard-hint {
   display: inline-flex;
   align-items: center;
@@ -1482,45 +1514,14 @@ h3 {
 .decks:not(.is-live) .dcard {
   min-height: 0;
 }
-.decks:not(.is-live) .deck-foot {
-  display: none;
-}
-.deck-foot {
-  position: absolute;
-  left: 0;
-  bottom: -68px;
-}
-.deck-next {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  padding: 14px 24px;
-  border: 1px solid rgb(16 38 27 / 0.35);
-  border-radius: 999px;
-  background: transparent;
-  color: var(--forest);
-  font: 500 15px / 1 var(--text);
-  cursor: pointer;
-  transition:
-    background-color var(--dur-ui) var(--ease),
-    color var(--dur-ui) var(--ease);
-}
-.deck-next:hover {
-  background: var(--forest);
-  color: var(--mist);
-}
-.deck-next .arrow {
-  width: 12px;
-  height: 12px;
-}
 @media (max-width: 860px) {
   .decks {
     grid-template-columns: minmax(0, 1fr);
     gap: var(--s-8);
-    margin-bottom: 96px;
+    margin-bottom: 40px;
   }
-  .decks.is-live .deck {
-    height: 500px;
+  .decks.is-live {
+    --stack: 500px;
   }
   .dcard {
     min-height: 0;
@@ -1543,8 +1544,7 @@ h3 {
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .dcard,
-  .deck-next {
+  .dcard {
     transition: none;
   }
 }
