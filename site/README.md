@@ -11,13 +11,10 @@ La pagina, dall'alto (versione in revisione, branch `v2-redesign`):
 2. **Cosa facciamo** (`#cosa-facciamo`, fondo Mist): "Un product lab, due linee di prodotto." Due colonne:
    - 01 · Processi: soluzioni AI nei processi del cliente; se le automazioni non bastano, un prodotto su misura chiavi in mano.
    - 02 · Product Studio: prodotti di nicchia costruiti, portati sul mercato e venduti a imprese.
-   Si vedono le due card; il percorso di ciascuna (tre fasi, che sono anche il metodo: Capire, Costruire,
-   Consegnare) è chiuso e si apre con "Scopri il percorso", uno alla volta, a tutta larghezza sotto le card (su
-   telefono subito sotto la sua card). In fondo al percorso: chiudi o passa all'altro. Senza JavaScript restano
-   aperti tutti e due. Sopra 860 px il percorso si apre dentro la sua colonna (le due colonne restano affiancate, una alla volta aperta); sotto, a tutta larghezza sotto la sua card. La voce di menu "Come lavoriamo" porta alle card (`#metodo`). Ogni fase ha uno schema in prospettiva: HTML e CSS
-   (`src/styles/mockups.css`, misure in em che scalano con la colonna), testi tradotti con le chiavi `mk.*`,
-   decorativo (aria-hidden). Mostrano il metodo, non schermate di un prodotto.
-3. **Contatto** (`#contact`, Lime): scelta della strada e modulo.
+   Due card, una per servizio: si sceglie il percorso dalla sua card e se ne vede uno alla volta, sotto le card
+a tutta larghezza. Le tre fasi (Capire, Costruire, Consegnare, che sono anche il metodo) si scorrono con i passi
+1·2·3 e avanti/indietro: il testo è a 16–17 px, lo schema a 760 px. Sul telefono le etichette dentro lo schema si
+nascondono e il significato resta nel testo. Senza JavaScript sono visibili tutti i percorsi e tutte le fasi.
 
 Non ci sono più il racconto a scorrimento né la sezione esempi: sono nella storia del branch (commit 69b6d1a) per
 ripensarli più avanti, a step approvati.

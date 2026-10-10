@@ -123,50 +123,74 @@ function interestLinks() {
   });
 }
 
-/** "Cosa facciamo": i due percorsi sono chiusi, si apre solo quello scelto (uno alla volta). Il pulsante della card
- *  apre e chiude; in fondo al percorso si chiude o si passa all'altro. Aprendo, il fuoco va al percorso e la pagina
- *  scorre al suo inizio; chiudendo, torna al pulsante della card. */
+/** "Cosa facciamo": si vede un percorso alla volta, scelto dalla sua card. Dentro il percorso si scorrono le tre
+ *  fasi (1·2·3, avanti e indietro). Senza JavaScript restano visibili tutti i percorsi e tutte le fasi. */
 function journeys(reduced: boolean) {
+  const root = document.documentElement;
   const toggles = Array.from(document.querySelectorAll<HTMLButtonElement>('.line-toggle[data-journey]'));
-  const panel = (id: string) => document.getElementById(`journey-${id}`);
+  const empty = document.querySelector<HTMLElement>('.stage-empty');
   if (!toggles.length) return;
-  const go = (el: HTMLElement) => {
-    const top = el.getBoundingClientRect().top + scrollY - 72;
-    if (window.__CAPTURE__) jsScroll(top);
-    else scrollTo({ top, behavior: reduced ? 'auto' : 'smooth' });
+  root.classList.add('js-steps');
+  const panel = (id: string) => document.getElementById(`journey-${id}`);
+  const scrollStage = (el: HTMLElement) => {
+    const top = el.getBoundingClientRect().top;
+    if (top < innerHeight * 0.6) return;
+    const y = top + scrollY - 80;
+    if (window.__CAPTURE__) jsScroll(y);
+    else scrollTo({ top: y, behavior: reduced ? 'auto' : 'smooth' });
   };
-  const set = (open: string | null) => {
-    for (const b of toggles) {
-      const id = b.dataset.journey!;
-      const on = id === open;
-      const p = panel(id);
-      b.setAttribute('aria-expanded', String(on));
-      b.closest('.line-col')?.classList.toggle('is-open', on);
-      if (!p) continue;
-      p.hidden = !on;
-      p.classList.toggle('is-entering', on && !reduced);
-    }
-  };
-  const open = (id: string) => {
-    set(id);
+  const setPhase = (id: string, n: number) => {
     const p = panel(id);
     if (!p) return;
-    p.focus({ preventScroll: true });
-    go(p);
+    const tappe = Array.from(p.querySelectorAll<HTMLElement>('.tappa'));
+    const last = tappe.length;
+    const k = Math.min(last, Math.max(1, n));
+    tappe.forEach((t, i) => t.classList.toggle('is-current', i === k - 1));
+    p.querySelectorAll<HTMLButtonElement>('.step-btn').forEach((b) => {
+      const on = Number(b.dataset.step) === k;
+      if (on) b.setAttribute('aria-current', 'step');
+      else b.removeAttribute('aria-current');
+    });
+    const prev = p.querySelector<HTMLButtonElement>('.step-prev');
+    const next = p.querySelector<HTMLButtonElement>('.step-next');
+    if (prev) prev.disabled = k === 1;
+    if (next) next.disabled = k === last;
   };
-  const close = (id: string) => {
-    set(null);
-    const b = toggles.find((t) => t.dataset.journey === id);
-    if (!b) return;
-    b.focus({ preventScroll: true });
-    go(b.closest<HTMLElement>('.lines') ?? b);
+  const open = (id: string) => {
+    for (const b of toggles) {
+      const on = b.dataset.journey === id;
+      const p = panel(b.dataset.journey!);
+      b.setAttribute('aria-expanded', String(on));
+      b.closest('.line-col')?.classList.toggle('is-open', on);
+      if (p) {
+        p.hidden = !on;
+        p.classList.toggle('is-entering', on && !reduced);
+      }
+    }
+    if (empty) empty.hidden = true;
+    const p = panel(id);
+    if (p) scrollStage(p);
   };
-  set(null);
+  // senza un percorso aperto il vano mostra solo il messaggio, come l'inizio della pagina
+  if (empty) empty.hidden = false;
   for (const b of toggles) {
-    b.addEventListener('click', () => (b.getAttribute('aria-expanded') === 'true' ? close(b.dataset.journey!) : open(b.dataset.journey!)));
+    const id = b.dataset.journey!;
+    const p = panel(id);
+    if (p) p.hidden = true;
+    b.addEventListener('click', () => open(id));
+    setPhase(id, 1);
   }
-  document.querySelectorAll<HTMLButtonElement>('[data-journey-close]').forEach((b) => b.addEventListener('click', () => close(b.dataset.journeyClose!)));
-  document.querySelectorAll<HTMLButtonElement>('[data-journey-switch]').forEach((b) => b.addEventListener('click', () => open(b.dataset.journeySwitch!)));
+  document.querySelectorAll<HTMLButtonElement>('.journey .step-btn').forEach((b) => {
+    b.addEventListener('click', () => setPhase(b.closest<HTMLElement>('.journey')!.id.replace('journey-', ''), Number(b.dataset.step)));
+  });
+  document.querySelectorAll<HTMLButtonElement>('.journey .step-prev, .journey .step-next').forEach((b) => {
+    b.addEventListener('click', () => {
+      const j = b.closest<HTMLElement>('.journey')!;
+      const cur = j.querySelector<HTMLElement>('.tappa.is-current');
+      const n = Number(cur?.dataset.phase ?? 1) + Number(b.dataset.dir);
+      setPhase(j.id.replace('journey-', ''), n);
+    });
+  });
 }
 
 /** Titoli e blocchi entrano salendo di poco quando arrivano sullo schermo (una volta sola). */

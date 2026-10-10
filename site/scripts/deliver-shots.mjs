@@ -37,6 +37,12 @@ const openJourney = async (page, id) => {
   await page.evaluate((id) => document.querySelector(`.line-toggle[data-journey="${id}"]`).click(), id);
   await page.waitForTimeout(900);
 };
+const goStep = async (page, id, n) => {
+  await page.evaluate(([id, n]) => document.querySelector(`#journey-${id} .step-btn[data-step="${n}"]`).click(), [id, n]);
+  await page.waitForTimeout(700);
+};
+/** in cima alla fase in vista del percorso */
+const currentPhase = (page, id) => page.evaluate((id) => document.querySelector(`#journey-${id} .tappa.is-current`).getBoundingClientRect().top + scrollY - 120, id);
 
 // --- hero
 for (const [vp, name, dpr] of [[{ width: 1440, height: 900 }, 'hero-desktop', 2], [{ width: 390, height: 844 }, 'hero-mobile', 3]]) {
@@ -47,13 +53,13 @@ for (const [vp, name, dpr] of [[{ width: 1440, height: 900 }, 'hero-desktop', 2]
   }
 }
 
-// --- punti chiave, IT ed EN, desktop e telefono (sotto l'header fisso: 72 px)
+// --- punti chiave, IT ed EN, desktop e telefono (il passo si sceglie con 1·2·3 del percorso aperto)
 const keys = [
   ['01-card-chiuse', (p) => top(p, '#cosa-facciamo .sec-head')],
-  ['02-percorso-processi-fase-1', async (p) => (await openJourney(p, 1), top(p, '#journey-1 .tappa'))],
-  ['03-percorso-processi-fase-2', (p) => p.evaluate(() => document.querySelectorAll('#journey-1 .tappa')[1].getBoundingClientRect().top + scrollY - 72)],
-  ['04-percorso-studio-fase-1', async (p) => (await openJourney(p, 2), top(p, '#journey-2 .tappa'))],
-  ['05-percorso-studio-fase-3', (p) => p.evaluate(() => document.querySelectorAll('#journey-2 .tappa')[2].getBoundingClientRect().top + scrollY - 72)],
+  ['02-percorso-processi-fase-1', async (p) => (await openJourney(p, 1), currentPhase(p, 1))],
+  ['03-percorso-processi-fase-2', async (p) => (await goStep(p, 1, 2), currentPhase(p, 1))],
+  ['04-percorso-studio-fase-1', async (p) => (await openJourney(p, 2), currentPhase(p, 2))],
+  ['05-percorso-studio-fase-3', async (p) => (await goStep(p, 2, 3), currentPhase(p, 2))],
   ['06-contatto', async (p) => Math.min(await top(p, '#contact'), await p.evaluate(() => document.documentElement.scrollHeight - innerHeight))],
 ];
 for (const [vp, tag] of [[{ width: 1440, height: 900 }, 'desktop'], [{ width: 390, height: 844 }, 'mobile']]) {

@@ -109,7 +109,7 @@
               <li data-i18n="line.1.tag.3">Prodotto su misura</li>
               </ul>
             </div>
-            <button type="button" class="line-toggle" aria-expanded="true" aria-controls="journey-1" data-journey="1">
+            <button type="button" class="line-toggle" aria-expanded="false" aria-controls="journey-1" data-journey="1">
               <span class="lt-open" data-i18n="journey.open">Scopri il percorso</span><span class="lt-close" data-i18n="journey.close">Chiudi il percorso</span><svg class="arrow arrow--down" viewBox="0 0 12 12" aria-hidden="true"><path d="M6 1v9M2.5 6.5 6 10l3.5-3.5" /></svg>
             </button>
           </article>
@@ -124,12 +124,18 @@
               <li data-i18n="line.2.tag.3">Vendita a imprese</li>
               </ul>
             </div>
-            <button type="button" class="line-toggle" aria-expanded="true" aria-controls="journey-2" data-journey="2">
+            <button type="button" class="line-toggle" aria-expanded="false" aria-controls="journey-2" data-journey="2">
               <span class="lt-open" data-i18n="journey.open">Scopri il percorso</span><span class="lt-close" data-i18n="journey.close">Chiudi il percorso</span><svg class="arrow arrow--down" viewBox="0 0 12 12" aria-hidden="true"><path d="M6 1v9M2.5 6.5 6 10l3.5-3.5" /></svg>
             </button>
           </article>
+          <p class="stage-empty" hidden data-i18n="stage.empty">Scegli un percorso per vederlo passo per passo.</p>
           <div class="journey" id="journey-1" role="region" aria-labelledby="line-1-title" tabindex="-1">
-            <div class="tappa">
+            <nav class="steps" aria-label="Fasi del percorso" data-i18n-attr="aria-label:steps.aria">
+              <button type="button" class="step-btn" data-step="1" aria-current="step"><span class="step-num">1</span><span data-i18n="steps.1">x</span></button>
+              <button type="button" class="step-btn" data-step="2"><span class="step-num">2</span><span data-i18n="steps.2">x</span></button>
+              <button type="button" class="step-btn" data-step="3"><span class="step-num">3</span><span data-i18n="steps.3">x</span></button>
+            </nav>
+            <div class="tappa is-current" data-phase="1">
               <p class="tappa-k" data-i18n="phase.1">Fase 1 · Capire</p>
               <h4 class="tappa-t" data-i18n="tappa.1.1.t">Troviamo dove l’AI incide.</h4>
               <p class="tappa-s" data-i18n="tappa.1.1.s">Mappiamo il processo con chi ci lavora, troviamo il punto critico e concordiamo come misurare il risultato.</p>
@@ -178,7 +184,7 @@
 
               </div>
             </div>
-            <div class="tappa">
+            <div class="tappa" data-phase="2">
               <p class="tappa-k" data-i18n="phase.2">Fase 2 · Costruire</p>
               <h4 class="tappa-t" data-i18n="tappa.1.2.t">La portiamo in produzione.</h4>
               <p class="tappa-s" data-i18n="tappa.1.2.s">L’AI entra nel flusso e nei sistemi che usate già. Le decisioni restano alle persone.</p>
@@ -227,7 +233,7 @@
 
               </div>
             </div>
-            <div class="tappa">
+            <div class="tappa" data-phase="3">
               <p class="tappa-k" data-i18n="phase.3">Fase 3 · Consegnare</p>
               <h4 class="tappa-t" data-i18n="tappa.1.3.t">Se serve, un prodotto su misura.</h4>
               <p class="tappa-s" data-i18n="tappa.1.3.s">Quando le automazioni non bastano, costruiamo un’applicazione dedicata e la consegniamo chiavi in mano.</p>
@@ -272,16 +278,21 @@
 
               </div>
             </div>
-            <div class="journey-foot">
-              <a class="line-link" href="#contact" data-interest="transform"><span data-i18n="line.1.link">Parliamo di un tuo processo</span><svg class="arrow" viewBox="0 0 12 12" aria-hidden="true"><path d="M1 6h9M6.5 2.5 10 6l-3.5 3.5" /></svg></a>
-              <span class="journey-actions">
-                <button type="button" class="journey-btn" data-journey-close="1"><span data-i18n="journey.closeShort">Chiudi</span></button>
-                <button type="button" class="journey-btn journey-btn--other" data-journey-switch="2"><span data-i18n="journey.other.2">Vedi il Product Studio</span><svg class="arrow" viewBox="0 0 12 12" aria-hidden="true"><path d="M1 6h9M6.5 2.5 10 6l-3.5 3.5" /></svg></button>
-              </span>
+                        <div class="journey-foot">
+              <div class="step-nav">
+                <button type="button" class="step-prev" data-dir="-1"><span data-i18n="steps.prev">Fase precedente</span></button>
+                <button type="button" class="step-next" data-dir="1"><span data-i18n="steps.next">Fase successiva</span></button>
+              </div>
+<a class="line-link" href="#contact" data-interest="transform"><span data-i18n="line.1.link">Parliamo di un tuo processo</span><svg class="arrow" viewBox="0 0 12 12" aria-hidden="true"><path d="M1 6h9M6.5 2.5 10 6l-3.5 3.5" /></svg></a>
             </div>
           </div>
           <div class="journey" id="journey-2" role="region" aria-labelledby="line-2-title" tabindex="-1">
-            <div class="tappa">
+            <nav class="steps" aria-label="Fasi del percorso" data-i18n-attr="aria-label:steps.aria">
+              <button type="button" class="step-btn" data-step="1" aria-current="step"><span class="step-num">1</span><span data-i18n="steps.1">x</span></button>
+              <button type="button" class="step-btn" data-step="2"><span class="step-num">2</span><span data-i18n="steps.2">x</span></button>
+              <button type="button" class="step-btn" data-step="3"><span class="step-num">3</span><span data-i18n="steps.3">x</span></button>
+            </nav>
+            <div class="tappa is-current" data-phase="1">
               <p class="tappa-k" data-i18n="phase.1">Fase 1 · Capire</p>
               <h4 class="tappa-t" data-i18n="tappa.2.1.t">Troviamo la nicchia.</h4>
               <p class="tappa-s" data-i18n="tappa.2.1.s">Valutiamo le nicchie su problema, urgenza e acquirente, e confermiamo la domanda prima di costruire.</p>
@@ -326,7 +337,7 @@
 
               </div>
             </div>
-            <div class="tappa">
+            <div class="tappa" data-phase="2">
               <p class="tappa-k" data-i18n="phase.2">Fase 2 · Costruire</p>
               <h4 class="tappa-t" data-i18n="tappa.2.2.t">Lo portiamo sul mercato.</h4>
               <p class="tappa-s" data-i18n="tappa.2.2.s">Costruiamo il prodotto AI-⁠native, lo lanciamo e lo seguiamo fino ai primi clienti paganti.</p>
@@ -379,7 +390,7 @@
 
               </div>
             </div>
-            <div class="tappa">
+            <div class="tappa" data-phase="3">
               <p class="tappa-k" data-i18n="phase.3">Fase 3 · Consegnare</p>
               <h4 class="tappa-t" data-i18n="tappa.2.3.t">Lo acquista un’impresa che vuole innovare.</h4>
               <p class="tappa-s" data-i18n="tappa.2.3.s">Un prodotto che funziona e ha già clienti, senza avviare un progetto interno.</p>
@@ -427,12 +438,12 @@
 
               </div>
             </div>
-            <div class="journey-foot">
-              <a class="line-link" href="#contact" data-interest="build"><span data-i18n="line.2.link">Parliamo di un tuo prodotto</span><svg class="arrow" viewBox="0 0 12 12" aria-hidden="true"><path d="M1 6h9M6.5 2.5 10 6l-3.5 3.5" /></svg></a>
-              <span class="journey-actions">
-                <button type="button" class="journey-btn" data-journey-close="2"><span data-i18n="journey.closeShort">Chiudi</span></button>
-                <button type="button" class="journey-btn journey-btn--other" data-journey-switch="1"><span data-i18n="journey.other.1">Vedi i processi</span><svg class="arrow" viewBox="0 0 12 12" aria-hidden="true"><path d="M1 6h9M6.5 2.5 10 6l-3.5 3.5" /></svg></button>
-              </span>
+                        <div class="journey-foot">
+              <div class="step-nav">
+                <button type="button" class="step-prev" data-dir="-1"><span data-i18n="steps.prev">Fase precedente</span></button>
+                <button type="button" class="step-next" data-dir="1"><span data-i18n="steps.next">Fase successiva</span></button>
+              </div>
+<a class="line-link" href="#contact" data-interest="build"><span data-i18n="line.2.link">Parliamo di un tuo prodotto</span><svg class="arrow" viewBox="0 0 12 12" aria-hidden="true"><path d="M1 6h9M6.5 2.5 10 6l-3.5 3.5" /></svg></a>
             </div>
           </div>
         </div>

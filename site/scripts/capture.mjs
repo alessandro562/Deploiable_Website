@@ -174,13 +174,13 @@ async function type(sel, text) {
 const top = (sel) => page.evaluate((sel) => document.querySelector(sel).getBoundingClientRect().top + scrollY, sel);
 const maxY = () => page.evaluate(() => document.documentElement.scrollHeight - innerHeight);
 const HEADER = 72;
-/** le tre fasi di un percorso aperto: per ognuna lo schema entra, poi una pausa di lettura */
+/** le tre fasi di un percorso: si sceglie il passo 1·2·3, la fase entra, poi una pausa di lettura */
 async function phases(id, speed = 1) {
-  for (let i = 0; i < 3; i++) {
-    const y = await page.evaluate(([id, i]) => document.querySelectorAll(`#journey-${id} .tappa`)[i].getBoundingClientRect().top + scrollY, [id, i]);
-    const sway = mobile ? null : (k) => ({ x: 1040 + Math.sin((i + k) * 2.3) * 120, y: 520 + Math.cos((i + k) * 1.9) * 90, o: 1 });
-    await scroll(y - HEADER - (mobile ? 8 : 40), 1.2 * speed, ease, sway);
-    await hold(1.3 * speed);
+  for (let i = 1; i <= 3; i++) {
+    if (i > 1) {
+      await press(`#journey-${id} .step-btn[data-step="${i}"]`);
+    }
+    await hold(1.6 * speed);
   }
 }
 /** contatto: il modulo e l'invio (all'indirizzo finto, intercettato sopra) */
@@ -244,8 +244,7 @@ if (!mobile) {
   await hold(1.0);
   await phases(2, 0.6);
   await scroll((await top('#journey-2 .journey-foot')) - 420, 0.8);
-  await press('#journey-2 [data-journey-close="2"]'); // chiude e torna alle card
-  await hold(1.0);
+  await hold(0.6);
   await scroll((await top('#contact')) + 380, 1.4);
   await press('.path', 1);
   await contact('giulia@company.com', 'Company Ltd');

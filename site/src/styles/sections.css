@@ -523,8 +523,7 @@ h3 {
 .line-toggle[aria-expanded='true'] .arrow {
   transform: rotate(180deg);
 }
-.line-toggle:focus-visible,
-.journey-btn:focus-visible {
+.line-toggle:focus-visible {
   outline: 2px solid var(--forest);
   outline-offset: 3px;
 }
@@ -534,17 +533,21 @@ h3 {
   }
 }
 
-/* il percorso aperto: sotto la sua card, dentro la sua colonna (sopra 860 px) o a tutta larghezza (telefono);
-   senza JavaScript restano aperti tutti e due */
-.journey {
+/* il percorso scelto: una sola volta sotto le card, a tutta larghezza; senza JavaScript restano visibili tutti */
+.journey,
+.stage-empty {
+  grid-column: 1 / -1;
   min-width: 0;
+}
+.journey {
   margin-top: var(--s-7);
-  padding-top: var(--s-2);
-  border-top: 1px solid var(--hair);
+  padding-top: var(--s-5);
+  border-top: 1px solid var(--forest);
   scroll-margin-top: 72px;
   outline: none;
 }
-.journey[hidden] {
+.journey[hidden],
+.stage-empty[hidden] {
   display: none;
 }
 .journey.is-entering {
@@ -556,42 +559,113 @@ h3 {
     transform: translateY(16px);
   }
 }
+.stage-empty {
+  margin-top: var(--s-7);
+  padding-top: var(--s-5);
+  border-top: 1px solid var(--hair);
+  font: var(--t-body);
+  font-size: 16px;
+  color: var(--ink-soft);
+}
+
+/* passi della fase: 1 · 2 · 3, con avanti e indietro in fondo */
+.steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+  margin: 0 0 var(--s-6);
+  padding: 0;
+  list-style: none;
+}
+.step-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  min-height: 48px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  box-shadow: inset 0 0 0 1px rgb(16 38 27 / 0.3);
+  font: var(--t-button);
+  font-size: 16px;
+  color: var(--forest);
+  cursor: pointer;
+  transition: background-color var(--dur-ui) var(--ease), color var(--dur-ui) var(--ease);
+}
+.step-num {
+  display: inline-grid;
+  place-items: center;
+  width: 1.7em;
+  height: 1.7em;
+  border-radius: 50%;
+  background: rgb(16 38 27 / 0.08);
+  font-size: 13px;
+  font-weight: 700;
+}
+.step-btn[aria-current='step'] {
+  background: var(--forest);
+  box-shadow: none;
+  color: var(--mist);
+}
+.step-btn[aria-current='step'] .step-num {
+  background: var(--lime);
+  color: var(--forest);
+}
+.step-btn:focus-visible,
+.step-prev:focus-visible,
+.step-next:focus-visible {
+  outline: 2px solid var(--forest);
+  outline-offset: 3px;
+}
 .journey-foot {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: var(--s-4);
-  margin-top: var(--s-8);
+  margin-top: var(--s-7);
   padding-top: var(--s-5);
   border-top: 1px solid var(--hair);
 }
 .journey-foot .line-link {
   margin-top: 0;
 }
-.journey-actions {
+.step-nav {
   display: flex;
-  flex-wrap: wrap;
-  gap: var(--s-3);
-}
-.journey-btn {
-  display: inline-flex;
-  align-items: center;
   gap: var(--s-2);
-  min-height: 44px;
+}
+.step-prev,
+.step-next {
+  min-height: 48px;
   padding: 0 18px;
   border: 0;
   border-radius: 999px;
   background: transparent;
-  box-shadow: inset 0 0 0 1px rgb(16 38 27 / 0.35);
+  box-shadow: inset 0 0 0 1px rgb(16 38 27 / 0.3);
   font: var(--t-button);
+  font-size: 16px;
   color: var(--forest);
   cursor: pointer;
 }
-.journey-btn--other {
+.step-next {
   background: var(--forest);
   box-shadow: none;
   color: var(--mist);
+}
+.step-prev:disabled,
+.step-next:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+/* senza JavaScript i passi non funzionano: si nascondono, e le fasi restano tutte in fila */
+.steps,
+.step-nav {
+  display: none;
+}
+.js-steps .steps,
+.js-steps .step-nav {
+  display: flex;
 }
 .line-num {
   font: var(--t-label);
@@ -653,22 +727,16 @@ h3 {
     transform: translateX(3px);
   }
 }
-/* una fase: su desktop testo a sinistra e schema a destra, su telefono uno sotto l'altro */
+/* una fase: testo a 16 px sopra, schema a larghezza piena sotto (760 px: le etichette dentro lo schema arrivano
+   a 12–14 px). Sul telefono lo schema è troppo piccolo per il testo: le etichette si nascondono e il significato
+   resta nel testo della fase */
 .tappa {
-  display: grid;
-  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-  grid-template-rows: auto auto 1fr;
-  column-gap: var(--s-7);
-  align-items: start;
-  padding-top: clamp(48px, 7vh, 88px);
+  padding-top: clamp(40px, 6vh, 64px);
 }
-.tappa-k,
-.tappa-t,
-.tappa-s {
-  grid-column: 1;
+.js-steps .tappa:not(.is-current) {
+  display: none;
 }
 .tappa-k {
-  padding-top: clamp(24px, 4vw, 64px);
   font: var(--t-label);
   letter-spacing: var(--track-label);
   text-transform: uppercase;
@@ -676,108 +744,44 @@ h3 {
 }
 .tappa-t {
   margin: var(--s-2) 0 0;
-  max-width: 18em;
-  font: 700 clamp(22px, 2vw, 28px) / 1.18 var(--sans);
+  max-width: 22em;
+  font: 700 clamp(24px, 2.4vw, 32px) / 1.14 var(--sans);
   letter-spacing: -0.02em;
   text-wrap: balance;
   color: var(--forest);
 }
 .tappa-s {
   margin: var(--s-3) 0 0;
-  max-width: 30em;
+  max-width: 36em;
   font: var(--t-body);
+  font-size: 17px;
   text-wrap: pretty;
   color: var(--forest);
 }
 .tappa-fig {
-  grid-column: 2;
-  grid-row: 1 / span 3;
-  justify-self: end;
+  margin-top: var(--s-6);
   width: 100%;
-  max-width: 600px;
+  max-width: 760px;
 }
 .tappa-fig .mk {
-  max-width: 600px;
+  max-width: 100%;
 }
-/* desktop: due colonne affiancate; ogni percorso va sotto la card della sua colonna, dentro la colonna */
-@media (min-width: 861px) {
-  #line-1 { grid-column: 1; grid-row: 1; }
-  #line-2 { grid-column: 2; grid-row: 1; }
-  #journey-1 { grid-column: 1; grid-row: 2; }
-  #journey-2 { grid-column: 2; grid-row: 2; }
-  .journey {
-    margin-top: var(--s-6);
-    padding-top: var(--s-5);
+@media (max-width: 860px) {
+  .tappa-fig .mk [data-i18n] {
+    visibility: hidden;
   }
-  .journey-btn--other {
+  .tappa-fig .mk .mk-pill,
+  .tappa-fig .mk .mk-src,
+  .tappa-fig .mk .mk-note,
+  .tappa-fig .mk .mk-flag,
+  .tappa-fig .mk .mk-tag {
     display: none;
   }
-  .journey-foot {
-    margin-top: var(--s-7);
-    padding-top: var(--s-4);
-  }
-  /* le fasi in verticale dentro la colonna: testo, poi lo schema alla larghezza della colonna */
-  .tappa {
-    grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: none;
-    padding-top: 0;
-  }
-  .tappa + .tappa {
-    margin-top: var(--s-7);
-    padding-top: var(--s-7);
-    border-top: 1px solid var(--hair);
-  }
-  .tappa-k {
-    padding-top: 0;
-    grid-column: auto;
-  }
-  .tappa-t,
-  .tappa-s {
-    grid-column: auto;
-  }
-  .tappa-t {
-    font-size: clamp(22px, 2vw, 26px);
-  }
-  .tappa-fig {
-    grid-column: auto;
-    grid-row: auto;
-    justify-self: start;
-    max-width: 100%;
-    margin-top: var(--s-5);
-  }
-  .tappa-fig .mk {
-    max-width: 100%;
-  }
-}
-
-@media (max-width: 860px) {
   .lines {
     grid-template-columns: minmax(0, 1fr);
   }
-  /* su telefono il percorso si apre subito sotto la sua card */
-  #line-1 { order: 1; }
-  #journey-1 { order: 2; }
-  #line-2 { order: 3; margin-top: var(--s-8); }
-  #journey-2 { order: 4; }
-  .journey {
-    margin-top: var(--s-5);
-  }
-  .tappa {
-    grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: none;
-  }
-  .tappa-k {
-    padding-top: 0;
-  }
-  .tappa-fig {
-    grid-column: 1;
-    grid-row: auto;
-    justify-self: start;
-    margin-top: var(--s-5);
-  }
-  .journey-foot {
-    flex-direction: column;
-    align-items: flex-start;
+  .line-col + .line-col {
+    margin-top: var(--s-8);
   }
 }
 
