@@ -50,7 +50,7 @@ for (const path of pages) {
     const sel = [
       '.lang button, .nav-list a, .soon, .claim .line, .sub, .hero-ctas .btn span, .proof-line',
       '.kicker, .sec-title, .sec-lead, .sec-note, .line-num, .line-title, .line-text, .line-tags li, .line-link span',
-      '.step-num, .step-title, .step-text',
+      '.tappa-k, .tappa-t, .tappa-s',
       '.contact-title, .contact-lead, .offer-title, .offer, .paths-legend, .path-num, .path-title, .path-text',
       '.signup-row input, .signup button, .consent-text, .consent a, .signup-note, .foot p, .foot dt, .foot dd, .foot a',
       '.doc-body p, .doc-body h2, .doc-draft, .doc-updated, .doc-back a',

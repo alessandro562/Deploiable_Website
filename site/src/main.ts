@@ -1,6 +1,7 @@
 import './styles/fonts.css';
 import './styles/main.css';
 import './styles/sections.css';
+import './styles/mockups.css';
 import { detect } from './core/capabilities';
 import { initI18n } from './i18n';
 import { initSignup } from './signup';

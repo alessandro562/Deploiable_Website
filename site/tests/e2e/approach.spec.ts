@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 
-// La pagina snella (step 1 del piano V2): "Cosa facciamo" subito sotto la hero, due linee di prodotto,
-// "Come lavoriamo", contatto. Niente racconto 3D, niente esempi.
+// La pagina snella: "Cosa facciamo" subito sotto la hero, due linee di prodotto raccontate in tre fasi
+// (che sono anche il metodo), poi il contatto. Niente racconto 3D, niente esempi.
 
 const ready = async (page: import('@playwright/test').Page) => {
   await page.goto('/?__test=1');
@@ -25,20 +25,27 @@ test('subito sotto la hero: "Cosa facciamo" con le due linee di prodotto', async
   expect(gap).toBeLessThan(2);
 });
 
-test('le figure sono decorative: immagini con alt vuoto e dimensioni fisse', async ({ page }) => {
+test('ogni colonna racconta tre fasi, ognuna con uno schema decorativo', async ({ page }) => {
   await ready(page);
-  const figs = page.locator('#cosa-facciamo .line-fig');
-  await expect(figs).toHaveCount(2);
-  for (const f of await figs.all()) {
-    await expect(f).toHaveAttribute('alt', '');
-    await expect(f).toHaveAttribute('aria-hidden', 'true');
-    await expect(f).toHaveAttribute('width', '560');
-    await expect(f).toHaveAttribute('height', '360');
+  for (const col of await page.locator('#cosa-facciamo .line-col').all()) {
+    await expect(col.locator('.tappa')).toHaveCount(3);
+    await expect(col.locator('.tappa-k')).toHaveText([/1/, /2/, /3/]);
   }
-  // le immagini si caricano davvero dal sottopercorso di pagina
-  for (const f of await figs.all()) {
-    expect(await f.evaluate((el: HTMLImageElement) => el.complete && el.naturalWidth > 0)).toBe(true);
-  }
+  const figs = page.locator('#cosa-facciamo .mk');
+  await expect(figs).toHaveCount(6);
+  for (const f of await figs.all()) await expect(f).toHaveAttribute('aria-hidden', 'true');
+  // "Come lavoriamo" non è più una sezione a sé: l'ancora porta alla prima fase
+  await expect(page.locator('section#metodo, .sec--method')).toHaveCount(0);
+  await expect(page.locator('#cosa-facciamo .tappa#metodo')).toHaveCount(1);
+});
+
+test('gli schemi si traducono con la pagina', async ({ page }) => {
+  await ready(page);
+  const first = page.locator('#cosa-facciamo .mk [data-i18n="mk.1"]');
+  await expect(first).toHaveText('Mappa del processo · oggi');
+  await page.click('[data-lang="en"]');
+  await expect(first).toHaveText('Process map · today');
+  await expect(page.locator('#cosa-facciamo .tappa-k').first()).toHaveText('Phase 1 · Understand');
 });
 
 test('ogni linea porta al contatto con la strada già scelta', async ({ page }) => {
@@ -64,15 +71,17 @@ test('navigazione: Approccio, Come lavoriamo, Contatti; niente esempi né "Cosa 
   await expect.poll(() => page.evaluate(() => Math.abs(document.getElementById('metodo')!.getBoundingClientRect().top)), { timeout: 5000 }).toBeLessThan(4);
 });
 
-test('header: testi Forest sopra la fascia Mist, chiari sopra le fasce scure', async ({ page }) => {
+test('header: testi Forest sopra la fascia Mist e sul Lime, chiari sopra la hero', async ({ page }) => {
   await ready(page);
   await page.evaluate(() => document.getElementById('cosa-facciamo')!.scrollIntoView());
   await expect(page.locator('html')).toHaveClass(/is-light-under/);
   await expect(page.locator('html')).not.toHaveClass(/is-dark-under/);
   const ink = await page.locator('.logo-slot').evaluate((el) => getComputedStyle(el).color);
   expect(ink).toBe('rgb(16, 38, 27)'); // Forest
-  await page.evaluate(() => document.getElementById('metodo')!.scrollIntoView());
-  await expect(page.locator('html')).toHaveClass(/is-dark-under/);
+  await page.evaluate(() => document.getElementById('contact')!.scrollIntoView());
+  await expect(page.locator('html')).toHaveClass(/is-lime-under/);
+  await page.evaluate(() => scrollTo(0, 0));
+  await expect(page.locator('html')).not.toHaveClass(/is-light-under|is-lime-under/);
 });
 
 test('nessuno scorrimento orizzontale da 360 a 1920 px, nemmeno con le linee', async ({ browser }) => {

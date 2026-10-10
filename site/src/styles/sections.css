@@ -282,18 +282,6 @@ h3 {
   padding: clamp(88px, 13vh, 152px) var(--pad-x);
   scroll-margin-top: 0;
 }
-.sec--method {
-  padding-top: clamp(64px, 9vh, 112px);
-}
-/* filo sottile fra due sezioni scure, largo quanto il contenuto */
-.sec--method::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: max(var(--pad-x), calc((100vw - var(--content)) / 2));
-  right: max(var(--pad-x), calc((100vw - var(--content)) / 2));
-  border-top: 1px solid var(--hair);
-}
 .sec-head {
   max-width: var(--content);
   margin: 0 auto var(--s-8);
@@ -317,43 +305,6 @@ h3 {
   margin-top: var(--s-4);
   font: var(--t-small);
   color: var(--sage);
-}
-
-/* Metodo: tre stati dello stesso stack */
-.steps {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--s-6);
-  max-width: var(--content);
-  margin: 0 auto;
-  padding: 0;
-  list-style: none;
-}
-.step-num {
-  margin-top: var(--s-5);
-  font: var(--t-label);
-  letter-spacing: var(--track-label);
-  color: var(--lime);
-}
-.step-title {
-  margin-top: var(--s-2);
-  font: 700 clamp(24px, 2.2vw, 30px) / 1.1 var(--sans);
-  letter-spacing: -0.025em;
-  color: var(--mist);
-}
-.step-text {
-  margin-top: var(--s-3);
-  max-width: 26em;
-  font: var(--t-body);
-  font-size: 16px;
-  text-wrap: pretty;
-  color: var(--ink-body);
-}
-@media (max-width: 760px) {
-  .steps {
-    grid-template-columns: minmax(0, 1fr);
-    gap: var(--s-7);
-  }
 }
 
 /* ---------- Contatto: su Lime, solo Forest ---------- */
@@ -507,25 +458,23 @@ h3 {
 .lines {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--s-8) var(--s-7);
+  grid-template-rows: repeat(5, auto);
+  column-gap: var(--s-7);
   max-width: var(--content);
   margin: 0 auto;
 }
 .line-col {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
+  display: grid;
+  grid-row: span 5;
+  grid-template-rows: subgrid;
+  align-items: start;
   min-width: 0;
   padding-top: var(--s-5);
   border-top: 1px solid var(--hair);
 }
-/* figura piatta e statica: dimensioni fisse (niente spostamento del layout), decorativa (alt vuoto) */
-.line-fig {
-  display: block;
-  width: 100%;
-  max-width: 560px;
-  height: auto;
-  margin: 0 0 var(--s-6);
+.line-head,
+.tappa {
+  min-width: 0;
 }
 .line-num {
   font: var(--t-label);
@@ -587,10 +536,49 @@ h3 {
     transform: translateX(3px);
   }
 }
+/* una fase: etichetta, titolo, testo, schema */
+.tappa {
+  padding-top: clamp(56px, 8vh, 96px);
+}
+.tappa-k {
+  font: var(--t-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.tappa-t {
+  margin: var(--s-2) 0 0;
+  max-width: 20em;
+  font: 700 clamp(21px, 1.8vw, 24px) / 1.2 var(--sans);
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+  color: var(--forest);
+}
+.tappa-s {
+  margin: var(--s-2) 0 0;
+  max-width: 32em;
+  font: var(--t-body);
+  font-size: 16px;
+  text-wrap: pretty;
+  color: var(--forest);
+}
+.tappa-fig {
+  margin-top: var(--s-5);
+}
+.line-col > .line-link {
+  margin-top: var(--s-7);
+}
 @media (max-width: 860px) {
   .lines {
     grid-template-columns: minmax(0, 1fr);
-    gap: var(--s-7);
+    grid-template-rows: none;
+  }
+  .line-col {
+    grid-row: auto;
+    grid-template-rows: none;
+  }
+  .line-col + .line-col {
+    margin-top: var(--s-8);
   }
 }
 
@@ -615,10 +603,31 @@ h3 {
   opacity: 0;
   transform: translateY(18px);
 }
-.rv-on .line-col:nth-child(2),
-.rv-on .step:nth-child(2) {
-  transition-delay: 90ms;
+/* lo schema arriva più piatto e si piega in prospettiva; le schede in primo piano si staccano subito dopo */
+.rv-on .tappa.rv {
+  transform: none;
+  opacity: 1;
 }
-.rv-on .step:nth-child(3) {
-  transition-delay: 180ms;
+.rv-on .tappa.rv .tappa-k,
+.rv-on .tappa.rv .tappa-t,
+.rv-on .tappa.rv .tappa-s {
+  transition: opacity 0.7s var(--ease), transform 0.7s var(--ease);
+}
+.rv-on .tappa.rv:not(.in) :is(.tappa-k, .tappa-t, .tappa-s) {
+  opacity: 0;
+  transform: translateY(14px);
+}
+.rv-on .tappa.rv .mk-stage {
+  transition: transform 1.2s cubic-bezier(0.2, 0.7, 0.2, 1), opacity 0.9s var(--ease);
+}
+.rv-on .tappa.rv:not(.in) .mk-stage {
+  opacity: 0;
+  transform: rotateX(8deg) rotateY(-4deg) rotateZ(1deg) translateY(3em);
+}
+.rv-on .tappa.rv .mk-stage > .mk-panel:not(.mk-layer) {
+  transition: transform 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) 0.45s, opacity 0.6s var(--ease) 0.45s;
+}
+.rv-on .tappa.rv:not(.in) .mk-stage > .mk-panel:not(.mk-layer) {
+  opacity: 0;
+  transform: translateZ(0);
 }

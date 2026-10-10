@@ -116,10 +116,11 @@ test('tipografia: ogni testo piccolo usa una misura della scala (12, 13, 14, 16,
       const scale = [12, 13, 14, 16, 17];
       // titoli e frasi grandi hanno misure fluide (clamp) e stanno fuori da questo controllo
       const big =
-        '.claim, .claim *, .sub, h2, h3, .line-title, .sec-lead, .contact-lead, .path-title, .nav-open .nav-list, .doc-body h1, .doc-lead, .doc-body h2';
+        '.claim, .claim *, .sub, h2, h3, .line-title, .tappa-t, .sec-lead, .contact-lead, .path-title, .nav-open .nav-list, .doc-body h1, .doc-lead, .doc-body h2';
       const out: string[] = [];
       for (const el of document.querySelectorAll<HTMLElement>('body *')) {
-        if (el.closest(big) || el.closest('script, style, svg, noscript')) continue;
+        // gli schemi in prospettiva (.mk) scalano con la colonna: misure in em, decorativi (aria-hidden)
+        if (el.closest(big) || el.closest('script, style, svg, noscript, .mk')) continue;
         const own = Array.from(el.childNodes).some((n) => n.nodeType === 3 && n.textContent!.trim());
         if (!own) continue;
         const fs = parseFloat(getComputedStyle(el).fontSize);

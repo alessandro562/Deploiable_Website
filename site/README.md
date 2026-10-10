@@ -11,9 +11,11 @@ La pagina, dall'alto (versione in revisione, branch `v2-redesign`):
 2. **Cosa facciamo** (`#cosa-facciamo`, fondo Mist): "Un product lab, due linee di prodotto." Due colonne:
    - 01 · Processi: soluzioni AI nei processi del cliente; se le automazioni non bastano, un prodotto su misura chiavi in mano.
    - 02 · Product Studio: prodotti di nicchia costruiti, portati sul mercato e venduti a imprese.
-   Le figure sono SVG piatti e statici in `public/assets/mockups/`, decorativi (alt vuoto).
-3. **Come lavoriamo** (`#metodo`): Comprendiamo · Costruiamo · Mettiamo in produzione.
-4. **Contatto** (`#contact`, Lime): scelta della strada e modulo.
+   Ogni colonna racconta il servizio in tre fasi, che sono anche il metodo (Capire, Costruire, Consegnare; la
+   voce di menu "Come lavoriamo" porta alla prima, `#metodo`). Ogni fase ha uno schema in prospettiva: HTML e CSS
+   (`src/styles/mockups.css`, misure in em che scalano con la colonna), testi tradotti con le chiavi `mk.*`,
+   decorativo (aria-hidden). Mostrano il metodo, non schermate di un prodotto.
+3. **Contatto** (`#contact`, Lime): scelta della strada e modulo.
 
 Non ci sono più il racconto a scorrimento né la sezione esempi: sono nella storia del branch (commit 69b6d1a) per
 ripensarli più avanti, a step approvati.

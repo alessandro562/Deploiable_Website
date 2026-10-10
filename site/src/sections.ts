@@ -126,7 +126,7 @@ function interestLinks() {
 function reveals(reduced: boolean) {
   if (reduced || !('IntersectionObserver' in window)) return;
   const root = document.documentElement;
-  const els = Array.from(document.querySelectorAll<HTMLElement>('.sec-head, .line-col, .step, .contact-head, .signup-box'));
+  const els = Array.from(document.querySelectorAll<HTMLElement>('.sec-head, .line-head, .tappa, .line-col > .line-link, .contact-head, .signup-box'));
   root.classList.add('rv-on');
   const io = new IntersectionObserver(
     (entries) => {

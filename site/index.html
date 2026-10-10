@@ -87,8 +87,9 @@
         </div>
       </section>
 
-      <!-- Cosa facciamo: le due linee di prodotto, subito sotto la hero. Le figure sono immagini statiche
-           (public/assets/mockups), decorative: il significato è nel testo. -->
+      <!-- Cosa facciamo: le due linee di prodotto, subito sotto la hero. Ogni colonna racconta il suo servizio in tre
+           fasi (Capire, Costruire, Consegnare: è anche il nostro metodo), ognuna con uno schema in prospettiva.
+           Gli schemi sono HTML e CSS (src/styles/mockups.css), decorativi (aria-hidden): il significato è nel testo. -->
       <section class="sec sec--approach" id="cosa-facciamo" data-surface="light" aria-labelledby="approach-title">
         <div class="sec-head">
           <p class="kicker" data-i18n="approach.k">Cosa facciamo</p>
@@ -96,44 +97,323 @@
         </div>
         <div class="lines">
           <article class="line-col">
-            <img class="line-fig" src="assets/mockups/processi.svg" width="560" height="360" alt="" aria-hidden="true" />
-            <p class="line-num" data-i18n="line.1.k">01 · Per i processi delle aziende</p>
-            <h3 class="line-title" data-i18n="line.1.t">Soluzioni AI integrate nei processi del cliente.</h3>
-            <p class="line-text" data-i18n="line.1.s">Individuiamo i processi in cui l’AI incide su costi, tempi o ricavi e la portiamo in produzione, dentro l’operatività del cliente, con un modello legato al risultato. Se le automazioni non bastano, creiamo un prodotto su misura e lo consegniamo chiavi in mano.</p>
-            <ul class="line-tags">
+            <div class="line-head">
+              <p class="line-num" data-i18n="line.1.k">01 · Per i processi delle aziende</p>
+              <h3 class="line-title" data-i18n="line.1.t">Soluzioni AI integrate nei processi del cliente.</h3>
+              <p class="line-text" data-i18n="line.1.s">Individuiamo i processi in cui l’AI incide su costi, tempi o ricavi e la portiamo in produzione, dentro l’operatività del cliente, con un modello legato al risultato. Se le automazioni non bastano, creiamo un prodotto su misura e lo consegniamo chiavi in mano.</p>
+              <ul class="line-tags">
               <li data-i18n="line.1.tag.1">Workflow AI</li>
               <li data-i18n="line.1.tag.2">Agenti AI</li>
               <li data-i18n="line.1.tag.3">Prodotto su misura</li>
-            </ul>
+              </ul>
+            </div>
+            <div class="tappa" id="metodo">
+              <p class="tappa-k" data-i18n="phase.1">Fase 1 · Capire</p>
+              <h4 class="tappa-t" data-i18n="tappa.1.1.t">Troviamo dove l’AI incide.</h4>
+              <p class="tappa-s" data-i18n="tappa.1.1.s">Mappiamo il processo con chi ci lavora, troviamo il punto critico e concordiamo come misurare il risultato.</p>
+              <div class="tappa-fig">
+                <div class="mk" aria-hidden="true">
+                  <div class="mk-fit">
+                    <div class="mk-stage">
+                      <div class="mk-layer mk-panel mk-map">
+                        <div class="mk-flow-head">
+                          <div>
+                            <div class="mk-k"><span data-i18n="mk.1">Mappa del processo · oggi</span></div>
+                            <div class="mk-t"><span data-i18n="mk.2">Ordini ai fornitori</span></div>
+                          </div>
+                          <span class="mk-pill mk-pill--wait"><span data-i18n="mk.3">Analisi</span></span>
+                        </div>
+                        <div class="mk-flowmap">
+                          <div class="mk-n"><svg class="mk-ico" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg><div><div class="mk-b"><span data-i18n="mk.4">Ricezione</span></div><div class="mk-s"><span data-i18n="mk.5">Email e PDF</span></div></div></div>
+                          <span class="mk-link"></span>
+                          <div class="mk-n mk-n--hot"><svg class="mk-ico" viewBox="0 0 24 24"><rect x="2.5" y="6" width="19" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10"/></svg><div><div class="mk-b"><span data-i18n="mk.6">Inserimento</span></div><div class="mk-s"><span data-i18n="mk.7">A mano</span></div></div><span class="mk-flag">!</span></div>
+                          <span class="mk-link"></span>
+                          <div class="mk-n"><svg class="mk-ico" viewBox="0 0 24 24"><path d="M9 4h6M9 4a2 2 0 0 0-2 2H5v15h14V6h-2a2 2 0 0 0-2-2M8.5 13.5l2.5 2.5 4.5-4.5"/></svg><div><div class="mk-b"><span data-i18n="mk.8">Verifica</span></div><div class="mk-s"><span data-i18n="mk.9">Prezzi a listino</span></div></div></div>
+                          <span class="mk-link"></span>
+                          <div class="mk-n"><svg class="mk-ico" viewBox="0 0 24 24"><circle cx="10" cy="8" r="3.5"/><path d="M3.5 20c.8-3.6 3.4-5.5 6.5-5.5 1.5 0 2.9.4 4 1.3M15.5 18.5l2 2 4-4"/></svg><div><div class="mk-b"><span data-i18n="mk.10">Approvazione</span></div><div class="mk-s"><span data-i18n="mk.11">Responsabile</span></div></div></div>
+                          <div class="mk-note"><div><div class="mk-b"><span data-i18n="mk.12">Punto critico</span></div><div class="mk-s"><span data-i18n="mk.13">Dati copiati a mano, ogni giorno.</span></div></div></div>
+                        </div>
+                      </div>
+
+                      <div class="mk-panel mk-sources">
+                        <span class="mk-src"><svg class="mk-ico" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20c.6-3.4 3-5 6-5s5.4 1.6 6 5M16 4.5a3 3 0 0 1 0 6M18 15c1.6.6 2.7 2.2 3 5"/></svg><span data-i18n="mk.14">Interviste</span></span>
+                        <span class="mk-src"><svg class="mk-ico" viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v12c0 1.7 3.1 3 7 3s7-1.3 7-3V6M5 12c0 1.7 3.1 3 7 3s7-1.3 7-3"/></svg><span data-i18n="mk.15">Dati</span></span>
+                        <span class="mk-src"><svg class="mk-ico" viewBox="0 0 24 24"><path d="M7 3h7l4 4v14H7zM14 3v4h4"/></svg><span data-i18n="mk.16">Documenti</span></span>
+                      </div>
+
+                      <div class="mk-panel mk-goal mk-goal--low">
+                        <div class="mk-k"><span data-i18n="mk.17">Obiettivo concordato</span></div>
+                        <div class="mk-t"><span data-i18n="mk.18">Tempo di evasione ordini</span></div>
+                        <div class="mk-rows">
+                          <div class="mk-row"><span><span data-i18n="mk.19">Misura di partenza</span></span><b class="mk-ok"><svg class="mk-ico" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span data-i18n="mk.20">Rilevata</span></b></div>
+                          <div class="mk-row"><span><span data-i18n="mk.21">Misura in produzione</span></span><b><span data-i18n="mk.22">Ogni mese</span></b></div>
+                          <div class="mk-row"><span><span data-i18n="mk.23">Compenso</span></span><b class="mk-accent"><span data-i18n="mk.24">Legato al risultato</span></b></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+            <div class="tappa">
+              <p class="tappa-k" data-i18n="phase.2">Fase 2 · Costruire</p>
+              <h4 class="tappa-t" data-i18n="tappa.1.2.t">La portiamo in produzione.</h4>
+              <p class="tappa-s" data-i18n="tappa.1.2.s">L’AI entra nel flusso e nei sistemi che usate già. Le decisioni restano alle persone.</p>
+              <div class="tappa-fig">
+                <div class="mk" aria-hidden="true">
+                  <div class="mk-fit">
+                    <div class="mk-stage">
+                      <div class="mk-layer mk-panel mk-map">
+                        <div class="mk-flow-head">
+                          <div>
+                            <div class="mk-k"><span data-i18n="mk.25">Mappa del processo · con l’AI</span></div>
+                            <div class="mk-t"><span data-i18n="mk.2">Ordini ai fornitori</span></div>
+                          </div>
+                          <span class="mk-pill mk-pill--live"><span data-i18n="mk.26">In produzione</span></span>
+                        </div>
+                        <div class="mk-flowmap">
+                          <div class="mk-n"><svg class="mk-ico" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg><div><div class="mk-b"><span data-i18n="mk.4">Ricezione</span></div><div class="mk-s"><span data-i18n="mk.5">Email e PDF</span></div></div></div>
+                          <span class="mk-link mk-link--ai"></span>
+                          <div class="mk-n mk-n--ai"><svg class="mk-ico" viewBox="0 0 24 24" style="fill:currentColor;stroke:none"><path d="M12 2.5c.7 4.6 3 6.9 7.6 7.6-4.6.7-6.9 3-7.6 7.6-.7-4.6-3-6.9-7.6-7.6 4.6-.7 6.9-3 7.6-7.6Z"/><path d="M19 15.5c.3 1.9 1.2 2.8 3 3.1-1.8.3-2.7 1.2-3 3.1-.3-1.9-1.2-2.8-3-3.1 1.8-.3 2.7-1.2 3-3.1Z"/></svg><div><div class="mk-b"><span data-i18n="mk.27">Estrazione</span></div><div class="mk-s"><span data-i18n="mk.28">Agente AI</span></div></div></div>
+                          <span class="mk-link mk-link--ai"></span>
+                          <div class="mk-n"><svg class="mk-ico" viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v12c0 1.7 3.1 3 7 3s7-1.3 7-3V6M5 12c0 1.7 3.1 3 7 3s7-1.3 7-3"/></svg><div><div class="mk-b"><span data-i18n="mk.8">Verifica</span></div><div class="mk-s"><span data-i18n="mk.29">Sul gestionale</span></div></div></div>
+                          <span class="mk-link"></span>
+                          <div class="mk-n mk-n--hot"><svg class="mk-ico" viewBox="0 0 24 24"><circle cx="10" cy="8" r="3.5"/><path d="M3.5 20c.8-3.6 3.4-5.5 6.5-5.5 1.5 0 2.9.4 4 1.3M15.5 18.5l2 2 4-4"/></svg><div><div class="mk-b"><span data-i18n="mk.10">Approvazione</span></div><div class="mk-s"><span data-i18n="mk.11">Responsabile</span></div></div><span class="mk-flag mk-flag--ok"><svg viewBox="0 0 24 24"><path d="M6 12.5l4 4L18 8.5"/></svg></span></div>
+                          <div class="mk-note"><div><div class="mk-b"><span data-i18n="mk.30">Inserimento automatico</span></div><div class="mk-s"><span data-i18n="mk.31">L’AI legge i PDF e compila l’ordine.</span></div></div></div>
+                        </div>
+                      </div>
+
+                      <div class="mk-panel mk-sources">
+                        <span class="mk-src"><svg class="mk-ico" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg><span data-i18n="mk.32">Email</span></span>
+                        <span class="mk-src"><svg class="mk-ico" viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v12c0 1.7 3.1 3 7 3s7-1.3 7-3V6M5 12c0 1.7 3.1 3 7 3s7-1.3 7-3"/></svg><span data-i18n="mk.33">ERP</span></span>
+                        <span class="mk-src"><svg class="mk-ico" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20c.6-3.4 3-5 6-5s5.4 1.6 6 5M16 4.5a3 3 0 0 1 0 6M18 15c1.6.6 2.7 2.2 3 5"/></svg><span data-i18n="mk.34">CRM</span></span>
+                      </div>
+
+                      <div class="mk-panel mk-goal mk-goal--low">
+                        <div class="mk-k"><span data-i18n="mk.35">Persona al controllo</span></div>
+                        <div class="mk-t"><span data-i18n="mk.36">L’ultima parola è vostra</span></div>
+                        <div class="mk-rows">
+                          <div class="mk-row"><span><span data-i18n="mk.37">L’AI prepara</span></span><b><span data-i18n="mk.38">Ordine compilato</span></b></div>
+                          <div class="mk-row"><span><span data-i18n="mk.39">La persona</span></span><b><span data-i18n="mk.40">Approva o corregge</span></b></div>
+                          <div class="mk-row"><span><span data-i18n="mk.41">Ogni passaggio</span></span><b class="mk-accent"><span data-i18n="mk.42">Tracciato</span></b></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+            <div class="tappa">
+              <p class="tappa-k" data-i18n="phase.3">Fase 3 · Consegnare</p>
+              <h4 class="tappa-t" data-i18n="tappa.1.3.t">Se serve, un prodotto su misura.</h4>
+              <p class="tappa-s" data-i18n="tappa.1.3.s">Quando le automazioni non bastano, costruiamo un’applicazione dedicata e la consegniamo chiavi in mano.</p>
+              <div class="tappa-fig">
+                <div class="mk" aria-hidden="true">
+                  <div class="mk-fit">
+                    <div class="mk-stage">
+                      <div class="mk-layer mk-panel mk-map">
+                        <div class="mk-flow-head">
+                          <div>
+                            <div class="mk-k"><span data-i18n="mk.43">Piano · prodotto su misura</span></div>
+                            <div class="mk-t"><span data-i18n="mk.2">Ordini ai fornitori</span></div>
+                          </div>
+                          <span class="mk-pill mk-pill--wait"><span data-i18n="mk.44">Su misura</span></span>
+                        </div>
+                        <div class="mk-thead mk-thead--gantt"><span><span data-i18n="mk.45">Fase</span></span><span><span><span data-i18n="mk.46">Inizio</span></span><span></span><span></span><span style="text-align:right"><span data-i18n="mk.47">Consegna</span></span></span></div>
+                        <div class="mk-gantt">
+                          <div class="mk-grow"><div><div class="mk-b"><span data-i18n="mk.48">Definizione</span></div><div class="mk-s"><span data-i18n="mk.49">Requisiti con il team</span></div></div><div class="mk-track"><span class="mk-span" style="left:2%;width:28%"></span></div></div>
+                          <div class="mk-grow"><div><div class="mk-b"><span data-i18n="mk.50">Sviluppo</span></div><div class="mk-s"><span data-i18n="mk.51">Rilasci progressivi</span></div></div><div class="mk-track"><span class="mk-span mk-span--dark" style="left:24%;width:50%"></span></div></div>
+                          <div class="mk-grow"><div><div class="mk-b"><span data-i18n="mk.52">Integrazione</span></div><div class="mk-s"><span data-i18n="mk.53">Nei sistemi in uso</span></div></div><div class="mk-track"><span class="mk-span mk-span--lime" style="left:62%;width:36%"></span></div></div>
+                        </div>
+                      </div>
+
+                      <div class="mk-panel mk-sources">
+                        <span class="mk-src"><svg class="mk-ico" viewBox="0 0 24 24"><path d="M4 12h4l3-8 4 16 3-8h2"/></svg><span data-i18n="mk.54">Le automazioni non bastano</span></span>
+                        <span class="mk-src mk-src--lime"><svg class="mk-ico" viewBox="0 0 24 24"><path d="M3 7l9-4 9 4-9 4-9-4zM3 7v10l9 4 9-4V7M12 11v10"/></svg><span data-i18n="mk.55">Prodotto su misura</span></span>
+                      </div>
+
+                      <div class="mk-panel mk-deliver mk-deliver--plan">
+                        <div class="mk-k"><span data-i18n="mk.47">Consegna</span></div>
+                        <div class="mk-t"><span data-i18n="mk.56">Chiavi in mano</span></div>
+                        <ul class="mk-checks">
+                          <li><span data-i18n="mk.57">Codice e dati del cliente</span></li>
+                          <li><span data-i18n="mk.58">Integrato nei sistemi in uso</span></li>
+                          <li><span data-i18n="mk.59">Team formato</span></li>
+                          <li><span data-i18n="mk.60">Assistenza attiva</span></li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
             <a class="line-link" href="#contact" data-interest="transform"><span data-i18n="line.1.link">Parliamo di un tuo processo</span><svg class="arrow" viewBox="0 0 12 12" aria-hidden="true"><path d="M1 6h9M6.5 2.5 10 6l-3.5 3.5" /></svg></a>
           </article>
           <article class="line-col">
-            <img class="line-fig" src="assets/mockups/prodotto.svg" width="560" height="360" alt="" aria-hidden="true" />
-            <p class="line-num" data-i18n="line.2.k">02 · Product Studio</p>
-            <h3 class="line-title" data-i18n="line.2.t">Prodotti di nicchia per acquirenti strategici.</h3>
-            <p class="line-text" data-i18n="line.2.s">Troviamo la nicchia, costruiamo il prodotto AI-⁠native e lo portiamo sul mercato. L’azienda lo acquista quando funziona e ha già clienti, senza avviare un progetto interno. Lo vendiamo a imprese che vogliono innovare per ampliare o integrare il proprio business.</p>
-            <ul class="line-tags">
+            <div class="line-head">
+              <p class="line-num" data-i18n="line.2.k">02 · Product Studio</p>
+              <h3 class="line-title" data-i18n="line.2.t">Prodotti di nicchia per acquirenti strategici.</h3>
+              <p class="line-text" data-i18n="line.2.s">Troviamo la nicchia, costruiamo il prodotto AI-⁠native e lo portiamo sul mercato. L’azienda lo acquista quando funziona e ha già clienti, senza avviare un progetto interno. Lo vendiamo a imprese che vogliono innovare per ampliare o integrare il proprio business.</p>
+              <ul class="line-tags">
               <li data-i18n="line.2.tag.1">Prodotti AI-⁠native</li>
               <li data-i18n="line.2.tag.2">Lancio sul mercato</li>
               <li data-i18n="line.2.tag.3">Vendita a imprese</li>
-            </ul>
+              </ul>
+            </div>
+            <div class="tappa">
+              <p class="tappa-k" data-i18n="phase.1">Fase 1 · Capire</p>
+              <h4 class="tappa-t" data-i18n="tappa.2.1.t">Troviamo la nicchia.</h4>
+              <p class="tappa-s" data-i18n="tappa.2.1.s">Valutiamo le nicchie su problema, urgenza e acquirente, e confermiamo la domanda prima di costruire.</p>
+              <div class="tappa-fig">
+                <div class="mk" aria-hidden="true">
+                  <div class="mk-fit">
+                    <div class="mk-stage">
+                      <div class="mk-layer mk-panel mk-map">
+                        <div class="mk-flow-head">
+                          <div>
+                            <div class="mk-k"><span data-i18n="mk.61">Product Studio · ricerca</span></div>
+                            <div class="mk-t"><span data-i18n="mk.62">Scelta della nicchia</span></div>
+                          </div>
+                          <span class="mk-pill mk-pill--wait"><span data-i18n="mk.63">Ricerca</span></span>
+                        </div>
+                        <div class="mk-table">
+                          <div class="mk-thead mk-thead--niche"><span><span data-i18n="mk.64">Nicchia</span></span><span><span data-i18n="mk.65">Problema</span></span><span><span data-i18n="mk.66">Urgenza</span></span><span><span data-i18n="mk.67">Acquirente</span></span></div>
+                          <div class="mk-trow mk-trow--niche"><div><div class="mk-b"><span data-i18n="mk.68">Studi tecnici</span></div><div class="mk-s"><span data-i18n="mk.69">Pratiche e documenti</span></div></div><span class="mk-score"><i class="on"></i><i class="on"></i><i></i></span><span class="mk-score"><i class="on"></i><i></i><i></i></span><span class="mk-score"><i class="on"></i><i class="on"></i><i></i></span></div>
+                          <div class="mk-trow mk-trow--niche is-pick"><div><div class="mk-b"><span data-i18n="mk.70">Laboratori di analisi</span><span class="mk-tag"><span data-i18n="mk.71">Scelta</span></span></div><div class="mk-s"><span data-i18n="mk.72">Referti e controlli</span></div></div><span class="mk-score"><i class="on"></i><i class="on"></i><i class="on"></i></span><span class="mk-score"><i class="on"></i><i class="on"></i><i class="on"></i></span><span class="mk-score"><i class="on"></i><i class="on"></i><i class="on"></i></span></div>
+                          <div class="mk-trow mk-trow--niche"><div><div class="mk-b"><span data-i18n="mk.73">Distribuzione B2B</span></div><div class="mk-s"><span data-i18n="mk.74">Ordini e listini</span></div></div><span class="mk-score"><i class="on"></i><i class="on"></i><i></i></span><span class="mk-score"><i class="on"></i><i class="on"></i><i></i></span><span class="mk-score"><i class="on"></i><i></i><i></i></span></div>
+                        </div>
+                      </div>
+
+                      <div class="mk-panel mk-sources">
+                        <span class="mk-src"><svg class="mk-ico" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20c.6-3.4 3-5 6-5s5.4 1.6 6 5M16 4.5a3 3 0 0 1 0 6M18 15c1.6.6 2.7 2.2 3 5"/></svg><span data-i18n="mk.14">Interviste</span></span>
+                        <span class="mk-src"><svg class="mk-ico" viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span data-i18n="mk.75">Mercato</span></span>
+                        <span class="mk-src"><svg class="mk-ico" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l5 5"/></svg><span data-i18n="mk.76">Concorrenti</span></span>
+                      </div>
+
+                      <div class="mk-panel mk-deliver mk-goal--mid">
+                        <div class="mk-k"><span data-i18n="mk.77">Validazione</span></div>
+                        <div class="mk-t"><span data-i18n="mk.78">Domanda confermata</span></div>
+                        <ul class="mk-checks">
+                          <li><span data-i18n="mk.79">Problema ricorrente</span></li>
+                          <li><span data-i18n="mk.80">Aziende pilota</span></li>
+                          <li><span data-i18n="mk.81">Disponibilità a pagare</span></li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+            <div class="tappa">
+              <p class="tappa-k" data-i18n="phase.2">Fase 2 · Costruire</p>
+              <h4 class="tappa-t" data-i18n="tappa.2.2.t">Lo portiamo sul mercato.</h4>
+              <p class="tappa-s" data-i18n="tappa.2.2.s">Costruiamo il prodotto AI-⁠native, lo lanciamo e lo seguiamo fino ai primi clienti paganti.</p>
+              <div class="tappa-fig">
+                <div class="mk" aria-hidden="true">
+                  <div class="mk-fit">
+                    <div class="mk-stage">
+                      <div class="mk-layer mk-panel mk-map">
+                        <div class="mk-flow-head">
+                          <div>
+                            <div class="mk-k"><span data-i18n="mk.82">Product Studio · mercato</span></div>
+                            <div class="mk-t"><span data-i18n="mk.83">Dal lancio ai clienti</span></div>
+                          </div>
+                          <span class="mk-pill mk-pill--live"><span data-i18n="mk.84">Sul mercato</span></span>
+                        </div>
+                        <div class="mk-miles">
+                          <div class="mk-mile"><span class="mk-dot mk-dot--done"><svg viewBox="0 0 24 24"><path d="M6 12.5l4 4L18 8.5"/></svg></span><div><div class="mk-b"><span data-i18n="mk.85">Prima versione</span></div><div class="mk-s"><span data-i18n="mk.86">Rilasciata</span></div></div></div>
+                          <div class="mk-mile"><span class="mk-dot mk-dot--done"><svg viewBox="0 0 24 24"><path d="M6 12.5l4 4L18 8.5"/></svg></span><div><div class="mk-b"><span data-i18n="mk.80">Aziende pilota</span></div><div class="mk-s"><span data-i18n="mk.87">In uso</span></div></div></div>
+                          <div class="mk-mile"><span class="mk-dot mk-dot--now"></span><div><div class="mk-b"><span data-i18n="mk.88">Primi clienti</span></div><div class="mk-s"><span data-i18n="mk.89">Paganti</span></div></div></div>
+                          <div class="mk-mile"><span class="mk-dot"></span><div><div class="mk-b"><span data-i18n="mk.90">Crescita</span></div><div class="mk-s"><span data-i18n="mk.91">Nuovi mercati</span></div></div></div>
+                        </div>
+                        <div class="mk-chart">
+                          <div class="mk-k"><span data-i18n="mk.92">Utilizzo</span></div>
+                          <svg viewBox="0 0 200 60" preserveAspectRatio="none">
+                            <defs><linearGradient id="mkfill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c8f25a" stop-opacity="0.75"/><stop offset="1" stop-color="#c8f25a" stop-opacity="0"/></linearGradient></defs>
+                            <path d="M0 56 C30 55 45 50 70 46 S110 40 130 30 S170 12 200 4 L200 60 L0 60Z" fill="url(#mkfill)"/>
+                            <path d="M0 56 C30 55 45 50 70 46 S110 40 130 30 S170 12 200 4" fill="none" stroke="#10261b" stroke-width="2.2" vector-effect="non-scaling-stroke"/>
+                          </svg>
+                        </div>
+                      </div>
+
+                      <div class="mk-panel mk-sources">
+                        <span class="mk-src"><svg class="mk-ico" viewBox="0 0 24 24"><path d="M3 7l9-4 9 4-9 4-9-4zM3 7v10l9 4 9-4V7M12 11v10"/></svg><span data-i18n="mk.50">Sviluppo</span></span>
+                        <span class="mk-src"><svg class="mk-ico" viewBox="0 0 24 24"><path d="M5 19l5-5M14 4l6 6-8 8-6-6 8-8z"/></svg><span data-i18n="mk.93">Lancio</span></span>
+                        <span class="mk-src"><svg class="mk-ico" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20c.6-3.4 3-5 6-5s5.4 1.6 6 5M16 4.5a3 3 0 0 1 0 6M18 15c1.6.6 2.7 2.2 3 5"/></svg><span data-i18n="mk.94">Vendite</span></span>
+                      </div>
+
+                      <div class="mk-panel mk-deliver mk-goal--low">
+                        <div class="mk-k"><span data-i18n="mk.95">Prova sul mercato</span></div>
+                        <div class="mk-t"><span data-i18n="mk.96">Il prodotto funziona</span></div>
+                        <ul class="mk-checks">
+                          <li><span data-i18n="mk.97">Clienti paganti</span></li>
+                          <li><span data-i18n="mk.98">Utilizzo costante</span></li>
+                          <li><span data-i18n="mk.99">Supporto e aggiornamenti</span></li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+            <div class="tappa">
+              <p class="tappa-k" data-i18n="phase.3">Fase 3 · Consegnare</p>
+              <h4 class="tappa-t" data-i18n="tappa.2.3.t">Lo acquista un’impresa che vuole innovare.</h4>
+              <p class="tappa-s" data-i18n="tappa.2.3.s">Un prodotto che funziona e ha già clienti, senza avviare un progetto interno.</p>
+              <div class="tappa-fig">
+                <div class="mk" aria-hidden="true">
+                  <div class="mk-fit">
+                    <div class="mk-stage">
+                      <div class="mk-layer mk-panel mk-map">
+                        <div class="mk-flow-head">
+                          <div>
+                            <div class="mk-k"><span data-i18n="mk.100">Product Studio · cessione</span></div>
+                            <div class="mk-t"><span data-i18n="mk.101">Passaggio all’acquirente</span></div>
+                          </div>
+                          <span class="mk-pill mk-pill--run"><span data-i18n="mk.102">Pronto</span></span>
+                        </div>
+                        <div class="mk-handover">
+                          <div class="mk-party mk-party--from"><svg class="mk-ico" viewBox="0 0 24 24" style="fill:currentColor;stroke:none"><path d="M12 2.5c.7 4.6 3 6.9 7.6 7.6-4.6.7-6.9 3-7.6 7.6-.7-4.6-3-6.9-7.6-7.6 4.6-.7 6.9-3 7.6-7.6Z"/></svg><div><div class="mk-b"><span data-i18n="mk.103">Deploiable</span></div><div class="mk-s"><span data-i18n="mk.104">Product Studio</span></div></div></div>
+                          <div class="mk-assets">
+                            <div class="mk-asset is-key"><svg class="mk-ico" viewBox="0 0 24 24"><path d="M3 7l9-4 9 4-9 4-9-4zM3 7v10l9 4 9-4V7M12 11v10"/></svg><span data-i18n="mk.105">Prodotto e codice</span></div>
+                            <div class="mk-asset"><svg class="mk-ico" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20c.6-3.4 3-5 6-5s5.4 1.6 6 5M16 4.5a3 3 0 0 1 0 6M18 15c1.6.6 2.7 2.2 3 5"/></svg><span data-i18n="mk.106">Clienti e contratti</span></div>
+                            <div class="mk-asset"><svg class="mk-ico" viewBox="0 0 24 24"><path d="M4 19V5M4 5h11l-2 3.5L15 12H4"/></svg><span data-i18n="mk.107">Roadmap</span></div>
+                            <div class="mk-asset"><svg class="mk-ico" viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5zM4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5"/></svg><span data-i18n="mk.108">Know-how</span></div>
+                          </div>
+                          <div class="mk-party mk-party--to"><svg class="mk-ico" viewBox="0 0 24 24"><path d="M3 21h18M5 21V8l7-4 7 4v13M9 12h.01M15 12h.01M9 16h.01M15 16h.01"/></svg><div><div class="mk-b"><span data-i18n="mk.109">Impresa acquirente</span></div><div class="mk-s"><span data-i18n="mk.110">Vuole innovare</span></div></div></div>
+                        </div>
+                      </div>
+
+                      <div class="mk-panel mk-sources">
+                        <span class="mk-src"><svg class="mk-ico" viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8M15 7h6v6"/></svg><span data-i18n="mk.111">Ampliare il business</span></span>
+                        <span class="mk-src"><svg class="mk-ico" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M12 8v8M8 12h8"/></svg><span data-i18n="mk.112">Integrare l’offerta</span></span>
+                      </div>
+
+                      <div class="mk-panel mk-deliver mk-goal--deep">
+                        <div class="mk-k"><span data-i18n="mk.113">Per chi acquista</span></div>
+                        <div class="mk-t"><span data-i18n="mk.114">Un prodotto che funziona già</span></div>
+                        <ul class="mk-checks">
+                          <li><span data-i18n="mk.115">Sul mercato, con clienti</span></li>
+                          <li><span data-i18n="mk.116">Nessun progetto interno</span></li>
+                          <li><span data-i18n="mk.117">Affiancamento nel passaggio</span></li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
             <a class="line-link" href="#contact" data-interest="build"><span data-i18n="line.2.link">Parliamo di un tuo prodotto</span><svg class="arrow" viewBox="0 0 12 12" aria-hidden="true"><path d="M1 6h9M6.5 2.5 10 6l-3.5 3.5" /></svg></a>
           </article>
         </div>
       </section>
 
-      <!-- Come lavoriamo: tre passi. Versione compatta, senza figure (step 4 del piano). -->
-      <section class="sec sec--method" id="metodo" data-surface="dark" aria-labelledby="method-title">
-        <div class="sec-head">
-          <p class="kicker" data-i18n="method.k">Come lavoriamo</p>
-          <h2 class="sec-title" id="method-title" data-i18n="method.t">Comprendiamo. Costruiamo. Mettiamo in produzione.</h2>
-        </div>
-        <ol class="steps">
-          <li class="step"><p class="step-num">01</p><h3 class="step-title" data-i18n="step.1.t">Comprendiamo</h3><p class="step-text" data-i18n="step.1.s">Analizziamo processi, utenti, dati, sistemi e opportunità.</p></li>
-          <li class="step"><p class="step-num">02</p><h3 class="step-title" data-i18n="step.2.t">Costruiamo</h3><p class="step-text" data-i18n="step.2.s">Progettiamo e sviluppiamo la soluzione più adatta: workflow, agente, applicazione o prodotto AI-⁠native.</p></li>
-          <li class="step"><p class="step-num">03</p><h3 class="step-title" data-i18n="step.3.t">Mettiamo in produzione</h3><p class="step-text" data-i18n="step.3.s">Integriamo, testiamo, rilasciamo, monitoriamo e miglioriamo nel tempo.</p></li>
-        </ol>
-      </section>
           <!-- Contatto: due strade, un modulo. La strada scelta arriva con la richiesta (campo interest). -->
       <section class="sec sec--contact" id="contact" data-surface="lime" aria-labelledby="contact-title">
         <div class="contact">

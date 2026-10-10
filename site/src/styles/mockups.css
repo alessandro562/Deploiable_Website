@@ -113,7 +113,7 @@
 .mk-approve-head { display: flex; align-items: center; gap: 1em; }
 .mk-avatar { width: 3.2em; height: 3.2em; border-radius: 50%; background: #1c3a2a; color: #f1f3ea; display: grid; place-items: center; font-weight: 600; font-size: 1.05em; flex: none; }
 .mk-rows { margin: 1.2em 0 1.3em; display: grid; gap: 0.7em; }
-.mk-row { display: flex; justify-content: space-between; font-size: 1.05em; color: var(--mk-soft); }
+.mk-row { display: flex; justify-content: space-between; gap: 1em; white-space: nowrap; font-size: 1.05em; color: var(--mk-soft); }
 .mk-row b { color: var(--mk-ink); font-weight: 600; }
 .mk-actions { display: flex; gap: 0.8em; }
 .mk-btn { flex: 1; text-align: center; padding: 0.85em 0; border-radius: 0.9em; font-weight: 600; font-size: 1.1em; }
@@ -144,7 +144,7 @@
   gap: 1.2em;
   padding: 0 1em;
 }
-.mk-thead { font-size: 0.9em; letter-spacing: 0.08em; text-transform: uppercase; color: var(--mk-faint); font-weight: 600; padding-bottom: 0.6em; }
+.mk-thead { font-size: 0.9em; letter-spacing: 0.08em; text-transform: uppercase; color: var(--mk-soft); font-weight: 600; padding-bottom: 0.6em; }
 .mk-trow { padding-top: 1.05em; padding-bottom: 1.05em; border-radius: 1em; }
 .mk-trow + .mk-trow { box-shadow: 0 -0.1em 0 var(--mk-line); }
 .mk-trow.is-pick { background: rgb(200 242 90 / 0.22); box-shadow: inset 0 0 0 0.1em rgb(16 38 27 / 0.12); }
