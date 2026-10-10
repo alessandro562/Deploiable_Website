@@ -198,13 +198,26 @@ p {
   justify-self: end;
 }
 @media (max-width: 640px) {
+  /* su telefono le colonne seguono il contenuto: il pulsante non esce mai dallo schermo */
   .top {
+    grid-template-columns: auto minmax(0, 1fr) auto;
     padding: var(--s-2) var(--s-4);
     gap: var(--s-2);
   }
   .top .soon--top {
     font-size: 11px;
     letter-spacing: 0.08em;
+  }
+  .top .nav-list .nav-cta {
+    margin-left: 0;
+    padding: 0 var(--s-2);
+    font-size: 13px;
+  }
+}
+/* schermi molto stretti: "Coming soon" resta solo nel footer */
+@media (max-width: 379px) {
+  .top .soon--top {
+    visibility: hidden;
   }
 }
 
