@@ -1104,129 +1104,171 @@ h3 {
   }
 }
 
-/* ---------- Schema del metodo: una linea di passi su pannello Forest, che si accende scorrendo ---------- */
+/* ---------- Schema del metodo: pila di card 3D. Il primo passo è in primo piano, gli altri scalano dietro. ---------- */
+/* desktop: nessun pannello, la pila galleggia sul fondo; la profondità viene da translate3d per passo */
 .tappa-fig .mkm-stage {
   position: relative;
-  overflow: hidden;
-  padding: var(--s-7) var(--s-6);
-  border-radius: 16px;
-  background-color: var(--forest);
-  background-image:
-    linear-gradient(rgb(241 243 234 / 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgb(241 243 234 / 0.05) 1px, transparent 1px);
-  background-size: 32px 32px;
-  color: var(--mist);
-  box-shadow:
-    0 2.6em 3.4em -1.6em rgb(16 38 27 / 0.5),
-    0 0.5em 1em rgb(16 38 27 / 0.18);
-  /* entra dal basso e si appoggia al piano con una lieve inclinazione (--p, da src/sections.ts) */
-  transform: perspective(1000px)
-    translateY(calc(16px * (1 - var(--p, 1))))
-    rotateX(calc(3deg + 7deg * (1 - var(--p, 1)) + var(--my, 0) * -3deg))
-    rotateY(calc(var(--mx, 0) * 4deg));
-  transition: transform 0.2s var(--ease);
+  padding: calc(var(--s-7) + 132px) var(--s-6) var(--s-6) var(--s-5);
+  perspective: 1200px;
 }
 .mkm-flow {
-  position: relative;
-  display: flex;
-  gap: var(--s-4);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
   margin: 0;
   padding: 0;
   list-style: none;
+  transform-style: preserve-3d;
+  /* entra dal basso e si appoggia al piano (--p da src/sections.ts), appena sul puntatore (--mx) */
+  transform: translate3d(0, calc(24px * (1 - var(--p, 1))), 0)
+    rotateX(calc(4deg + 6deg * (1 - var(--p, 1))))
+    rotateY(calc(-4deg + var(--mx, 0) * 4deg));
+  transition: transform 0.2s var(--ease);
 }
-/* binario: sottile sotto i cerchi, e una linea Lime che si disegna quando la fase entra in vista */
 .mkm-flow::before,
 .mkm-flow::after {
-  content: '';
-  position: absolute;
-  top: 14px;
-  left: 14px;
-  right: 14px;
-  height: 1px;
-}
-.mkm-flow::before {
-  background: rgb(241 243 234 / 0.18);
-}
-.mkm-flow::after {
-  background: var(--lime);
-  transform-origin: left center;
-  transform: scaleX(var(--p, 1));
-  transition: transform 0.9s var(--ease);
+  display: none;
 }
 .mkm-node {
+  grid-area: 1 / 1;
   position: relative;
-  flex: 1 1 0;
-  min-width: 0;
+  z-index: calc(10 - var(--i));
   display: flex;
+  height: 176px;
+  padding: 18px 24px;
+  border-radius: 18px;
+  background: var(--c);
+  color: var(--forest);
+  transform: translate3d(calc(var(--i) * 26px), calc(var(--i) * -44px), calc(var(--i) * -20px));
+  box-shadow: 0 26px 42px -24px rgb(16 38 27 / 0.5), 0 2px 6px rgb(16 38 27 / 0.1);
+}
+.mkm-node:nth-child(1) { --i: 0; --c: linear-gradient(160deg, #1f4031 0%, var(--forest) 72%); color: var(--mist); }
+.mkm-node:nth-child(2) { --i: 1; --c: #e6ebdd; }
+.mkm-node:nth-child(3) { --i: 2; --c: #dfe6d4; }
+.mkm-node:nth-child(4) { --i: 3; --c: #d6dfca; }
+/* il primo passo: numero in alto, etichetta grande in basso */
+.mkm-node:first-child {
   flex-direction: column;
-  gap: var(--s-4);
+  justify-content: space-between;
+}
+/* gli altri: una striscia in alto, visibile dietro la card davanti */
+.mkm-node:not(:first-child) {
+  flex-direction: row;
+  align-items: flex-start;
+  gap: var(--s-3);
+  padding-top: 14px;
 }
 .mkm-n {
-  position: relative;
-  z-index: 1;
-  display: grid;
-  place-items: center;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  border: 1px solid rgb(241 243 234 / 0.35);
-  background: var(--forest);
   font: 500 12px / 1 var(--text);
-  letter-spacing: 0.04em;
-  color: var(--mist);
+  letter-spacing: 0.12em;
+  color: var(--moss-ink);
 }
-.mkm-l {
-  min-height: 2.5em;
-  font: 700 17px / 1.25 var(--sans);
-  letter-spacing: -0.01em;
-  color: var(--mist);
-  text-wrap: balance;
-}
-/* il risultato della fase: cerchio e testo in Lime */
-.mkm-node:last-child .mkm-n {
-  background: var(--lime);
-  border-color: var(--lime);
-  color: var(--forest);
-}
-.mkm-node:last-child .mkm-l {
+.mkm-node:first-child .mkm-n {
   color: var(--lime);
 }
+.mkm-l {
+  font: 700 15px / 1.2 var(--sans);
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+.mkm-node:first-child .mkm-l {
+  font-size: 30px;
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  color: var(--mist);
+}
+/* il risultato della fase resta un risultato: anche nella pila, in Lime sulla card in primo piano */
+.mkm-node:last-child .mkm-l {
+  color: var(--forest);
+}
+.mkm-node:first-child:last-child .mkm-l {
+  color: var(--mist);
+}
 @media (prefers-reduced-motion: reduce) {
-  .tappa-fig .mkm-stage,
-  .mkm-flow::after {
+  .mkm-flow {
     transition: none;
   }
 }
-/* telefono: il binario diventa verticale, con i cerchi a sinistra e le etichette accanto; niente inclinazione */
+/* telefono: colonna di passi su pannello Forest, con binario e cerchi; niente pila, né profondità */
 @media (max-width: 860px) {
   .tappa-fig .mkm-stage {
     padding: var(--s-5);
-    transform: none;
+    border-radius: 16px;
+    background-color: var(--forest);
+    box-shadow: 0 2.4em 3em -1.4em rgb(16 38 27 / 0.45);
+    perspective: none;
   }
   .mkm-flow {
+    position: relative;
+    display: flex;
     flex-direction: column;
     gap: var(--s-4);
+    transform: none;
   }
   .mkm-flow::before,
   .mkm-flow::after {
+    display: block;
+    content: '';
+    position: absolute;
     top: 14px;
     bottom: 14px;
     left: 13px;
-    right: auto;
     width: 1px;
-    height: auto;
+  }
+  .mkm-flow::before {
+    background: rgb(241 243 234 / 0.18);
   }
   .mkm-flow::after {
+    background: var(--lime);
     transform-origin: top center;
     transform: scaleY(var(--p, 1));
+    transition: transform 0.9s var(--ease);
   }
-  .mkm-node {
+  .mkm-node,
+  .mkm-node:nth-child(n),
+  .mkm-node:not(:first-child) {
+    display: flex;
     flex-direction: row;
     align-items: center;
     gap: var(--s-4);
+    justify-content: flex-start;
+    height: auto;
+    padding: 0;
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
+    transform: none;
+    color: var(--mist);
+    z-index: auto;
   }
-  .mkm-l {
-    min-height: 0;
-    font-size: 16px;
+  .mkm-n {
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 1px solid rgb(241 243 234 / 0.35);
+    background: var(--forest);
+    font: 500 12px / 1 var(--text);
+    letter-spacing: 0.04em;
+    color: var(--mist);
+    position: relative;
+    z-index: 1;
+  }
+  .mkm-node:first-child .mkm-n {
+    color: var(--mist);
+  }
+  .mkm-l,
+  .mkm-node:first-child .mkm-l {
+    font: 700 16px / 1.25 var(--sans);
+    letter-spacing: -0.01em;
+    color: var(--mist);
+  }
+  .mkm-node:last-child .mkm-n {
+    background: var(--lime);
+    border-color: var(--lime);
+    color: var(--forest);
+  }
+  .mkm-node:last-child .mkm-l {
+    color: var(--lime);
   }
 }
