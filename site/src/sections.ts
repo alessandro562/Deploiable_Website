@@ -183,6 +183,24 @@ function journeys(reduced: boolean) {
   document.querySelectorAll<HTMLButtonElement>('.journey .step-btn').forEach((b) => {
     b.addEventListener('click', () => setPhase(b.closest<HTMLElement>('.journey')!.id.replace('journey-', ''), Number(b.dataset.step)));
   });
+  // tasti freccia tra i passi (sinistra e destra, Home e Fine): come in un controllo a schede
+  document.querySelectorAll<HTMLElement>('.journey .steps').forEach((nav) => {
+    nav.addEventListener('keydown', (e) => {
+      const btns = Array.from(nav.querySelectorAll<HTMLButtonElement>('.step-btn'));
+      const cur = btns.findIndex((b) => b.getAttribute('aria-current') === 'step');
+      const k = e.key;
+      let to = -1;
+      if (k === 'ArrowRight') to = Math.min(btns.length - 1, cur + 1);
+      else if (k === 'ArrowLeft') to = Math.max(0, cur - 1);
+      else if (k === 'Home') to = 0;
+      else if (k === 'End') to = btns.length - 1;
+      if (to < 0 || to === cur) return;
+      e.preventDefault();
+      const j = nav.closest<HTMLElement>('.journey')!;
+      setPhase(j.id.replace('journey-', ''), to + 1);
+      btns[to].focus();
+    });
+  });
   document.querySelectorAll<HTMLButtonElement>('.journey .step-prev, .journey .step-next').forEach((b) => {
     b.addEventListener('click', () => {
       const j = b.closest<HTMLElement>('.journey')!;

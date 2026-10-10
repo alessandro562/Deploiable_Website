@@ -5,7 +5,7 @@ import { execFileSync } from 'node:child_process';
 import { mkdirSync, statSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
-const WEIGHTS = [300, 500, 900];
+const WEIGHTS = [300, 500, 700, 900];
 const CSS_URL = `https://api.fontshare.com/v2/css?f[]=satoshi@${WEIGHTS.join(',')}&display=swap`;
 const outDir = fileURLToPath(new URL('../src/assets/fonts/', import.meta.url));
 const curl = (...args) => execFileSync('curl', ['-sSfL', '--retry', '4', '--retry-all-errors', ...args], { maxBuffer: 1 << 24 });

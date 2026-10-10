@@ -858,3 +858,139 @@ h3 {
   opacity: 0;
   transform: translateZ(0);
 }
+
+/* ——— rifinitura: un solo sistema per tutti i comandi della sezione (sostituisce le regole precedenti) ——— */
+.line-toggle,
+.step-btn,
+.step-prev,
+.step-next {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 52px;
+  padding: 0 22px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  box-shadow: inset 0 0 0 1px rgb(16 38 27 / 0.22);
+  font: 600 16px / 1 var(--text);
+  letter-spacing: 0.005em;
+  color: var(--forest);
+  cursor: pointer;
+  transition:
+    background-color var(--dur-state) var(--ease),
+    color var(--dur-state) var(--ease),
+    box-shadow var(--dur-state) var(--ease),
+    transform var(--dur-ui) var(--ease);
+  -webkit-tap-highlight-color: transparent;
+  font-variant-numeric: tabular-nums;
+}
+.line-toggle:active,
+.step-btn:active,
+.step-prev:active,
+.step-next:active {
+  transform: scale(0.98);
+}
+.line-toggle:focus-visible,
+.step-btn:focus-visible,
+.step-prev:focus-visible,
+.step-next:focus-visible {
+  outline: 2px solid var(--forest);
+  outline-offset: 3px;
+}
+@media (hover: hover) {
+  .line-toggle:hover,
+  .step-btn:hover,
+  .step-prev:hover {
+    background: rgb(16 38 27 / 0.06);
+    box-shadow: inset 0 0 0 1px var(--forest);
+  }
+  .step-next:hover {
+    background: var(--pine, #1c3a2a);
+  }
+  .line-toggle:hover .arrow,
+  .step-next:hover .arrow {
+    transform: translateX(3px);
+  }
+}
+.step-btn[aria-current='step']:hover,
+.line-toggle[aria-expanded='true']:hover {
+  background: var(--forest);
+  box-shadow: none;
+}
+.step-next {
+  background: var(--forest);
+  box-shadow: none;
+  color: var(--mist);
+}
+.step-prev:disabled,
+.step-next:disabled {
+  opacity: 0.32;
+  cursor: default;
+  transform: none;
+}
+.step-next:disabled:hover {
+  background: var(--forest);
+}
+
+/* la card è un unico bersaglio: il pulsante copre tutta la colonna (nessun testo cliccabile a parte) */
+.line-col {
+  position: relative;
+}
+.line-toggle {
+  position: static;
+  margin-top: var(--s-6);
+  align-self: flex-start;
+}
+.line-toggle::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 6px;
+}
+.line-toggle .arrow {
+  width: 12px;
+  height: 12px;
+}
+.line-col:has(.line-toggle:focus-visible) {
+  outline: 2px solid var(--forest);
+  outline-offset: 6px;
+  border-radius: 6px;
+}
+
+/* il marcatore quadrato è il simbolo del brand in piccolo: segna le etichette di fase */
+.tappa-k::before {
+  content: '';
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-right: 10px;
+  vertical-align: 1px;
+  background: var(--forest);
+}
+
+/* passaggio tra le fasi: il testo e lo schema entrano in dissolvenza, con il movimento ridotto restano fermi */
+.js-steps .tappa.is-current {
+  animation: phase-in 0.5s var(--ease) both;
+}
+@keyframes phase-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .js-steps .tappa.is-current {
+    animation: none;
+  }
+}
+
+/* lo schema più grande: le etichette restano sopra 12 px */
+.tappa-fig {
+  max-width: 820px;
+}
