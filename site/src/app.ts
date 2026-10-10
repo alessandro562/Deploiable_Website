@@ -43,8 +43,6 @@ export async function start(caps: Capabilities) {
   const outroItems = [['.sub'], ['.outro-cta']].map((sel) =>
     sel.map((q) => document.querySelector<HTMLElement>(q)!),
   );
-  // "Coming soon" dell'header entra con la frase, solo in opacità: il CSS lo centra con translateY(-50%)
-  const soonTop = document.querySelector<HTMLElement>('.soon--top');
   const slotEl = document.querySelector<HTMLElement>('.logo-slot')!;
 
   // Macchina da scrivere su "Ready to be yours.": ogni lettera è uno <span>; quelle "cancellate" restano al loro posto
@@ -124,8 +122,8 @@ export async function start(caps: Capabilities) {
   const dock = () => {
     const root = document.documentElement;
     if (scrolled !== scrollY > 2) root.classList.toggle('is-scrolled', (scrolled = scrollY > 2));
-    // il vetro dell'header si fa più pieno scorrendo: pieno a 240 px
-    root.style.setProperty('--glass', Math.min(1, Math.max(0, scrollY / 240)).toFixed(3));
+    // la barra di vetro compare a intro finita (CSS: .is-ready)
+    root.classList.toggle('is-ready', time >= DURATION);
     if (docked !== (scrolled && time >= DURATION)) {
       docked = !docked;
       root.classList.toggle('is-docked', docked);
@@ -183,7 +181,6 @@ export async function start(caps: Capabilities) {
         el.style.transform = `translate3d(0, ${((1 - e) * 10).toFixed(2)}px, 0)`;
       }
     });
-    if (soonTop) soonTop.style.opacity = Math.min(1, Math.max(0, state.outro * 2)).toFixed(3);
     // la linea: testa e coda sono percentuali della sua lunghezza
     sweep.style.clipPath = `inset(0 ${((1 - state.sweepHead) * 100).toFixed(2)}% 0 ${(state.sweepTail * 100).toFixed(2)}%)`;
     engine.render(story ? () => story.render(engine.renderer, engine.width, engine.height, engine.dpr) : undefined);

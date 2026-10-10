@@ -145,9 +145,23 @@ p {
   width: max-content;
   max-width: calc(100vw - 2 * var(--s-3));
 }
-/* Pillola di vetro, piccola e centrale: contiene logo, etichetta, menu e lingua. In cima è trasparente; scorrendo
-   il vetro si fa pieno (--glass, impostata da src/app.ts). Con il 3D resta trasparente fino a intro finita: il logo
-   3D (sul canvas, sotto la pagina) non va sfocato né coperto prima. */
+/* Pillola di vetro, piccola e centrale: logo, menu e lingua. Compare a intro finita (.is-ready), senza "Coming soon"
+   (sta nel footer). Scrollando il vetro si fa più pieno e sfoca ciò che gli passa sotto; in cima non c'è nulla
+   sotto, e il logo 3D sul canvas resta nitido. */
+.top {
+  position: fixed;
+  z-index: 15; /* sopra l'hero (che parte da y = 0): il logo deve ricevere passaggio del mouse e clic */
+  top: max(var(--s-3), env(safe-area-inset-top));
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: var(--s-4);
+  padding: var(--s-1) var(--s-5);
+  /* fissa (position fixed con left 50%: senza questo la larghezza sarebbe metà schermo) */
+  width: max-content;
+  max-width: calc(100vw - 2 * var(--s-3));
+}
 .top::before {
   content: '';
   position: absolute;
@@ -155,23 +169,26 @@ p {
   z-index: -1;
   pointer-events: none;
   border-radius: 999px;
-  /* vetro traslucido con luce sul bordo (stile liquid glass): si vedono i colori dietro, sfocati e saturati;
-     più pieno scorrendo (--glass 0 → 1) */
+  opacity: 0;
+  background: rgb(255 255 255 / 0.22);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.6), inset 0 0 0 1px rgb(255 255 255 / 0.3);
+  transition: opacity var(--dur-state) var(--ease), background var(--dur-state) var(--ease);
+}
+/* a intro finita il vetro compare subito; sulle pagine senza 3D è sempre presente */
+.is-ready .top::before,
+html:not(.is-webgl) .top::before {
+  opacity: 1;
+}
+/* scrollando il vetro si fa più pieno e sfoca ciò che gli passa sotto */
+.is-scrolled .top::before {
   background: linear-gradient(135deg, rgb(255 255 255 / 0.42), rgb(255 255 255 / 0.14));
-  opacity: var(--glass, 0);
   backdrop-filter: blur(22px) saturate(1.8);
   -webkit-backdrop-filter: blur(22px) saturate(1.8);
-  box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.75),
-    inset 0 -1px 0 rgb(255 255 255 / 0.3),
-    inset 0 0 0 1px rgb(255 255 255 / 0.35),
-    inset 0 0 18px rgb(255 255 255 / 0.18);
 }
-.is-webgl:not(.is-docked) .top::before {
-  --glass: 0;
-}
-.is-scrolled:not(.is-webgl) .top::before {
-  --glass: 1;
+/* durante l'intro la barra è vuota: nessuna voce ferma in alto */
+.is-webgl:not(.is-ready) .top .nav,
+.is-webgl:not(.is-ready) .top .lang {
+  visibility: hidden;
 }
 @media (max-width: 640px) {
   .top {
@@ -179,7 +196,6 @@ p {
     justify-content: center;
     gap: var(--s-2) var(--s-4);
     padding: var(--s-2) var(--s-4);
-    border-radius: 28px;
   }
   .top::before {
     border-radius: 28px;
@@ -190,6 +206,35 @@ p {
     flex: 0 0 auto;
   }
 }
+
+/* quando scendi: un solo simbolo fisso in basso a sinistra, che riporta alla hero */
+.back-top {
+  position: fixed;
+  z-index: 16;
+  left: max(var(--pad-x), env(safe-area-inset-left));
+  bottom: max(var(--s-4), env(safe-area-inset-bottom));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  color: var(--ink-strong);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--dur-state) var(--ease);
+}
+.back-top svg {
+  width: 30px;
+  height: auto;
+}
+.is-scrolled .back-top {
+  opacity: 1;
+  pointer-events: auto;
+}
+.is-dark-under .back-top {
+  color: var(--mist);
+}
+
 .logo-slot {
   display: block;
   border-radius: 4px;

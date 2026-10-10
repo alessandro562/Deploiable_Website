@@ -9,7 +9,7 @@ test('italiano predefinito, inglese col toggle: testi, lang, title e meta', asyn
   await page.waitForFunction(() => window.__DEPLOIABLE__?.ready === true);
   await expect(page.locator('html')).toHaveAttribute('lang', 'it');
   await expect(page.locator('.sub')).toHaveText(/Portiamo l’AI in produzione nei processi/);
-  await expect(page.locator('.soon--top')).toHaveText(/Coming soon/);
+  await expect(page.locator('.soon--foot')).toHaveText(/Coming soon/);
   await expect(page.locator('[data-lang="it"]')).toHaveAttribute('aria-pressed', 'true');
   // l'headline resta in inglese, marcata come tale
   await expect(page.locator('h1 .line').first()).toHaveAttribute('lang', 'en');
@@ -18,7 +18,7 @@ test('italiano predefinito, inglese col toggle: testi, lang, title e meta', asyn
   await page.click('[data-lang="en"]');
   await expect(page.locator('html')).toHaveAttribute('lang', 'en');
   await expect(page.locator('.sub')).toHaveText('We put AI into production in companies’ processes and in the products we build, starting from an agreed number.');
-  await expect(page.locator('.soon--top')).toHaveText(/Coming soon/);
+  await expect(page.locator('.soon--foot')).toHaveText(/Coming soon/);
   await expect(page.locator('[data-lang="en"]')).toHaveAttribute('aria-pressed', 'true');
   expect(await meta(page, 'meta[name="description"]')).toMatch(/starting from an agreed number\./);
   expect(await meta(page, 'meta[property="og:description"]')).toMatch(/We put AI into production/);

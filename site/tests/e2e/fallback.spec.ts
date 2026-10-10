@@ -41,7 +41,7 @@ test('senza WebGL si usa la versione statica', async ({ browser }) => {
 test('versione statica: coming soon e CTA visibili', async ({ page }) => {
   await page.goto('/?mode=static');
   await expect(page.locator('.outro')).toBeVisible();
-  await expect(page.locator('.soon--top')).toHaveText(/Coming soon/i);
+  await expect(page.locator('.soon--foot')).toHaveText(/Coming soon/i);
   await expect(page.locator('.hero .act-cta')).toBeVisible();
 });
 

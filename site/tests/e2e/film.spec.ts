@@ -274,11 +274,11 @@ test('dettagli: testo secondario in Moss scurito pieno, Satoshi per i titoli e G
   // Satoshi per titoli e frase principale, Geist per i testi piccoli
   for (const sel of ['.line--black'])
     expect(await css(sel, 'font-family'), sel).toMatch(/^"?Satoshi/);
-  for (const sel of ['.soon--top', '.sub', '.hero .act-cta'])
+  for (const sel of ['.soon--foot', '.sub', '.hero .act-cta'])
     expect(await css(sel, 'font-family'), sel).toMatch(/^"?Geist/);
-  expect(await css('.soon--top', 'text-transform')).toBe('uppercase');
+  expect(await css('.soon--foot', 'text-transform')).toBe('uppercase');
   // etichetta del sistema (--t-label): Geist 500, maiuscolo spaziato
-  expect(await css('.soon--top', 'font-weight')).toBe('500');
+  expect(await css('.soon--foot', 'font-weight')).toBe('500');
 });
 
 test('hero: il blocco dei testi è centrato in altezza (centro ottico appena sopra la metà)', async ({ page }) => {
