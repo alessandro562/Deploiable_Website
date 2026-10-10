@@ -28,7 +28,7 @@ test('tastiera: ordine di tabulazione logico e focus sempre visibile', async ({ 
   await page.waitForFunction(() => window.__DEPLOIABLE__?.ready === true);
   await page.waitForTimeout(2500);
   const mobile = info.project.name === 'mobile';
-  // logo, navigazione (su telefono il pulsante Menu), lingua, i due pulsanti dell'hero, i due link dei capitoli,
+  // logo, navigazione (su telefono il pulsante Menu), lingua, i due pulsanti dell'hero, i pulsanti dei due percorsi,
   // la scelta della strada, il modulo, il consenso con il link all'informativa, il footer
   const expected = [
     'a./',
@@ -37,8 +37,8 @@ test('tastiera: ordine di tabulazione logico e focus sempre visibile', async ({ 
     'lang-en',
     'a#contact',
     'a#cosa-facciamo',
-    'a#contact',
-    'a#contact',
+    'button.line-toggle',
+    'button.line-toggle',
     'input-interest',
     'signup-email',
     'signup-company',
@@ -89,7 +89,7 @@ test('telefono: ogni comando ha un’area di tocco di almeno 44 px in altezza e 
   await page.waitForFunction(() => window.__DEPLOIABLE__?.ready === true);
   await page.waitForTimeout(2500);
   // i link dentro una frase (consenso) hanno la riga come area: restano fuori, come vuole WCAG 2.5.8
-  const sel = ['.logo-slot', '.nav-toggle', '.lang button', '.hero-ctas .btn', '.line-link', '.path', '#signup-email', '#signup-company', '.signup button[type=submit]', '.foot-link'];
+  const sel = ['.logo-slot', '.nav-toggle', '.lang button', '.hero-ctas .btn', '.line-toggle', '.path', '#signup-email', '#signup-company', '.signup button[type=submit]', '.foot-link'];
   for (const s of sel) {
     for (const el of await page.locator(s).all()) {
       await el.scrollIntoViewIfNeeded();

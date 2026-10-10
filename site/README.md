@@ -11,8 +11,10 @@ La pagina, dall'alto (versione in revisione, branch `v2-redesign`):
 2. **Cosa facciamo** (`#cosa-facciamo`, fondo Mist): "Un product lab, due linee di prodotto." Due colonne:
    - 01 · Processi: soluzioni AI nei processi del cliente; se le automazioni non bastano, un prodotto su misura chiavi in mano.
    - 02 · Product Studio: prodotti di nicchia costruiti, portati sul mercato e venduti a imprese.
-   Ogni colonna racconta il servizio in tre fasi, che sono anche il metodo (Capire, Costruire, Consegnare; la
-   voce di menu "Come lavoriamo" porta alla prima, `#metodo`). Ogni fase ha uno schema in prospettiva: HTML e CSS
+   Si vedono le due card; il percorso di ciascuna (tre fasi, che sono anche il metodo: Capire, Costruire,
+   Consegnare) è chiuso e si apre con "Scopri il percorso", uno alla volta, a tutta larghezza sotto le card (su
+   telefono subito sotto la sua card). In fondo al percorso: chiudi o passa all'altro. Senza JavaScript restano
+   aperti tutti e due. La voce di menu "Come lavoriamo" porta alle card (`#metodo`). Ogni fase ha uno schema in prospettiva: HTML e CSS
    (`src/styles/mockups.css`, misure in em che scalano con la colonna), testi tradotti con le chiavi `mk.*`,
    decorativo (aria-hidden). Mostrano il metodo, non schermate di un prodotto.
 3. **Contatto** (`#contact`, Lime): scelta della strada e modulo.

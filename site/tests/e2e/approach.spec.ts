@@ -25,18 +25,52 @@ test('subito sotto la hero: "Cosa facciamo" con le due linee di prodotto', async
   expect(gap).toBeLessThan(2);
 });
 
-test('ogni colonna racconta tre fasi, ognuna con uno schema decorativo', async ({ page }) => {
+test('i percorsi sono chiusi: si apre solo quello scelto, poi si chiude o si passa all’altro', async ({ page }) => {
   await ready(page);
-  for (const col of await page.locator('#cosa-facciamo .line-col').all()) {
-    await expect(col.locator('.tappa')).toHaveCount(3);
-    await expect(col.locator('.tappa-k')).toHaveText([/1/, /2/, /3/]);
+  const j1 = page.locator('#journey-1'), j2 = page.locator('#journey-2');
+  const t1 = page.locator('.line-toggle[data-journey="1"]'), t2 = page.locator('.line-toggle[data-journey="2"]');
+  await expect(j1).toBeHidden();
+  await expect(j2).toBeHidden();
+  await expect(t1).toHaveAttribute('aria-expanded', 'false');
+  await expect(t1).toHaveAttribute('aria-controls', 'journey-1');
+  // ogni percorso ha tre fasi con uno schema decorativo
+  for (const j of [j1, j2]) {
+    await expect(j.locator('.tappa')).toHaveCount(3);
+    await expect(j.locator('.tappa-k')).toHaveText([/1/, /2/, /3/]);
+    for (const f of await j.locator('.mk').all()) await expect(f).toHaveAttribute('aria-hidden', 'true');
   }
-  const figs = page.locator('#cosa-facciamo .mk');
-  await expect(figs).toHaveCount(6);
-  for (const f of await figs.all()) await expect(f).toHaveAttribute('aria-hidden', 'true');
-  // "Come lavoriamo" non è più una sezione a sé: l'ancora porta alla prima fase
+  await t1.click();
+  await expect(j1).toBeVisible();
+  await expect(j2).toBeHidden();
+  await expect(t1).toHaveAttribute('aria-expanded', 'true');
+  await expect(j1).toBeFocused();
+  // in fondo: passa all'altro
+  await page.click('#journey-1 [data-journey-switch="2"]');
+  await expect(j1).toBeHidden();
+  await expect(j2).toBeVisible();
+  await expect(t2).toHaveAttribute('aria-expanded', 'true');
+  // chiudi: il fuoco torna al pulsante della card
+  await page.click('#journey-2 [data-journey-close="2"]');
+  await expect(j2).toBeHidden();
+  await expect(t2).toBeFocused();
+  await expect(t2).toHaveAttribute('aria-expanded', 'false');
+  // il pulsante della card apre e chiude
+  await t2.click();
+  await expect(j2).toBeVisible();
+  await t2.click();
+  await expect(j2).toBeHidden();
+  // "Come lavoriamo" non è più una sezione a sé: l'ancora porta alle due card
   await expect(page.locator('section#metodo, .sec--method')).toHaveCount(0);
-  await expect(page.locator('#cosa-facciamo .tappa#metodo')).toHaveCount(1);
+  await expect(page.locator('#metodo.lines')).toHaveCount(1);
+});
+
+test('senza JavaScript i due percorsi restano aperti', async ({ browser }) => {
+  const ctx = await browser.newContext({ javaScriptEnabled: false });
+  const page = await ctx.newPage();
+  await page.goto('/');
+  await expect(page.locator('#journey-1')).toBeVisible();
+  await expect(page.locator('#journey-2')).toBeVisible();
+  await ctx.close();
 });
 
 test('gli schemi si traducono con la pagina', async ({ page }) => {
@@ -50,10 +84,12 @@ test('gli schemi si traducono con la pagina', async ({ page }) => {
 
 test('ogni linea porta al contatto con la strada già scelta', async ({ page }) => {
   await ready(page);
+  await page.click('.line-toggle[data-journey="2"]');
   await page.click('#cosa-facciamo .line-link[data-interest="build"]');
   await expect(page.locator('input[name="interest"][value="build"]')).toBeChecked();
   await page.goto('/?__test=1');
   await page.waitForFunction(() => window.__DEPLOIABLE__?.ready === true);
+  await page.click('.line-toggle[data-journey="1"]');
   await page.click('#cosa-facciamo .line-link[data-interest="transform"]');
   await expect(page.locator('input[name="interest"][value="transform"]')).toBeChecked();
 });
@@ -68,7 +104,7 @@ test('navigazione: Approccio, Come lavoriamo, Contatti; niente esempi né "Cosa 
   await expect(page.locator('#cases, #build, .sec--build, .narr')).toHaveCount(0);
   if (info.project.name === 'mobile') await page.click('.nav-toggle');
   await links.nth(1).click();
-  await expect.poll(() => page.evaluate(() => Math.abs(document.getElementById('metodo')!.getBoundingClientRect().top)), { timeout: 5000 }).toBeLessThan(4);
+  await expect.poll(() => page.evaluate(() => Math.abs(document.getElementById('metodo')!.getBoundingClientRect().top - 72)), { timeout: 5000 }).toBeLessThan(4);
 });
 
 test('header: testi Forest sopra la fascia Mist e sul Lime, chiari sopra la hero', async ({ page }) => {

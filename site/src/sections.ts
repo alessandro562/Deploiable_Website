@@ -7,6 +7,7 @@ export function initSections(opts: { reduced: boolean }) {
   navMenu();
   anchors(opts.reduced);
   interestLinks();
+  journeys(opts.reduced);
   reveals(opts.reduced);
 }
 
@@ -122,11 +123,57 @@ function interestLinks() {
   });
 }
 
+/** "Cosa facciamo": i due percorsi sono chiusi, si apre solo quello scelto (uno alla volta). Il pulsante della card
+ *  apre e chiude; in fondo al percorso si chiude o si passa all'altro. Aprendo, il fuoco va al percorso e la pagina
+ *  scorre al suo inizio; chiudendo, torna al pulsante della card. */
+function journeys(reduced: boolean) {
+  const toggles = Array.from(document.querySelectorAll<HTMLButtonElement>('.line-toggle[data-journey]'));
+  const panel = (id: string) => document.getElementById(`journey-${id}`);
+  if (!toggles.length) return;
+  const go = (el: HTMLElement) => {
+    const top = el.getBoundingClientRect().top + scrollY - 72;
+    if (window.__CAPTURE__) jsScroll(top);
+    else scrollTo({ top, behavior: reduced ? 'auto' : 'smooth' });
+  };
+  const set = (open: string | null) => {
+    for (const b of toggles) {
+      const id = b.dataset.journey!;
+      const on = id === open;
+      const p = panel(id);
+      b.setAttribute('aria-expanded', String(on));
+      b.closest('.line-col')?.classList.toggle('is-open', on);
+      if (!p) continue;
+      p.hidden = !on;
+      p.classList.toggle('is-entering', on && !reduced);
+    }
+  };
+  const open = (id: string) => {
+    set(id);
+    const p = panel(id);
+    if (!p) return;
+    p.focus({ preventScroll: true });
+    go(p);
+  };
+  const close = (id: string) => {
+    set(null);
+    const b = toggles.find((t) => t.dataset.journey === id);
+    if (!b) return;
+    b.focus({ preventScroll: true });
+    go(b.closest<HTMLElement>('.lines') ?? b);
+  };
+  set(null);
+  for (const b of toggles) {
+    b.addEventListener('click', () => (b.getAttribute('aria-expanded') === 'true' ? close(b.dataset.journey!) : open(b.dataset.journey!)));
+  }
+  document.querySelectorAll<HTMLButtonElement>('[data-journey-close]').forEach((b) => b.addEventListener('click', () => close(b.dataset.journeyClose!)));
+  document.querySelectorAll<HTMLButtonElement>('[data-journey-switch]').forEach((b) => b.addEventListener('click', () => open(b.dataset.journeySwitch!)));
+}
+
 /** Titoli e blocchi entrano salendo di poco quando arrivano sullo schermo (una volta sola). */
 function reveals(reduced: boolean) {
   if (reduced || !('IntersectionObserver' in window)) return;
   const root = document.documentElement;
-  const els = Array.from(document.querySelectorAll<HTMLElement>('.sec-head, .line-head, .tappa, .line-col > .line-link, .contact-head, .signup-box'));
+  const els = Array.from(document.querySelectorAll<HTMLElement>('.sec-head, .line-col, .tappa, .contact-head, .signup-box'));
   root.classList.add('rv-on');
   const io = new IntersectionObserver(
     (entries) => {
