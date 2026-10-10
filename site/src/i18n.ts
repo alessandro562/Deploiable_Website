@@ -17,8 +17,8 @@ const TITLE = {
   en: 'Built to work. Ready to be yours.',
 };
 const SUB = {
-  it: 'Costruiti per funzionare, pronti a diventare tuoi. Deploiable è il deployer di innovazione AI-native: l’AI non è un’offerta tra le altre, è il metodo con cui la mettiamo in produzione, nei processi del cliente e nei prodotti che costruiamo.',
-  en: 'Built to work, ready to become yours. Deploiable is the AI-native innovation deployer: AI isn’t one service among many, it’s the method we use to put it into production, inside client processes and in the products we build.',
+  it: 'Costruiti per funzionare, pronti a diventare tuoi. Deploiable porta l’AI in produzione.',
+  en: 'Built to work, ready to become yours. Deploiable puts AI into production.',
 };
 
 // il "word joiner" (U+2060) tiene unito "AI-native" a capo; nei meta non serve
