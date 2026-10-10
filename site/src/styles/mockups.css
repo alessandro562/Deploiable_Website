@@ -340,3 +340,18 @@
 .is-pick .mk-score i.on { background: #10261b; }
 .mk-tag { display: inline-block; margin-left: 0.6em; font-size: 0.8em; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; background: #10261b; color: #c8f25a; padding: 0.2em 0.6em; border-radius: 99em; vertical-align: 0.15em; }
 .mk-goal--mid { bottom: -8.6em; }
+
+/* ——— 02 · tappa 2: percorso sul mercato (tappe sulla linea, curva di utilizzo) ——— */
+.mk-miles { position: relative; display: grid; grid-template-columns: repeat(4, 1fr); margin-top: 2em; }
+.mk-miles::before, .mk-miles::after { content: ''; position: absolute; top: 0.95em; height: 0.16em; left: 12.5%; }
+.mk-miles::before { right: 12.5%; background: repeating-linear-gradient(90deg, rgb(16 38 27 / 0.25) 0 0.5em, transparent 0.5em 0.9em); }
+.mk-miles::after { width: 50%; background: #10261b; }
+.mk-mile { display: grid; justify-items: center; text-align: center; gap: 0.5em; position: relative; z-index: 1; }
+.mk-dot { width: 2em; height: 2em; border-radius: 50%; display: grid; place-items: center; background: var(--mk-surface); box-shadow: inset 0 0 0 0.16em rgb(16 38 27 / 0.25); }
+.mk-dot svg { width: 1.1em; height: 1.1em; stroke: #c8f25a; fill: none; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+.mk-dot--done { background: #10261b; box-shadow: none; }
+.mk-dot--now { background: #c8f25a; box-shadow: 0 0 0 0.35em rgb(200 242 90 / 0.35), inset 0 0 0 0.16em #10261b; }
+.mk-mile .mk-b { font-size: 1em; white-space: nowrap; }
+.mk-mile .mk-s { font-size: 0.9em; }
+.mk-chart { margin-top: 1.6em; width: 58%; padding: 1em 1.1em 0.8em; border-radius: 1em; background: var(--mk-sunk); box-shadow: inset 0 0 0 0.1em var(--mk-line); }
+.mk-chart svg { display: block; width: 100%; height: 6.2em; margin-top: 0.6em; overflow: visible; }
