@@ -7,6 +7,7 @@ import { DURATION, LOCK, ROLL_DUR, createState, rollAt, stateAt, typewriter } fr
 import { PALETTES, type PaletteName } from './config/brand';
 import { Color } from 'three';
 import { onLangChange } from './i18n';
+import { Story } from './gl/story';
 import { SILENZIO_A } from './gl/timeline';
 
 // Tre livelli, come nella skill web3d-integration-patterns (Pattern 1):
@@ -30,62 +31,43 @@ export async function start(caps: Capabilities) {
   const canvas = document.querySelector<HTMLCanvasElement>('canvas.gl')!;
   const engine = new Engine(canvas, quality, testMode);
   const stage = new Stage(engine.scene);
+  // il racconto a scorrimento sotto l'hero (la sezione è nell'HTML: senza 3D resta una pagina statica)
+  const storyEl = document.querySelector<HTMLElement>('.story');
+  const story = storyEl ? new Story(storyEl, testMode) : null;
+  let darkUnder = false;
 
   const claim = Array.from(document.querySelectorAll<HTMLElement>('.claim .line'));
   const sweep = document.querySelector<HTMLElement>('.sweep')!;
   const outro = document.querySelector<HTMLElement>('.outro')!;
-  // sottotitolo, etichetta, pulsanti e navigazione entrano uno dopo l'altro
-  const outroItems = [['.sub'], ['.soon'], ['.hero-ctas']].map((sel) => sel.map((q) => document.querySelector<HTMLElement>(q)!));
-  const navEl = document.querySelector<HTMLElement>('.nav')!;
-  const heroEl = document.querySelector<HTMLElement>('.hero')!;
-  const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches || new URLSearchParams(location.search).get('motion') === 'reduced';
-  // il simbolo della hero parte quando l'intro è finita: il canvas compare sopra la versione statica
-  const heroSymbol = document.querySelector<HTMLElement>('.hero-symbol')!;
-  const heroCanvas = heroSymbol.querySelector<HTMLCanvasElement>('.hero-canvas')!;
-  setTimeout(() => {
-    import('./hero-symbol')
-      .then((m) => {
-        m.startHeroSymbol(heroSymbol, heroCanvas, reducedMotion);
-        heroSymbol.classList.add('is-live');
-      })
-      .catch(() => {});
-  }, (DURATION + 0.2) * 1000);
+  // la pillola di conferma prende il posto del modulo: entra con lui
+  const outroItems = [['.sub'], ['.soon'], ['.offer-title', '.offer'], ['.signup', '.signup-done'], ['.signup-note']].map((sel) =>
+    sel.map((q) => document.querySelector<HTMLElement>(q)!),
+  );
   const slotEl = document.querySelector<HTMLElement>('.logo-slot')!;
 
-  // Macchina da scrivere sulla seconda riga ("to production AI."): ogni lettera è uno <span>; quelle "cancellate"
-  // restano al loro posto (visibility: hidden), così la riga non si ricentra a ogni lettera e, se va a capo, va a
-  // capo sempre allo stesso punto. Il testo intero resta per i lettori di schermo. Si ricostruisce cambiando lingua
-  // (il dizionario rimette il testo nella riga, qui lo si divide di nuovo in lettere).
+  // Macchina da scrivere su "what AI can do.": ogni lettera è uno <span>; quelle "cancellate" restano al loro posto
+  // (visibility: hidden), così la parola non si ricentra a ogni lettera. Il testo intero resta per i lettori di schermo.
   const twLine = document.querySelector<HTMLElement>('.line--black')!;
-  let letters: HTMLElement[] = [];
+  const word = twLine.textContent ?? '';
+  const twVisual = document.createElement('span');
+  twVisual.className = 'tw';
+  twVisual.setAttribute('aria-hidden', 'true');
+  const letters = Array.from(word, (ch) => {
+    const el = document.createElement('span');
+    el.className = 'ch';
+    el.textContent = ch;
+    return el;
+  });
   const caret = document.createElement('i');
   caret.className = 'tw-caret';
-  const buildTw = () => {
-    const word = twLine.textContent ?? '';
-    const twVisual = document.createElement('span');
-    twVisual.className = 'tw';
-    twVisual.setAttribute('aria-hidden', 'true');
-    letters = Array.from(word, (ch) => {
-      const el = document.createElement('span');
-      el.className = 'ch';
-      el.textContent = ch;
-      return el;
-    });
-    twVisual.append(...letters, caret);
-    const twText = document.createElement('span');
-    twText.className = 'sr-only';
-    twText.textContent = word;
-    twLine.replaceChildren(twText, twVisual);
-  };
-  buildTw();
-  // posizione del cursore dopo 0, 1, … n lettere (px, misurata una volta): anche in verticale, se la riga va a capo
-  let caretX: number[] = [];
-  let caretY: number[] = [];
+  twVisual.append(...letters, caret);
+  const twText = document.createElement('span');
+  twText.className = 'sr-only';
+  twText.textContent = word;
+  twLine.replaceChildren(twText, twVisual);
+  let caretX: number[] = []; // posizione del cursore dopo 0, 1, … n lettere (px, misurata una volta)
   const measureCaret = () => {
-    const first = letters[0];
-    const y0 = first ? first.offsetTop : 0;
-    caretX = [first ? first.offsetLeft : 0, ...letters.map((l) => l.offsetLeft + l.offsetWidth)];
-    caretY = [0, ...letters.map((l) => l.offsetTop - y0)];
+    caretX = [0, ...letters.map((l) => l.offsetLeft + l.offsetWidth)];
   };
   let twShown = -1;
   let twCaret = false;
@@ -105,7 +87,6 @@ export async function start(caps: Capabilities) {
   let playing = true;
   let paused = false;
 
-  // I testi che la supergrafica non deve mai toccare (in coordinate della pagina, non della finestra).
   let scrollY = window.scrollY;
   let moved = true; // la pagina si è mossa dall'ultimo disegno: il segnaposto del logo va rimisurato
   const measureSlot = () => {
@@ -163,7 +144,7 @@ export async function start(caps: Capabilities) {
     const tw = typewriter(time, letters.length);
     if (tw.shown !== twShown || tw.caret !== twCaret) {
       for (let i = 0; i < letters.length; i++) letters[i].classList.toggle('off', i >= tw.shown);
-      caret.style.transform = `translate(${(caretX[tw.shown] ?? 0).toFixed(1)}px, ${(caretY[tw.shown] ?? 0).toFixed(1)}px)`;
+      caret.style.transform = `translateX(${(caretX[tw.shown] ?? 0).toFixed(1)}px)`;
       caret.classList.toggle('on', tw.caret);
       twShown = tw.shown;
       twCaret = tw.caret;
@@ -174,6 +155,9 @@ export async function start(caps: Capabilities) {
     // (nel silenzio fra il clic e la linea anche le luci si fermano: il fotogramma resta immobile)
     const lightT = time < LOCK[0] ? time : time < SILENZIO_A ? LOCK[0] : time - (SILENZIO_A - LOCK[0]);
     stage.setChrome(1, Math.sin(lightT * 0.35) * 0.5);
+    story?.update(time, engine.width, engine.height);
+    // sopra la fascia scura del racconto l'header passa al vetro scuro
+    if (story && story.dark !== darkUnder) document.documentElement.classList.toggle('is-dark-under', (darkUnder = story.dark));
     // camera cinematografica nell'intro: giri più ampi, che rientrano prima dell'incastro
     const amp = 1 + 0.7 * (1 - Math.min(1, Math.max(0, (time - (LOCK[2] - 0.6)) / 0.6)));
     state.az *= amp;
@@ -186,7 +170,6 @@ export async function start(caps: Capabilities) {
     // "Coming soon", modulo e nota: entrano uno dopo l'altro (80 ms), salendo di poco; finché sono invisibili
     // non si possono raggiungere col tab
     outro.style.visibility = state.outro > 0.01 ? 'visible' : 'hidden';
-    navEl.style.visibility = outro.style.visibility;
     outroItems.forEach((els, i) => {
       const p = Math.min(1, Math.max(0, state.outro * 2 - i * 0.18));
       const e = 1 - Math.pow(1 - p, 3);
@@ -194,25 +177,18 @@ export async function start(caps: Capabilities) {
         el.style.opacity = e.toFixed(3);
         el.style.transform = `translate3d(0, ${((1 - e) * 10).toFixed(2)}px, 0)`;
       }
-      // la navigazione entra con i pulsanti, solo in dissolvenza: una trasformazione farebbe da riferimento al
-      // pannello del menu (position: fixed) e lo stringerebbe nella navigazione
-      if (i === 2) navEl.style.opacity = e.toFixed(3);
     });
     // la linea: testa e coda sono percentuali della sua lunghezza
     sweep.style.clipPath = `inset(0 ${((1 - state.sweepHead) * 100).toFixed(2)}% 0 ${(state.sweepTail * 100).toFixed(2)}%)`;
-    // fuori dall'hero il canvas è coperto dalle sezioni: non si disegna (GPU e batteria a riposo)
-    if (scrollY < heroBottom || time < DURATION) engine.render();
+    engine.render(story ? () => story.render(engine.renderer, engine.width, engine.height, engine.dpr) : undefined);
   };
 
-  let heroBottom = 0;
-  const measureHero = () => (heroBottom = heroEl.offsetTop + heroEl.offsetHeight);
-  measureHero();
   measureSlot();
   // Stato iniziale: testo nascosto prima del primo disegno, poi si attende font e shader.
   stateAt(0, state);
   claim.forEach((el) => (el.style.transform = 'translate3d(0, 150%, 0)'));
   await document.fonts.ready;
-  measureHero();
+  story?.measure();
   measureCaret();
   // Riscaldamento: shader e geometrie vengono compilati e caricati sulla GPU ora, con la pagina ancora
   // nel Forest iniziale, così nessun scatto arriva all'incastro (9,2 s) o al lampo (10,2 s).
@@ -226,20 +202,13 @@ export async function start(caps: Capabilities) {
     if (!playing || paused) return;
     const dt = Math.min(deltaMs, 100) / 1000;
     time += dt;
-    // intro finita e hero fuori dallo schermo: niente da disegnare, si aggiorna solo l'header
-    if (time > DURATION + 1 && window.scrollY >= heroBottom) {
-      if (moved) measureSlot();
-      moved = false;
-      dock();
-      return;
-    }
     draw();
   });
   window.addEventListener('resize', () => {
     engine.resize();
     measureSlot();
-    measureCaret();
-    measureHero();
+      measureCaret();
+    story?.measure();
     twShown = -1; // ridisegna il cursore nella nuova posizione
     draw();
   });
@@ -260,12 +229,8 @@ export async function start(caps: Capabilities) {
     },
     { passive: true },
   );
-  // Cambiando lingua le righe cambiano: la frase si ridivide in lettere, la supergrafica si ricalcola.
-  onLangChange(() => {
-    buildTw();
-    twShown = -1;
-    requestAnimationFrame(() => (measureCaret(), measureHero(), draw()));
-  });
+  // Cambiando lingua le righe cambiano larghezza: la supergrafica e il racconto si ricalcolano.
+  onLangChange(() => requestAnimationFrame(() => (story?.measure(), draw())));
   document.addEventListener('visibilitychange', () => {
     paused = document.hidden;
     if (paused) gsap.ticker.sleep();

@@ -3,12 +3,12 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <title>Deploiable · Costruiti per funzionare. Pronti a diventare tuoi.</title>
-    <meta name="description" content="Ripensiamo i processi aziendali e sviluppiamo prodotti AI-native su misura. Dall’analisi alla messa in produzione, integrati nei sistemi che la tua azienda usa già." data-i18n-attr="content:meta.description" />
+    <title>Deploiable · Stop doing what AI can do.</title>
+    <meta name="description" content="Stop doing what AI can do. Individuiamo i processi ripetitivi, li ridisegniamo con AI e automazione e li integriamo nei sistemi che già usi. Passo dopo passo, da manuali ad autonomi. Coming soon." data-i18n-attr="content:meta.description" />
     <meta name="theme-color" content="#10261B" />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="Deploiable · Costruiti per funzionare. Pronti a diventare tuoi." data-i18n-attr="content:meta.title" />
-    <meta property="og:description" content="Ripensiamo i processi aziendali e sviluppiamo prodotti AI-native su misura. Dall’analisi alla messa in produzione, integrati nei sistemi che la tua azienda usa già." data-i18n-attr="content:og.description" />
+    <meta property="og:title" content="Deploiable · Stop doing what AI can do." data-i18n-attr="content:meta.title" />
+    <meta property="og:description" content="Individuiamo i processi ripetitivi, li ridisegniamo con AI e automazione e li integriamo nei sistemi che già usi. Passo dopo passo, da manuali ad autonomi. Coming soon." data-i18n-attr="content:og.description" />
     <meta property="og:locale" content="it_IT" />
     <meta property="og:locale:alternate" content="en_GB" />
     <meta property="og:image" content="%VITE_SITE_URL%og.jpg" />
@@ -19,19 +19,16 @@
     <noscript>
       <style>
         .line { transform: none !important; }
-        .sub, .soon, .outro > *, .nav { opacity: 1 !important; }
-        .outro, .nav { visibility: visible !important; }
+        .sub, .soon, .outro > *, .proof { opacity: 1 !important; }
+        .outro { visibility: visible !important; }
       </style>
     </noscript>
   </head>
   <body>
     <canvas class="gl" aria-hidden="true"></canvas>
     <i class="sweep" aria-hidden="true"></i>
-    <!-- supergrafica della versione statica (in quella 3D la disegna il canvas) -->
-    <div class="sg-frame" aria-hidden="true"><!-- symbol:supergraphic --></div>
     <!-- header: il logo piccolo in alto a sinistra. Nella versione 3D la camera finale lo inquadra esattamente
-         qui (il logo 3D "atterra" nel segnaposto); nella versione statica è il logo ufficiale. A destra la
-         navigazione (su telefono dietro il pulsante Menu) e la lingua. -->
+         qui (il logo 3D "atterra" nel segnaposto); nella versione statica è il logo ufficiale. -->
     <header class="top">
       <a class="logo-slot" href="./" aria-label="Deploiable"><!-- logo:static-logo --></a>
       <nav class="nav" aria-label="Navigazione principale" data-i18n-attr="aria-label:nav.label">
@@ -39,7 +36,7 @@
         <ul class="nav-list" id="nav-list">
           <li><a href="#cosa-facciamo" data-i18n="nav.approach">Approccio</a></li>
           <li><a href="#metodo" data-i18n="nav.method">Come lavoriamo</a></li>
-          <li><a class="nav-cta" href="#contact" data-i18n="nav.contact">Contatti</a></li>
+          <li><a class="nav-cta" href="#signup-email" data-i18n="nav.contact">Contatti</a></li>
         </ul>
       </nav>
     </header>
@@ -51,25 +48,42 @@
     </div>
     <main class="page">
       <section class="hero">
-        <div class="hero-symbol" aria-hidden="true">
-          <!-- symbol:hero-art -->
-          <canvas class="hero-canvas"></canvas>
-        </div>
-        <div class="hero-copy">
-          <p class="soon"><i class="soon-dot" aria-hidden="true"></i><span data-i18n="launch" lang="en">Coming soon</span></p>
-          <h1 class="claim">
-            <span class="mask"><span class="line line--light" data-i18n="claim.1">Built to work.</span></span>
-            <span class="mask"><span class="line line--black" data-i18n="claim.2">Ready to be yours.</span></span>
-          </h1>
-          <p class="sub" data-i18n="sub">Costruiti per funzionare, pronti a diventare tuoi. Deploiable porta l’AI in produzione.</p>
-          <div class="outro">
-            <div class="hero-ctas">
-              <a class="btn btn--solid" href="#contact"><span class="btn-in"><span data-i18n="cta.primary">Costruiamo ciò che serve</span><svg class="arrow" viewBox="0 0 12 12" aria-hidden="true"><path d="M1 6h9M6.5 2.5 10 6l-3.5 3.5" /></svg></span></a>
-              <a class="btn btn--line" href="#cosa-facciamo"><span class="btn-in"><span data-i18n="cta.secondary">Scopri il nostro approccio</span><svg class="arrow arrow--down" viewBox="0 0 12 12" aria-hidden="true"><path d="M6 1v9M2.5 6.5 6 10l3.5-3.5" /></svg></span></a>
+        <p class="soon"><i class="soon-dot" aria-hidden="true"></i><span data-i18n="launch" lang="en">Coming soon</span></p>
+        <h1 class="claim">
+          <span class="mask"><span class="line line--light" lang="en">Stop doing</span></span>
+          <span class="mask"><span class="line line--black" lang="en">what AI can do.</span></span>
+        </h1>
+        <p class="sub" data-i18n="sub">Portiamo l’AI in produzione: nei processi delle aziende e nei prodotti che costruiamo.</p>
+        <div class="outro">
+          <p class="offer-title" data-i18n="form.offer.title">AI process review gratuita</p>
+          <p class="offer" data-i18n="form.offer">Per le prime 20 aziende: analizziamo i tuoi processi e ti mostriamo dove l’AI rende di più.</p>
+          <form class="signup" novalidate>
+            <div class="signup-row">
+              <label class="sr-only" for="signup-email" data-i18n="form.email.label">Email aziendale</label>
+              <span class="signup-field signup-field--email"><input id="signup-email" name="email" type="email" required autocomplete="email" inputmode="email" enterkeyhint="next" spellcheck="false" placeholder="nome@azienda.it" data-i18n-attr="placeholder:form.email.placeholder" /></span>
+              <label class="sr-only" for="signup-company" data-i18n="form.company.label">Azienda</label>
+              <span class="signup-field"><input id="signup-company" name="company" type="text" required autocomplete="organization" enterkeyhint="send" placeholder="Azienda" data-i18n-attr="placeholder:form.company.placeholder" /></span>
+              <button type="submit"><span class="btn-in"><span data-i18n="form.submit">Prenota la tua AI process review</span><svg class="arrow" viewBox="0 0 12 12" aria-hidden="true"><path d="M1 6h9M6.5 2.5 10 6l-3.5 3.5" /></svg></span></button>
             </div>
-          </div>
+            <label class="consent">
+              <input id="signup-consent" name="consent" type="checkbox" value="si" required />
+              <span class="consent-box" aria-hidden="true"><svg viewBox="0 0 12 12"><path d="M2 6.3 4.8 9 10 3" /></svg></span>
+              <span class="consent-text"><span data-i18n="form.consent.pre">Ho letto l’</span><a href="privacy.html" data-i18n="form.consent.link">informativa privacy</a><span data-i18n="form.consent.post"> e acconsento al trattamento dei miei dati per essere ricontattato/a.</span></span>
+            </label>
+            <!-- trappola per i bot: invisibile alle persone -->
+            <input class="hp" name="_gotcha" type="text" tabindex="-1" autocomplete="off" aria-hidden="true" />
+          </form>
+          <p class="signup-done" aria-hidden="true"><svg class="check" viewBox="0 0 12 12"><path d="M2 6.3 4.8 9 10 3" /></svg><span data-i18n="form.done">Richiesta ricevuta.</span></p>
+          <!-- messaggi del modulo (errori, avvisi, conferma): vuoto finché non serve -->
+          <p class="signup-note" role="status" aria-live="polite"></p>
         </div>
       </section>
+
+      <!-- Fascia Forest fra la hero (Lime) e la sezione bianca: il simbolo scorre lento, in fila, a basso contrasto -->
+      <div class="band" aria-hidden="true">
+        <div class="band-track"><!-- symbol:band-mark --><!-- symbol:band-mark --><!-- symbol:band-mark --><!-- symbol:band-mark --><!-- symbol:band-mark --><!-- symbol:band-mark --><!-- symbol:band-mark --><!-- symbol:band-mark --><!-- symbol:band-mark --><!-- symbol:band-mark --><!-- symbol:band-mark --><!-- symbol:band-mark --></div>
+        <div class="band-track"><!-- symbol:band-mark --><!-- symbol:band-mark --><!-- symbol:band-mark --><!-- symbol:band-mark --><!-- symbol:band-mark --><!-- symbol:band-mark --><!-- symbol:band-mark --><!-- symbol:band-mark --><!-- symbol:band-mark --><!-- symbol:band-mark --><!-- symbol:band-mark --><!-- symbol:band-mark --></div>
+      </div>
 
       <!-- Cosa facciamo: le due linee di prodotto, subito sotto la hero. Ogni colonna racconta il suo servizio in tre
            fasi (Capire, Costruire, Consegnare: è anche il nostro metodo), ognuna con uno schema in prospettiva.
@@ -120,7 +134,7 @@
               <button type="button" class="step-btn" data-step="3"><span class="step-num">3</span><span data-i18n="steps.3">x</span></button>
             </nav>
             <div class="tappa is-current" data-phase="1">
-              <p class="tappa-k" data-i18n="phase.1">Fase 1 · Capire</p>
+              <p class="tappa-k" data-i18n="phase.1">Phase 1 · Discovery</p>
               <h4 class="tappa-t" data-i18n="tappa.1.1.t">Troviamo dove l’AI conviene davvero.</h4>
               <p class="tappa-s" data-i18n="tappa.1.1.s">Mappiamo il processo con chi ci lavora, misuriamo la situazione di partenza (tempi, errori, costi) e stimiamo il beneficio prima di partire. L’obiettivo si concorda ora e si verifica a fine pilota.</p>
               <div class="tappa-fig">
@@ -169,7 +183,7 @@
               </div>
             </div>
             <div class="tappa" data-phase="2">
-              <p class="tappa-k" data-i18n="phase.2">Fase 2 · Costruire</p>
+              <p class="tappa-k" data-i18n="phase.2">Phase 2 · Engineering</p>
               <h4 class="tappa-t" data-i18n="tappa.1.2.t">La portiamo in produzione.</h4>
               <p class="tappa-s" data-i18n="tappa.1.2.s">Integriamo l’agente nei sistemi che usate già (email, ERP, CRM), con controlli umani sulle decisioni, test su dati reali e monitoraggio continuo. Restiamo accanto al team dopo l’avvio.</p>
               <div class="tappa-fig">
@@ -218,7 +232,7 @@
               </div>
             </div>
             <div class="tappa" data-phase="3">
-              <p class="tappa-k" data-i18n="phase.3">Fase 3 · Consegnare</p>
+              <p class="tappa-k" data-i18n="phase.3">Phase 3 · Deployment</p>
               <h4 class="tappa-t" data-i18n="tappa.1.3.t">Se le automazioni non bastano, un prodotto su misura.</h4>
               <p class="tappa-s" data-i18n="tappa.1.3.s">Costruiamo un’applicazione dedicata: requisiti condivisi, sviluppo a rilasci, integrazione nei sistemi dell’azienda. Alla consegna il cliente riceve codice, documentazione e formazione del team.</p>
               <div class="tappa-fig">
@@ -267,7 +281,7 @@
                 <button type="button" class="step-prev" data-dir="-1"><span data-i18n="steps.prev">Fase precedente</span></button>
                 <button type="button" class="step-next" data-dir="1"><span data-i18n="steps.next">Fase successiva</span></button>
               </div>
-<a class="line-link" href="#contact" data-interest="transform"><span data-i18n="line.1.link">Parliamo di un tuo processo</span><svg class="arrow" viewBox="0 0 12 12" aria-hidden="true"><path d="M1 6h9M6.5 2.5 10 6l-3.5 3.5" /></svg></a>
+<a class="line-link" href="#signup-email" data-interest="transform"><span data-i18n="line.1.link">Parliamo di un tuo processo</span><svg class="arrow" viewBox="0 0 12 12" aria-hidden="true"><path d="M1 6h9M6.5 2.5 10 6l-3.5 3.5" /></svg></a>
             </div>
           </div>
           <div class="journey" id="journey-2" role="region" aria-labelledby="line-2-title" tabindex="-1">
@@ -277,7 +291,7 @@
               <button type="button" class="step-btn" data-step="3"><span class="step-num">3</span><span data-i18n="steps.3">x</span></button>
             </nav>
             <div class="tappa is-current" data-phase="1">
-              <p class="tappa-k" data-i18n="phase.1">Fase 1 · Capire</p>
+              <p class="tappa-k" data-i18n="phase.1">Phase 1 · Discovery</p>
               <h4 class="tappa-t" data-i18n="tappa.2.1.t">Troviamo la nicchia.</h4>
               <p class="tappa-s" data-i18n="tappa.2.1.s">Valutiamo le nicchie su tre criteri: problema ricorrente, urgenza e chi paga. Prima di costruire verifichiamo la domanda con interviste e aziende pilota.</p>
               <div class="tappa-fig">
@@ -322,7 +336,7 @@
               </div>
             </div>
             <div class="tappa" data-phase="2">
-              <p class="tappa-k" data-i18n="phase.2">Fase 2 · Costruire</p>
+              <p class="tappa-k" data-i18n="phase.2">Phase 2 · Engineering</p>
               <h4 class="tappa-t" data-i18n="tappa.2.2.t">Lo portiamo sul mercato.</h4>
               <p class="tappa-s" data-i18n="tappa.2.2.s">Realizziamo il prodotto AI-native, lo lanciamo e lo facciamo crescere fino a una base di clienti paganti. Seguiamo utilizzo e feedback a ogni rilascio.</p>
               <div class="tappa-fig">
@@ -375,7 +389,7 @@
               </div>
             </div>
             <div class="tappa" data-phase="3">
-              <p class="tappa-k" data-i18n="phase.3">Fase 3 · Consegnare</p>
+              <p class="tappa-k" data-i18n="phase.3">Phase 3 · Deployment</p>
               <h4 class="tappa-t" data-i18n="tappa.2.3.t">Lo acquista un’impresa che vuole innovare.</h4>
               <p class="tappa-s" data-i18n="tappa.2.3.s">L’impresa compra quando il prodotto funziona e ha già clienti, senza avviare un progetto interno: riceve prodotto, codice, dati, clienti e roadmap, con affiancamento per il passaggio.</p>
               <div class="tappa-fig">
@@ -427,58 +441,44 @@
                 <button type="button" class="step-prev" data-dir="-1"><span data-i18n="steps.prev">Fase precedente</span></button>
                 <button type="button" class="step-next" data-dir="1"><span data-i18n="steps.next">Fase successiva</span></button>
               </div>
-<a class="line-link" href="#contact" data-interest="build"><span data-i18n="line.2.link">Parliamo di un tuo prodotto</span><svg class="arrow" viewBox="0 0 12 12" aria-hidden="true"><path d="M1 6h9M6.5 2.5 10 6l-3.5 3.5" /></svg></a>
+<a class="line-link" href="#signup-email" data-interest="build"><span data-i18n="line.2.link">Parliamo di un tuo prodotto</span><svg class="arrow" viewBox="0 0 12 12" aria-hidden="true"><path d="M1 6h9M6.5 2.5 10 6l-3.5 3.5" /></svg></a>
             </div>
           </div>
         </div>
       </section>
 
           <!-- Contatto: due strade, un modulo. La strada scelta arriva con la richiesta (campo interest). -->
-      <section class="sec sec--contact" id="contact" data-surface="lime" aria-labelledby="contact-title">
-        <div class="contact">
-          <div class="contact-head">
-            <p class="kicker" data-i18n="contact.k">Contatti</p>
-            <h2 class="contact-title" id="contact-title" data-i18n="contact.t">Cosa vuoi trasformare?</h2>
-            <p class="contact-lead" data-i18n="contact.s">Che tu voglia migliorare un processo esistente o costruire un nuovo prodotto AI, troviamo insieme l’approccio giusto.</p>
-            <div class="offer-box">
-              <p class="offer-title" data-i18n="form.offer.title">AI process review gratuita</p>
-              <p class="offer" data-i18n="form.offer">Per le prime 20 aziende: analizziamo i tuoi processi e ti mostriamo dove l’AI rende di più.</p>
+      <!-- Il racconto: tre step e la chiusura. Con il 3D i testi restano fermi e il simbolo si costruisce
+           scorrendo (src/gl/story.ts); senza, è una sezione statica. -->
+      <section class="story" aria-label="Come lavoriamo" data-i18n-attr="aria-label:story.label">
+        <div class="story-pin">
+          <!-- colonna di testo: i tre step occupano lo stesso posto (con il 3D ne compare uno alla volta),
+               sotto la barra di avanzamento -->
+          <div class="story-copy">
+            <div class="story-acts">
+              <article class="act">
+                <p class="act-kicker" data-i18n="story.1k">Analisi</p>
+                <h2 class="act-title" data-i18n="story.1">Troviamo il lavoro ripetitivo.</h2>
+                <p class="act-sub" data-i18n="story.1s">Mappiamo i processi e individuiamo quelli dove AI e automazione fanno risparmiare più tempo ed errori.</p>
+              </article>
+              <article class="act">
+                <p class="act-kicker" data-i18n="story.2k">Riprogettazione</p>
+                <h2 class="act-title" data-i18n="story.2">Lo ridisegniamo con l’AI.</h2>
+                <p class="act-sub" data-i18n="story.2s">Ripensiamo il processo attorno ad AI e automazione e lo colleghiamo ai sistemi che già usi: ERP, CRM, email, documenti.</p>
+              </article>
+              <article class="act">
+                <p class="act-kicker" data-i18n="story.3k">Autonomia</p>
+                <h2 class="act-title" data-i18n="story.3">Lo rendiamo autonomo, un passo alla volta.</h2>
+                <p class="act-sub" data-i18n="story.3s">Prima l’AI assiste le persone, poi esegue da sola dove è sicuro farlo. Ogni passaggio è misurato con i KPI.</p>
+              </article>
             </div>
+            <div class="story-meter" aria-hidden="true"><i></i><i></i><i></i></div>
           </div>
-          <div class="signup-box">
-            <form class="signup" novalidate>
-              <fieldset class="paths">
-                <legend class="paths-legend" data-i18n="contact.legend">Da dove partiamo?</legend>
-                <div class="paths-grid">
-                  <label class="path">
-                    <input type="radio" name="interest" value="transform" />
-                    <span class="path-box"><span class="path-num" aria-hidden="true">01</span><span class="path-title" data-i18n="path.transform">Trasformare un processo</span><span class="path-text" data-i18n="path.transform.s">Ridisegnare un processo esistente con AI e automazione.</span></span>
-                  </label>
-                  <label class="path">
-                    <input type="radio" name="interest" value="build" />
-                    <span class="path-box"><span class="path-num" aria-hidden="true">02</span><span class="path-title" data-i18n="path.build">Costruire un prodotto AI</span><span class="path-text" data-i18n="path.build.s">Progettare e sviluppare un’applicazione o un prodotto AI-⁠native.</span></span>
-                  </label>
-                </div>
-              </fieldset>
-              <div class="signup-row">
-                <label class="sr-only" for="signup-email" data-i18n="form.email.label">Email aziendale</label>
-                <span class="signup-field signup-field--email"><input id="signup-email" name="email" type="email" required autocomplete="email" inputmode="email" enterkeyhint="next" spellcheck="false" placeholder="nome@azienda.it" data-i18n-attr="placeholder:form.email.placeholder" /></span>
-                <label class="sr-only" for="signup-company" data-i18n="form.company.label">Azienda</label>
-                <span class="signup-field"><input id="signup-company" name="company" type="text" required autocomplete="organization" enterkeyhint="send" placeholder="Azienda" data-i18n-attr="placeholder:form.company.placeholder" /></span>
-                  <button type="submit"><span class="btn-in"><span data-i18n="form.submit">Parliamone</span><svg class="arrow" viewBox="0 0 12 12" aria-hidden="true"><path d="M1 6h9M6.5 2.5 10 6l-3.5 3.5" /></svg></span></button>
-              </div>
-              <label class="consent">
-                <input id="signup-consent" name="consent" type="checkbox" value="si" required />
-                <span class="consent-box" aria-hidden="true"><svg viewBox="0 0 12 12"><path d="M2 6.3 4.8 9 10 3" /></svg></span>
-                <span class="consent-text"><span data-i18n="form.consent.pre">Ho letto l’</span><a href="privacy.html" data-i18n="form.consent.link">informativa privacy</a><span data-i18n="form.consent.post"> e acconsento al trattamento dei miei dati per essere ricontattato/a.</span></span>
-              </label>
-              <!-- trappola per i bot: invisibile alle persone -->
-              <input class="hp" name="_gotcha" type="text" tabindex="-1" autocomplete="off" aria-hidden="true" />
-            </form>
-            <p class="signup-done" aria-hidden="true"><svg class="check" viewBox="0 0 12 12"><path d="M2 6.3 4.8 9 10 3" /></svg><span data-i18n="form.done">Richiesta ricevuta.</span></p>
-            <!-- messaggi del modulo (errori, avvisi, conferma): vuoto finché non serve -->
-            <p class="signup-note" role="status" aria-live="polite"></p>
-          </div>
+          <article class="act act--end">
+            <p class="act-claim" lang="en"><span>Stop doing </span><strong>what AI can do.</strong></p>
+            <p class="act-note" data-i18n="end.note">Dai bisogni che troviamo nelle aziende nascono anche i nostri prodotti AI-native.</p>
+            <a class="act-cta" href="#signup-email"><span data-i18n="form.submit">Prenota la tua AI process review</span></a>
+          </article>
         </div>
       </section>
     </main>

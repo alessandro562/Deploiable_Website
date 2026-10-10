@@ -9,6 +9,7 @@ export function initSections(opts: { reduced: boolean }) {
   interestLinks();
   journeys(opts.reduced);
   reveals(opts.reduced);
+  if (!opts.reduced) cards3d();
 }
 
 /** Sotto la sezione scura l'header è chiaro, sotto quella chiara (Mist) è Forest, sotto il contatto torna Forest. */
@@ -231,4 +232,37 @@ function reveals(reduced: boolean) {
     el.classList.add('rv');
     io.observe(el);
   });
+}
+
+/** Schemi come card 3D: l'inclinazione segue lo scorrimento (--p: 1 al centro dello schermo) e, su desktop, il
+ *  puntatore (--mx, --my fra -1 e 1). Si aggiorna solo la card della fase in vista. */
+function cards3d() {
+  let raf = 0;
+  const update = () => {
+    raf = 0;
+    const vh = innerHeight;
+    document.querySelectorAll<HTMLElement>('.tappa.is-current .tappa-fig').forEach((fig) => {
+      const r = fig.getBoundingClientRect();
+      if (r.bottom < 0 || r.top > vh) return;
+      const d = Math.abs(r.top + r.height / 2 - vh / 2) / (vh * 0.65);
+      fig.style.setProperty('--p', Math.max(0, 1 - d).toFixed(3));
+    });
+  };
+  const queue = () => (raf ||= requestAnimationFrame(update));
+  addEventListener('scroll', queue, { passive: true });
+  addEventListener('resize', queue);
+  document.addEventListener('click', () => setTimeout(queue, 50));
+  if (matchMedia('(pointer: fine)').matches) {
+    document.addEventListener('pointermove', (e) => {
+      const fig = (e.target as HTMLElement).closest?.<HTMLElement>('.tappa-fig');
+      document.querySelectorAll<HTMLElement>('.tappa-fig').forEach((f) => {
+        if (f !== fig) f.style.removeProperty('--mx'), f.style.removeProperty('--my');
+      });
+      if (!fig) return;
+      const r = fig.getBoundingClientRect();
+      fig.style.setProperty('--mx', (((e.clientX - r.left) / r.width) * 2 - 1).toFixed(3));
+      fig.style.setProperty('--my', (((e.clientY - r.top) / r.height) * 2 - 1).toFixed(3));
+    });
+  }
+  queue();
 }

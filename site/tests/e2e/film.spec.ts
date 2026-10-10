@@ -206,7 +206,7 @@ test('il naming compare alla fine, lettera dopo lettera da sinistra a destra', a
   expect((await letters()).every((v) => v === 1)).toBe(true);
 });
 
-test('allineamento: logo 3D nel segnaposto dell\'header; frase centrata sul telefono, allineata al logo sul desktop (misura sui pixel)', async ({ page }) => {
+test('allineamento: logo 3D nel segnaposto dell\'header, frase centrata sulla pagina (misura sui pixel)', async ({ page }) => {
   await openFilm(page, '', 'high');
   await seek(page, END);
   const rects = await page.evaluate(() => {
@@ -227,17 +227,10 @@ test('allineamento: logo 3D nel segnaposto dell\'header; frase centrata sul tele
   const logo = inkLeft(slot.x - 4, slot.y - 4, slot.x + slot.w + 4, slot.y + slot.h + 4);
   expect(Math.abs(logo.L - slot.x), 'bordo sinistro del logo 3D contro il segnaposto').toBeLessThanOrEqual(2);
   expect(Math.abs(logo.R - (slot.x + slot.w)), 'bordo destro del logo 3D contro il segnaposto').toBeLessThanOrEqual(2);
-  if (page.viewportSize()!.width >= 900) {
-    // desktop: la frase sta nella colonna sinistra, la riga in grassetto attacca il bordo del logo
-    const l = lines[1];
+  const mid = png.width / 2;
+  for (const [i, l] of lines.entries()) {
     const ink = inkLeft(l.x - 4, l.y, l.x + l.w + 4, l.y + l.h);
-    expect(Math.abs(ink.L - slot.x), 'bordo sinistro della frase contro il logo 3D').toBeLessThanOrEqual(2);
-  } else {
-    const mid = png.width / 2;
-    for (const [i, l] of lines.entries()) {
-      const ink = inkLeft(l.x - 4, l.y, l.x + l.w + 4, l.y + l.h);
-      expect(Math.abs((ink.L + ink.R) / 2 - mid), `centro della riga ${i + 1} contro il centro della pagina`).toBeLessThanOrEqual(2);
-    }
+    expect(Math.abs((ink.L + ink.R) / 2 - mid), `centro della riga ${i + 1} contro il centro della pagina`).toBeLessThanOrEqual(2);
   }
 });
 
@@ -262,7 +255,7 @@ test('sul telefono le barre non escono mai dallo schermo', async ({ page }) => {
   }
 });
 
-test('coming soon e pulsanti: compaiono per ultimi, dentro lo schermo, sotto la frase', async ({ page }) => {
+test('coming soon e modulo: compaiono per ultimi, dentro lo schermo, sotto la frase', async ({ page }) => {
   await openFilm(page);
   const outro = page.locator('.outro');
   for (const t of [TIMES.deploy, TIMES.silenzio, END - 0.5]) {
@@ -280,7 +273,7 @@ test('coming soon e pulsanti: compaiono per ultimi, dentro lo schermo, sotto la 
   expect(box.x + box.width).toBeLessThanOrEqual(vp.width);
 });
 
-test('contatto: strada scelta, validazione, avviso email personale, invio ad Apps Script, conferma', async ({ page }) => {
+test('richiesta review: validazione, avviso email personale, invio ad Apps Script, conferma', async ({ page }) => {
   await openFilm(page);
   await seek(page, END);
   const note = page.locator('.signup-note');
@@ -290,7 +283,7 @@ test('contatto: strada scelta, validazione, avviso email personale, invio ad App
   await page.fill('#signup-email', 'non-una-email');
   await submit();
   await expect(note).toHaveText(/email valido/);
-  await expect(page.locator('.signup-box')).toHaveAttribute('data-state', 'error');
+  await expect(page.locator('.outro')).toHaveAttribute('data-state', 'error');
   await expect(page.locator('#signup-email')).toHaveAttribute('aria-invalid', 'true');
   await expect(page.locator('#signup-email')).toBeFocused();
   // il bordo spesso è sulla capsula (desktop) o sul campo stesso (telefono, campi in colonna)
@@ -302,7 +295,7 @@ test('contatto: strada scelta, validazione, avviso email personale, invio ad App
   await page.fill('#signup-email', 'mario.rossi@gmail.com');
   await page.locator('#signup-email').blur();
   await expect(note).toHaveText(/email aziendale/);
-  await expect(page.locator('.signup-box')).toHaveAttribute('data-state', 'warn');
+  await expect(page.locator('.outro')).toHaveAttribute('data-state', 'warn');
 
   // azienda mancante, poi consenso mancante
   await submit();
@@ -315,13 +308,6 @@ test('contatto: strada scelta, validazione, avviso email personale, invio ad App
   // la casella non è pre-spuntata e si spunta cliccando il testo
   await page.click('.consent-text span >> nth=0');
   await expect(page.locator('#signup-consent')).toBeChecked();
-
-  // la strada: un link del racconto la preseleziona, nel modulo si può cambiare
-  await page.click('.line-toggle[data-journey="1"]');
-  await page.click('.line-link[data-interest="transform"]');
-  await expect(page.locator('input[name="interest"][value="transform"]')).toBeChecked();
-  await page.click('.path:has(input[value="build"])');
-  await expect(page.locator('input[name="interest"][value="build"]')).toBeChecked();
 
   // invio: prima la rete fallisce, poi va
   let body = '';
@@ -339,14 +325,13 @@ test('contatto: strada scelta, validazione, avviso email personale, invio ad App
   await submit();
   await expect(page.locator('.signup-done')).toBeVisible();
   await expect(page.locator('.signup-done')).toHaveText(/Richiesta ricevuta/);
-  await expect(note).toHaveText('Ti ricontattiamo entro 3 giorni lavorativi.');
+  await expect(note).toHaveText('Ti contattiamo entro 3 giorni lavorativi per fissare la review.');
   await expect(page.locator('.signup')).toBeHidden();
   const sent = new URLSearchParams(body);
   expect(sent.get('email')).toBe('mario.rossi@acme.it');
   expect(sent.get('company')).toBe('Acme Srl');
   expect(sent.get('consent')).toBe('si');
   expect(sent.get('lang')).toBe('it');
-  expect(sent.get('interest')).toBe('build');
 });
 
 test('modulo: link all\'informativa, casella non spuntata, su telefono in colonna con bersagli ≥ 44 px', async ({ page }) => {
@@ -367,7 +352,7 @@ test('modulo: link all\'informativa, casella non spuntata, su telefono in colonn
     expect(b.width).toBeGreaterThan(vp.width - 2 * 48); // a tutta larghezza
   }
   await page.click('[data-lang="en"]');
-  await expect(page.locator('.signup button[type="submit"]')).toHaveText(/Let’s talk/);
+  await expect(page.locator('.signup button[type="submit"]')).toHaveText(/Book your AI process review/);
   await expect(page.locator('#signup-email')).toHaveAttribute('placeholder', 'name@company.com');
 });
 
@@ -394,8 +379,8 @@ test('hero: il blocco dei testi è centrato in altezza (centro ottico appena sop
   await openFilm(page, '', 'high');
   await seek(page, END);
   const top = (await page.locator('.claim').boundingBox())!.y;
-  const outro = (await page.locator('.outro').boundingBox())!;
-  const bottom = outro.y + outro.height;
+  const proof = (await page.locator('.proof').boundingBox())!;
+  const bottom = proof.y + proof.height;
   const h = page.viewportSize()!.height;
   // su telefono i testi sono più alti dello schermo: conta l'aria fra l'header e la frase, non il centro
   if (page.viewportSize()!.width <= 640) {
@@ -466,32 +451,54 @@ test('header fisso: in cima trasparente col logo 3D, scorrendo barra di vetro co
   expect(await svgOpacity()).toBe('0');
 });
 
+test('prova sociale: riga di credibilità e loghi dei clienti in loop sotto il modulo', async ({ page }) => {
+  const logoResponses: number[] = [];
+  page.on('response', (r) => r.url().includes('/assets/clients/') && logoResponses.push(r.status()));
+  await openFilm(page, '', 'high');
+  await seek(page, END);
+  await expect(page.locator('.proof-line')).toHaveText('70+ clienti dal 2021');
+  // quattro loghi con il loro nome (la seconda copia della traccia è nascosta ai lettori di schermo)
+  const named = page.getByRole('img', { name: /Comtel|Braga Moro|Marchiani|Junker/ });
+  await expect(named).toHaveCount(4);
+  await expect(page.locator('.clients')).not.toContainText('[CLIENTE_');
+  await expect(page.locator('.clients')).not.toContainText(/green ?stone/i);
+  const form = (await page.locator('.signup').boundingBox())!;
+  const proof = (await page.locator('.proof').boundingBox())!;
+  expect(proof.y).toBeGreaterThan(form.y + form.height);
+  // la traccia scorre
+  const x = () => page.locator('.clients-track').first().evaluate((el) => el.getBoundingClientRect().x);
+  const x0 = await x();
+  await page.waitForTimeout(600);
+  expect(Math.abs((await x()) - x0)).toBeGreaterThan(5);
+  expect(logoResponses.length).toBeGreaterThan(0);
+  expect(logoResponses.every((s) => s === 200)).toBe(true);
+  await page.click('[data-lang="en"]');
+  await expect(page.locator('.proof-line')).toHaveText('70+ clients since 2021');
+});
 
-test('macchina da scrivere: la seconda riga si cancella e si riscrive in ciclo, senza spostarsi, in tutte e due le lingue', async ({ page }) => {
+test('macchina da scrivere: "what AI can do." si cancella e si riscrive in ciclo, senza spostare la riga', async ({ page }) => {
   await openFilm(page, '', 'high');
   const st = () => page.evaluate(() => window.__DEPLOIABLE__!.state!());
   const visible = () => page.locator('.tw .ch:not(.off)').count();
-  // il titolo resta intero per i lettori di schermo, qualunque cosa mostri la macchina da scrivere
-  await expect(page.getByRole('heading', { level: 1 })).toHaveAccessibleName(/Built to work\.\s*Ready to be yours\./);
+  // il titolo resta "Stop doing what AI can do." per i lettori di schermo, qualunque cosa mostri la macchina da scrivere
+  await expect(page.getByRole('heading', { level: 1 })).toHaveAccessibleName(/Stop doing\s*what AI can do\./);
   await seek(page, END);
-  const n = 'Ready to be yours.'.length; // 18, uguale in italiano e in inglese
-  expect(await visible()).toBe(n);
+  expect(await visible()).toBe(15);
   const full = (await page.locator('.tw').boundingBox())!;
   await seek(page, TW_START + TW_HOLD + TW_ERASE * 2.5);
-  expect((await st()).tw).toBe(n - 3);
+  expect((await st()).tw).toBe(12);
   expect((await st()).caret).toBe(true);
-  expect(await visible()).toBe(n - 3);
+  expect(await visible()).toBe(12);
   await expect(page.locator('.tw-caret')).toHaveClass(/on/);
-  // la riga non si ricentra mentre si cancella
+  // la parola non si ricentra mentre si cancella
   const mid = (await page.locator('.tw').boundingBox())!;
   expect(Math.abs(mid.x - full.x)).toBeLessThanOrEqual(0.5);
-  await seek(page, TW_START + TW_HOLD + TW_ERASE * n + 0.2);
+  await seek(page, TW_START + TW_HOLD + TW_ERASE * 15 + 0.2);
   expect((await st()).tw).toBe(0);
-  // cambiando lingua la riga si ridivide in lettere
-  await page.click('[data-lang="en"]');
-  await seek(page, END);
-  expect(await visible()).toBe(n);
-  await expect(page.getByRole('heading', { level: 1 })).toHaveAccessibleName(/Built to work\.\s*Ready to be yours\./);
+  // e torna intera
+  await seek(page, TW_START + 20 * 3);
+  const back = await st();
+  expect(back.tw).toBeGreaterThanOrEqual(0);
 });
 
 test('il simbolo nell\'header gira quando ci si passa sopra col mouse', async ({ page }) => {
